@@ -229,6 +229,8 @@ public:
 
     int32   ReadRawData( char *buffer, int32 length );
 
+    bool    ReadRawData(std::string& buf);
+
     void    ReadSequenceInfo( int32 &nSeqNrIn, int32 &nSeqNrOutAck );
 
     void    ReadCmdInfo( democmdinfo_t& info );

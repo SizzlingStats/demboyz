@@ -124,6 +124,32 @@ int32 CDemoFile::ReadRawData( char *buffer, int32 length )
     return size;
 }
 
+bool CDemoFile::ReadRawData(std::string& buf)
+{
+    if (!m_fileBuffer.size())
+    {
+        return false;
+    }
+
+    // read length of data block
+    int32 size = *(int32 *)(&m_fileBuffer[m_fileBufferPos]);
+    m_fileBufferPos += sizeof(int32);
+
+    if (size < 0)
+    {
+        fprintf(stderr, "CDemoFile::ReadRawData: invalid size (%i).\n", size);
+        return false;
+    }
+
+    buf.resize(size);
+
+    // read data into buffer
+    memcpy(&buf[0], &m_fileBuffer[m_fileBufferPos], size);
+    m_fileBufferPos += size;
+
+    return true;
+}
+
 bool CDemoFile::Open( const char *name )
 {
     Close();

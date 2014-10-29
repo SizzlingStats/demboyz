@@ -27,7 +27,9 @@
 #include <assert.h>
 #include "demofile.h"
 
-CDemoFile::CDemoFile()
+CDemoFile::CDemoFile():
+    m_DemoHeader(),
+    m_fileBufferPos(0)
 {
 }
 
@@ -56,7 +58,7 @@ void CDemoFile::ReadCmdInfo( democmdinfo_t& info )
     m_fileBufferPos += sizeof( democmdinfo_t );
 }
 
-void CDemoFile::ReadCmdHeader( unsigned char& cmd, int32& tick, unsigned char& playerSlot )
+void CDemoFile::ReadCmdHeader( unsigned char& cmd, int32& tick )
 {
     if ( !m_fileBuffer.size() )
         return;
@@ -77,10 +79,6 @@ void CDemoFile::ReadCmdHeader( unsigned char& cmd, int32& tick, unsigned char& p
     // Read the timestamp
     tick = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
     m_fileBufferPos += sizeof( int32 );
-
-    // read playerslot
-    playerSlot = *( unsigned char * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( unsigned char );
 }
 
 int32 CDemoFile::ReadUserCmd( char *buffer, int32 &size )
@@ -164,6 +162,14 @@ bool CDemoFile::Open( const char *name )
             return false;
         }
 
+        const int32 signOnLength = m_DemoHeader.signonlength;
+        if (signOnLength > 0)
+        {
+            m_signOnData.resize(signOnLength);
+            fread(&m_signOnData[0], 1, signOnLength, fp);
+            Length -= signOnLength;
+        }
+
         m_fileBuffer.resize( Length );
         fread( &m_fileBuffer[ 0 ], 1, Length, fp );
 
@@ -186,7 +192,8 @@ bool CDemoFile::Open( const char *name )
 void CDemoFile::Close()
 {
     m_szFileName.clear();
+    m_signOnData.clear();
+    m_fileBuffer.clear();
 
     m_fileBufferPos = 0;
-    m_fileBuffer.clear();
 }

@@ -34,7 +34,7 @@
 #include <inttypes.h>
 
 #define DEMO_HEADER_ID      "HL2DEMO"
-#define DEMO_PROTOCOL       4
+#define DEMO_PROTOCOL       3
 
 #if !defined( MAX_OSPATH )
 #define MAX_OSPATH      260         // max length of a filesystem pathname
@@ -92,7 +92,7 @@ struct demoheader_t
 #define FDEMO_USE_ANGLES2   ( 1 << 1 )
 #define FDEMO_NOINTERP      ( 1 << 2 )  // don't interpolate between this an last view
 
-#define MAX_SPLITSCREEN_CLIENTS 2
+#define MAX_SPLITSCREEN_CLIENTS 1
 
 struct QAngle
 {
@@ -218,11 +218,11 @@ struct democmdinfo_t
     Split_t         u[ MAX_SPLITSCREEN_CLIENTS ];
 };
 
-class CDemoFile  
+class CDemoFile
 {
 public:
     CDemoFile();
-    virtual ~CDemoFile();
+    ~CDemoFile();
 
     bool    Open( const char *name );
     void    Close();
@@ -233,19 +233,32 @@ public:
 
     void    ReadCmdInfo( democmdinfo_t& info );
 
-    void    ReadCmdHeader( unsigned char &cmd, int32 &tick, unsigned char& playerSlot );
+    void    ReadCmdHeader( unsigned char &cmd, int32 &tick );
     
     int32   ReadUserCmd( char *buffer, int32 &size );
 
-    demoheader_t *ReadDemoHeader();
+    const demoheader_t *GetDemoHeader() const;
 
-public:
+    const std::string& GetSignOnData() const;
+
+private:
     demoheader_t    m_DemoHeader;  //general demo info
 
     std::string m_szFileName;
+    std::string m_signOnData;
+    std::string m_fileBuffer;
 
     size_t m_fileBufferPos;
-    std::string m_fileBuffer;
 };
+
+inline const demoheader_t *CDemoFile::GetDemoHeader() const
+{
+    return &m_DemoHeader;
+}
+
+inline const std::string& CDemoFile::GetSignOnData() const
+{
+    return m_signOnData;
+}
 
 #endif // DEMOFILE_H

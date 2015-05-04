@@ -27,127 +27,167 @@
 #include <assert.h>
 #include "demofile.h"
 
-CDemoFile::CDemoFile():
-    m_DemoHeader(),
-    m_fileBufferPos(0)
+DemoSequenceReader::DemoSequenceReader(const std::vector<unsigned char>& sequenceData):
+    m_sequenceData(sequenceData),
+    m_dataReadOffset(0)
 {
 }
 
-CDemoFile::~CDemoFile()
+int32 DemoSequenceReader::ReadRawData(char *buffer, int32 length)
 {
-    Close();
-}
-
-void CDemoFile::ReadSequenceInfo( int32 &nSeqNrIn, int32 &nSeqNrOut )
-{
-    if ( !m_fileBuffer.size() )
-        return;
-
-    nSeqNrIn = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( int32 );
-    nSeqNrOut = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( int32 );
-}
-
-void CDemoFile::ReadCmdInfo( democmdinfo_t& info )
-{
-    if ( !m_fileBuffer.size() )
-        return;
-
-    memcpy( &info, &m_fileBuffer[ m_fileBufferPos ], sizeof( democmdinfo_t ) );
-    m_fileBufferPos += sizeof( democmdinfo_t );
-}
-
-void CDemoFile::ReadCmdHeader( unsigned char& cmd, int32& tick )
-{
-    if ( !m_fileBuffer.size() )
-        return;
-
-    // Read the command
-    cmd = *( unsigned char * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( unsigned char );
-    
-    if ( cmd <=0 )
+    if (m_sequenceData.empty())
     {
-        fprintf( stderr, "CDemoFile::ReadCmdHeader: Missing end tag in demo file.\n");
-        cmd = dem_stop;
-        return;
+        return 0;
     }
 
-    assert( cmd >= 1 && cmd <= dem_lastcmd );
-
-    // Read the timestamp
-    tick = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( int32 );
-}
-
-int32 CDemoFile::ReadUserCmd( char *buffer, int32 &size )
-{
-    if ( !m_fileBuffer.size() )
-        return 0;
-
-    int32 outgoing_sequence = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( int32 );
-    
-    size = ReadRawData( buffer, size );
-
-    return outgoing_sequence;
-}
-
-int32 CDemoFile::ReadRawData( char *buffer, int32 length )
-{
-    if ( !m_fileBuffer.size() )
-        return 0;
+    const unsigned char* sequenceData = m_sequenceData.data();
+    size_t currentReadOffset = m_dataReadOffset;
 
     // read length of data block
-    int32 size = *( int32 * )( &m_fileBuffer[ m_fileBufferPos ] );
-    m_fileBufferPos += sizeof( int32 );
-    
-    if ( buffer && (length < size) )
+    const int32 size = *reinterpret_cast<const int32*>(sequenceData + currentReadOffset);
+    currentReadOffset += sizeof(int32);
+
+    if (buffer && (length < size))
     {
-        fprintf( stderr, "CDemoFile::ReadRawData: buffer overflow (%i).\n", size );
+        fprintf(stderr, "CDemoFile::ReadRawData: buffer overflow (%i).\n", size);
         return -1;
     }
 
-    if ( buffer )
+    if (buffer)
     {
         // read data into buffer
-        memcpy( buffer, &m_fileBuffer[ m_fileBufferPos ], size );
-        m_fileBufferPos += size;
+        memcpy(buffer, sequenceData + currentReadOffset, size);
     }
-    else
-    {
-        // just skip it
-        m_fileBufferPos += size;
-    }
+    currentReadOffset += size;
 
+    m_dataReadOffset = currentReadOffset;
     return size;
 }
 
-bool CDemoFile::ReadRawData(std::vector<unsigned char>& buf)
+bool DemoSequenceReader::ReadRawData(std::vector<unsigned char>& buf,
+                                     const int32 maxReadSize /*= MAX_READ_SIZE*/)
 {
-    if (!m_fileBuffer.size())
+    if (m_sequenceData.empty())
     {
         return false;
     }
 
+    const unsigned char* sequenceData = m_sequenceData.data();
+    size_t currentReadOffset = m_dataReadOffset;
+
     // read length of data block
-    int32 size = *(int32 *)(&m_fileBuffer[m_fileBufferPos]);
-    m_fileBufferPos += sizeof(int32);
+    const int32 size = *reinterpret_cast<const int32*>(sequenceData + currentReadOffset);
+    currentReadOffset += sizeof(int32);
 
     if (size < 0)
     {
-        fprintf(stderr, "CDemoFile::ReadRawData: invalid size (%i).\n", size);
+        fprintf(stderr, "DemoSequenceReader::ReadRawData: invalid size (%i).\n", size);
+        return false;
+    }
+    if (maxReadSize < 0 || size > maxReadSize)
+    {
+        fprintf(stderr, "DemoSequenceReader::ReadRawData: invalid size (%i) with max (%i).\n", size, maxReadSize);
         return false;
     }
 
     buf.resize(size);
 
     // read data into buffer
-    memcpy(&buf[0], &m_fileBuffer[m_fileBufferPos], size);
-    m_fileBufferPos += size;
+    memcpy(buf.data(), sequenceData + currentReadOffset, size);
+    currentReadOffset += size;
 
+    m_dataReadOffset = currentReadOffset;
     return true;
+}
+
+void DemoSequenceReader::ReadSequenceInfo(int32 &nSeqNrIn, int32 &nSeqNrOut)
+{
+    if (m_sequenceData.empty())
+    {
+        return;
+    }
+
+    const unsigned char* sequenceData = m_sequenceData.data();
+    size_t currentReadOffset = m_dataReadOffset;
+
+    nSeqNrIn = *reinterpret_cast<const int32*>(sequenceData + currentReadOffset);
+    currentReadOffset += sizeof(int32);
+    nSeqNrOut = *reinterpret_cast<const int32*>(sequenceData + currentReadOffset);
+    currentReadOffset += sizeof(int32);
+
+    m_dataReadOffset = currentReadOffset;
+}
+
+void DemoSequenceReader::ReadCmdInfo(democmdinfo_t& info)
+{
+    if (m_sequenceData.empty())
+    {
+        return;
+    }
+
+    size_t currentReadOffset = m_dataReadOffset;
+
+    memcpy(&info, m_sequenceData.data() + currentReadOffset, sizeof(democmdinfo_t));
+    currentReadOffset += sizeof(democmdinfo_t);
+
+    m_dataReadOffset = currentReadOffset;
+}
+
+void DemoSequenceReader::ReadCmdHeader(unsigned char& cmd, int32& tick)
+{
+    if (m_sequenceData.empty())
+    {
+        return;
+    }
+
+    const unsigned char* sequenceData = m_sequenceData.data();
+    size_t currentReadOffset = m_dataReadOffset;
+
+    // Read the command
+    cmd = sequenceData[currentReadOffset];
+    currentReadOffset += sizeof(unsigned char);
+
+    if (cmd > 0)
+    {
+        assert(cmd <= dem_lastcmd);
+
+        // Read the timestamp
+        tick = *reinterpret_cast<const int32*>(sequenceData + currentReadOffset);
+        currentReadOffset += sizeof(int32);
+    }
+    else
+    {
+        fprintf(stderr, "CDemoFile::ReadCmdHeader: Missing end tag in demo file.\n");
+        cmd = dem_stop;
+    }
+    m_dataReadOffset = currentReadOffset;
+}
+
+int32 DemoSequenceReader::ReadUserCmd(std::vector<unsigned char>& buf)
+{
+    if (m_sequenceData.empty())
+    {
+        return 0;
+    }
+
+    const int32 outgoing_sequence = *reinterpret_cast<const int32*>(m_sequenceData.data() + m_dataReadOffset);
+    m_dataReadOffset += sizeof(int32);
+
+    if (!ReadRawData(buf))
+    {
+        return 0;
+    }
+    return outgoing_sequence;
+}
+
+CDemoFile::CDemoFile():
+    m_DemoHeader()
+{
+}
+
+CDemoFile::~CDemoFile()
+{
+    Close();
 }
 
 bool CDemoFile::Open( const char *name )
@@ -209,8 +249,6 @@ bool CDemoFile::Open( const char *name )
         Close();
         return false;
     }
-
-    m_fileBufferPos = 0;
     return true;
 }
 
@@ -218,6 +256,4 @@ void CDemoFile::Close()
 {
     m_signOnData.clear();
     m_fileBuffer.clear();
-
-    m_fileBufferPos = 0;
 }

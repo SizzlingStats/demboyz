@@ -218,6 +218,29 @@ struct democmdinfo_t
     Split_t         u[ MAX_SPLITSCREEN_CLIENTS ];
 };
 
+class DemoSequenceReader
+{
+    static const int32 MAX_READ_SIZE = 1024 * 1024;
+public:
+    DemoSequenceReader(const std::vector<unsigned char>& sequenceData);
+
+    int32   ReadRawData(char *buffer, int32 length);
+
+    bool    ReadRawData(std::vector<unsigned char>& buf, const int32 maxReadSize = MAX_READ_SIZE);
+
+    void    ReadSequenceInfo(int32 &nSeqNrIn, int32 &nSeqNrOutAck);
+
+    void    ReadCmdInfo(democmdinfo_t& info);
+
+    void    ReadCmdHeader(unsigned char &cmd, int32 &tick);
+
+    int32   ReadUserCmd(std::vector<unsigned char>& buf);
+
+private:
+    const std::vector<unsigned char>& m_sequenceData;
+    size_t m_dataReadOffset;
+};
+
 class CDemoFile
 {
 public:
@@ -227,29 +250,16 @@ public:
     bool    Open( const char *name );
     void    Close();
 
-    int32   ReadRawData( char *buffer, int32 length );
-
-    bool    ReadRawData(std::vector<unsigned char>& buf);
-
-    void    ReadSequenceInfo( int32 &nSeqNrIn, int32 &nSeqNrOutAck );
-
-    void    ReadCmdInfo( democmdinfo_t& info );
-
-    void    ReadCmdHeader( unsigned char &cmd, int32 &tick );
-    
-    int32   ReadUserCmd( char *buffer, int32 &size );
-
     const demoheader_t *GetDemoHeader() const;
 
     const std::vector<unsigned char>& GetSignOnData() const;
+    const std::vector<unsigned char>& GetDemoData() const;
 
 private:
     demoheader_t    m_DemoHeader;  //general demo info
 
     std::vector<unsigned char> m_signOnData;
     std::vector<unsigned char> m_fileBuffer;
-
-    size_t m_fileBufferPos;
 };
 
 inline const demoheader_t *CDemoFile::GetDemoHeader() const
@@ -260,6 +270,11 @@ inline const demoheader_t *CDemoFile::GetDemoHeader() const
 inline const std::vector<unsigned char>& CDemoFile::GetSignOnData() const
 {
     return m_signOnData;
+}
+
+inline const std::vector<unsigned char>& CDemoFile::GetDemoData() const
+{
+    return m_fileBuffer;
 }
 
 #endif // DEMOFILE_H

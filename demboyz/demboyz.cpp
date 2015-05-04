@@ -8,31 +8,63 @@
 void ParsePacket(const std::vector<unsigned char>& packet)
 {
     assert(packet.size() <= NET_MAX_PAYLOAD);
-    CBitRead bitBuf(packet.data(), packet.size());
-    while (bitBuf.GetNumBitsLeft() >= NETMSG_TYPE_BITS)
+    CBitRead bitbuf(packet.data(), packet.size());
+    while (bitbuf.GetNumBitsLeft() >= NETMSG_TYPE_BITS)
     {
-        uint32 typeId = bitBuf.ReadUBitLong(NETMSG_TYPE_BITS);
+        uint32 typeId = bitbuf.ReadUBitLong(NETMSG_TYPE_BITS);
         printf("%i\n", typeId);
-        ProcessNetMsg(typeId, bitBuf);
+        ProcessNetMsg(typeId, bitbuf);
     }
 }
 
-void ParseSignonData(const std::vector<unsigned char>& signonData)
+void ParseDemoSequence(const std::vector<unsigned char>& sequenceData)
 {
-    CBitRead bitbuf(signonData.data(), signonData.size());
-    const char cmd = bitbuf.ReadChar();
-    assert(cmd == dem_signon);
-    const int32 tick = bitbuf.ReadLong();
-    bitbuf.SeekRelative(sizeof(democmdinfo_t) * 8);
-    const int32 seq1 = bitbuf.ReadLong();
-    const int32 seq2 = bitbuf.ReadLong();
-    assert(seq1 == seq2);
+    unsigned char cmd;
+    int32 tick;
+    int32 sequenceInfo1;
+    int32 sequenceInfo2;
+    democmdinfo_t cmdInfo;
+    std::vector<unsigned char> buffer;
 
-    const int32 numBytes = bitbuf.ReadLong();
-    std::vector<unsigned char> packet;
-    packet.resize(numBytes);
-    bitbuf.ReadBytes(&packet[0], numBytes);
-    ParsePacket(packet);
+    DemoSequenceReader reader(sequenceData);
+    for (;;)
+    {
+        reader.ReadCmdHeader(cmd, tick);
+        switch (cmd)
+        {
+        case dem_signon:
+        case dem_packet:
+            reader.ReadCmdInfo(cmdInfo);
+            reader.ReadSequenceInfo(sequenceInfo1, sequenceInfo2);
+            assert(sequenceInfo1 == sequenceInfo2);
+            reader.ReadRawData(buffer);
+            ParsePacket(buffer);
+            break;
+        case dem_synctick:
+            // nothing
+            break;
+        case dem_consolecmd:
+            break;
+        case dem_usercmd:
+            reader.ReadUserCmd(buffer);
+            break;
+        case dem_datatables:
+            // TODO: datatables
+            reader.ReadRawData(nullptr, 0);
+            break;
+        case dem_stop:
+            // TODO assert frame and tick numbers
+            break;
+        case dem_customdata:
+            reader.ReadRawData(nullptr, 0);
+            break;
+        case dem_stringtables:
+            break;
+        default:
+            assert(false);
+            break;
+        }
+    }
 }
 
 int main(const int argc, const char* argv[])
@@ -49,48 +81,8 @@ int main(const int argc, const char* argv[])
     }
 
     auto demoHeader = demoFile.GetDemoHeader();
-
-    ParseSignonData(demoFile.GetSignOnData());
-
-    unsigned char cmd;
-    int32 tick;
-    int32 sequenceInfo1;
-    int32 sequenceInfo2;
-    democmdinfo_t cmdInfo;
-    std::vector<unsigned char> packet;
-    demoFile.ReadCmdHeader(cmd, tick);
-
-    assert(cmd == dem_synctick && tick == 0);
-    
-    const int numFrames = demoHeader->playback_frames;
-    const int numTicks = demoHeader->playback_ticks;
-    for (int i = 0; i <= numFrames; ++i)
-    {
-        demoFile.ReadCmdHeader(cmd, tick);
-        //printf("tick: %i\n", tick);
-        switch (cmd)
-        {
-            case dem_packet:
-                demoFile.ReadCmdInfo(cmdInfo);
-                demoFile.ReadSequenceInfo(sequenceInfo1, sequenceInfo2);
-                assert(sequenceInfo1 == sequenceInfo2);
-                demoFile.ReadRawData(packet);
-                ParsePacket(packet);
-                break;
-            case dem_stop:
-                assert(i == numFrames && tick == numTicks);
-                break;
-            case dem_synctick:
-            case dem_consolecmd:
-            case dem_usercmd:
-            case dem_datatables:
-            default:
-                assert(false);
-                break;
-        }
-    }
-
+    ParseDemoSequence(demoFile.GetSignOnData());
+    ParseDemoSequence(demoFile.GetDemoData());
     demoFile.Close();
-
     return 0;
 }

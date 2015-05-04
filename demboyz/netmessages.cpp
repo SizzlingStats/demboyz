@@ -114,6 +114,12 @@ void SVC_ServerInfo(CBitRead& bitbuf)
     bitbuf.ReadString(mapName, sizeof(mapName));
     bitbuf.ReadString(skyName, sizeof(skyName));
     bitbuf.ReadString(hostName, sizeof(hostName));
+    
+    // TODO:
+    // if (this.something() > 15)
+    // {
+    const bool unknown = bitbuf.ReadOneBit() != 0;
+    // }
 }
 
 void SVC_SendTable(CBitRead& bitbuf)

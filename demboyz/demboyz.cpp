@@ -3,17 +3,6 @@
 #include "demofilebitbuf.h"
 #include "netmessages.h"
 #include <assert.h>
-#include <vector>
-#include <fstream>
-
-std::vector<std::string> eventNames;
-
-void ParseGameEvent(const std::string& eventBuf)
-{
-    CBitRead bitBuf(eventBuf.data(), eventBuf.size());
-    uint32 eventId = bitBuf.ReadUBitLong(9);
-    printf("%s\n", eventNames[eventId].c_str());
-}
 
 void ParsePacket(const char* packetBuf, const int numBytes)
 {
@@ -24,29 +13,6 @@ void ParsePacket(const char* packetBuf, const int numBytes)
         uint32 typeId = bitBuf.ReadUBitLong(NETMSG_TYPE_BITS);
         printf("%i\n", typeId);
         ProcessNetMsg(typeId, bitBuf);
-        /*if (typeId != 25)
-        {
-            break;
-        }
-
-        uint32 length = bitBuf.ReadUBitLong(11);
-        int numBytes = (length / 8) + (length % 8 > 0);
-
-        std::string subpacket;
-        subpacket.resize(numBytes);
-
-        bitBuf.ReadBits(&subpacket[0], length);
-        ParseGameEvent(subpacket);*/
-    }
-}
-
-void ParseEventNames(const char* eventfile, std::vector<std::string>& eventNames)
-{
-    using namespace std;
-    ifstream eventStream(eventfile);
-    if (eventStream)
-    {
-        move(istream_iterator<string>(eventStream), istream_iterator<string>(), back_inserter(eventNames));
     }
 }
 
@@ -70,12 +36,10 @@ void ParseSignonData(const std::string& signonData)
 
 int main(const int argc, const char* argv[])
 {
-    if (argc < 3)
+    if (argc < 2)
     {
         return -1;
     }
-
-    ParseEventNames(argv[1], eventNames);
 
     CDemoFile demoFile;
     if (!demoFile.Open(argv[2]))

@@ -3,11 +3,12 @@
 #include "demofilebitbuf.h"
 #include "netmessages.h"
 #include <assert.h>
+#include <vector>
 
-void ParsePacket(const char* packetBuf, const int numBytes)
+void ParsePacket(const std::vector<unsigned char>& packet)
 {
-    assert(numBytes <= NET_MAX_PAYLOAD);
-    CBitRead bitBuf(packetBuf, numBytes);
+    assert(packet.size() <= NET_MAX_PAYLOAD);
+    CBitRead bitBuf(packet.data(), packet.size());
     while (bitBuf.GetNumBitsLeft() >= NETMSG_TYPE_BITS)
     {
         uint32 typeId = bitBuf.ReadUBitLong(NETMSG_TYPE_BITS);
@@ -16,9 +17,9 @@ void ParsePacket(const char* packetBuf, const int numBytes)
     }
 }
 
-void ParseSignonData(const std::string& signonData)
+void ParseSignonData(const std::vector<unsigned char>& signonData)
 {
-    CBitRead bitbuf(signonData.data(), signonData.length());
+    CBitRead bitbuf(signonData.data(), signonData.size());
     const char cmd = bitbuf.ReadChar();
     assert(cmd == dem_signon);
     const int32 tick = bitbuf.ReadLong();
@@ -28,10 +29,10 @@ void ParseSignonData(const std::string& signonData)
     assert(seq1 == seq2);
 
     const int32 numBytes = bitbuf.ReadLong();
-    std::string packet;
+    std::vector<unsigned char> packet;
     packet.resize(numBytes);
     bitbuf.ReadBytes(&packet[0], numBytes);
-    ParsePacket(packet.data(), numBytes);
+    ParsePacket(packet);
 }
 
 int main(const int argc, const char* argv[])
@@ -56,7 +57,7 @@ int main(const int argc, const char* argv[])
     int32 sequenceInfo1;
     int32 sequenceInfo2;
     democmdinfo_t cmdInfo;
-    char* packetBuf = (char*)malloc(NET_MAX_PAYLOAD);
+    std::vector<unsigned char> packet;
     demoFile.ReadCmdHeader(cmd, tick);
 
     assert(cmd == dem_synctick && tick == 0);
@@ -70,13 +71,11 @@ int main(const int argc, const char* argv[])
         switch (cmd)
         {
             case dem_packet:
-                {
-                    demoFile.ReadCmdInfo(cmdInfo);
-                    demoFile.ReadSequenceInfo(sequenceInfo1, sequenceInfo2);
-                    assert(sequenceInfo1 == sequenceInfo2);
-                    const int32 length = demoFile.ReadRawData(packetBuf, NET_MAX_PAYLOAD);
-                    ParsePacket(packetBuf, length);
-                }
+                demoFile.ReadCmdInfo(cmdInfo);
+                demoFile.ReadSequenceInfo(sequenceInfo1, sequenceInfo2);
+                assert(sequenceInfo1 == sequenceInfo2);
+                demoFile.ReadRawData(packet);
+                ParsePacket(packet);
                 break;
             case dem_stop:
                 assert(i == numFrames && tick == numTicks);
@@ -91,7 +90,6 @@ int main(const int argc, const char* argv[])
         }
     }
 
-    free(packetBuf);
     demoFile.Close();
 
     return 0;

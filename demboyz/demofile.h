@@ -28,7 +28,7 @@
 #pragma once
 #endif
 
-#include <string>
+#include <vector>
 
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
@@ -229,7 +229,7 @@ public:
 
     int32   ReadRawData( char *buffer, int32 length );
 
-    bool    ReadRawData(std::string& buf);
+    bool    ReadRawData(std::vector<unsigned char>& buf);
 
     void    ReadSequenceInfo( int32 &nSeqNrIn, int32 &nSeqNrOutAck );
 
@@ -241,13 +241,13 @@ public:
 
     const demoheader_t *GetDemoHeader() const;
 
-    const std::string& GetSignOnData() const;
+    const std::vector<unsigned char>& GetSignOnData() const;
 
 private:
     demoheader_t    m_DemoHeader;  //general demo info
 
-    std::string m_signOnData;
-    std::string m_fileBuffer;
+    std::vector<unsigned char> m_signOnData;
+    std::vector<unsigned char> m_fileBuffer;
 
     size_t m_fileBufferPos;
 };
@@ -257,7 +257,7 @@ inline const demoheader_t *CDemoFile::GetDemoHeader() const
     return &m_DemoHeader;
 }
 
-inline const std::string& CDemoFile::GetSignOnData() const
+inline const std::vector<unsigned char>& CDemoFile::GetSignOnData() const
 {
     return m_signOnData;
 }

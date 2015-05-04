@@ -124,7 +124,7 @@ int32 CDemoFile::ReadRawData( char *buffer, int32 length )
     return size;
 }
 
-bool CDemoFile::ReadRawData(std::string& buf)
+bool CDemoFile::ReadRawData(std::vector<unsigned char>& buf)
 {
     if (!m_fileBuffer.size())
     {

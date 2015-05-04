@@ -246,7 +246,6 @@ public:
 private:
     demoheader_t    m_DemoHeader;  //general demo info
 
-    std::string m_szFileName;
     std::string m_signOnData;
     std::string m_fileBuffer;
 

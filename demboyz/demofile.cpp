@@ -176,7 +176,7 @@ bool CDemoFile::Open( const char *name )
 
         if ( strcmp ( m_DemoHeader.demofilestamp, DEMO_HEADER_ID ) )
         {
-            fprintf( stderr, "CDemoFile::Open: %s has invalid demo header ID.\n", m_szFileName.c_str() );
+            fprintf(stderr, "CDemoFile::Open: %s has invalid demo header ID.\n", name);
             fclose( fp );
             return false;
         }
@@ -211,13 +211,11 @@ bool CDemoFile::Open( const char *name )
     }
 
     m_fileBufferPos = 0;
-    m_szFileName = name;
     return true;
 }
 
 void CDemoFile::Close()
 {
-    m_szFileName.clear();
     m_signOnData.clear();
     m_fileBuffer.clear();
 

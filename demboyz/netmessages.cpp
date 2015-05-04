@@ -54,6 +54,7 @@ void Net_StringCmd(CBitRead& bitbuf)
     bitbuf.ReadString(commandBuffer, sizeof(commandBuffer));
 }
 
+// verified
 void Net_SetConVar(CBitRead& bitbuf)
 {
     typedef struct cvar_s
@@ -71,10 +72,12 @@ void Net_SetConVar(CBitRead& bitbuf)
     }
 }
 
+// verified
 void Net_SignonState(CBitRead& bitbuf)
 {
     const int signonState = bitbuf.ReadByte();
-    //assert(signonState == SIGNONSTATE_PRESPAWN);
+    assert(signonState >= SIGNONSTATE_NONE &&
+           signonState <= SIGNONSTATE_CHANGELEVEL);
     const int spawnCount = bitbuf.ReadLong();
 }
 

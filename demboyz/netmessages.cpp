@@ -38,6 +38,7 @@ void Net_File(CBitRead& bitbuf)
     const bool isRequest = bitbuf.ReadOneBit() != 0;
 }
 
+// verified
 void Net_Tick(CBitRead& bitbuf)
 {
     static const float NET_TICK_SCALEUP = 100000.0f;
@@ -83,6 +84,7 @@ void SVC_Print(CBitRead& bitbuf)
     bitbuf.ReadString(textBuffer, sizeof(textBuffer));
 }
 
+// verified
 void SVC_ServerInfo(CBitRead& bitbuf)
 {
     const int protocol = bitbuf.ReadShort();            // protocol version
@@ -116,7 +118,7 @@ void SVC_ServerInfo(CBitRead& bitbuf)
     bitbuf.ReadString(hostName, sizeof(hostName));
     
     // TODO:
-    // if (this.something() > 15)
+    // if (protocol > 15)
     // {
     const bool unknown = bitbuf.ReadOneBit() != 0;
     // }
@@ -159,11 +161,17 @@ void SVC_SetPause(CBitRead& bitbuf)
     const bool paused = bitbuf.ReadOneBit() != 0;
 }
 
+// verified
 void SVC_CreateStringTable(CBitRead& bitbuf)
 {
     if (bitbuf.PeekUBitLong(8) == ':')
     {
+        const bool isFilenames = true;
         bitbuf.ReadByte();
+    }
+    else
+    {
+        const bool isFilenames = false;
     }
 
     char tableName[256];
@@ -171,13 +179,38 @@ void SVC_CreateStringTable(CBitRead& bitbuf)
     const int maxEntries = bitbuf.ReadWord();
     const int encodeBits = math::log2(maxEntries);
     const int numEntries = bitbuf.ReadUBitLong(encodeBits + 1);
-    const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PALYLOAD_BITS + 3);
+
+    // TODO:
+    // if (protocol > 23)
+    // {
+    const uint32 lengthInBits = bitbuf.ReadVarInt32();
+    // }
+    // else
+    // {
+    //     const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PALYLOAD_BITS + 1);
+    // }
+    
     const bool userDataFixedSize = bitbuf.ReadOneBit() != 0;
     if (userDataFixedSize)
     {
         const int userDataSize = bitbuf.ReadUBitLong(12);
         const int userDataSizeBits = bitbuf.ReadUBitLong(4);
     }
+    else
+    {
+        const int userDataSize = 0;
+        const int userDataSizeBits = 0;
+    }
+
+    // TODO:
+    // if (protocol > 14)
+    // {
+    const bool unk1 = bitbuf.ReadOneBit() != 0;
+    // }
+    // else
+    // {
+    //     const bool unk1 = false;
+    // }
     bitbuf.SeekRelative(lengthInBits);
 }
 

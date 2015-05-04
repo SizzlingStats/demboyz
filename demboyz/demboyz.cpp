@@ -43,7 +43,7 @@ int main(const int argc, const char* argv[])
     }
 
     CDemoFile demoFile;
-    if (!demoFile.Open(argv[2]))
+    if (!demoFile.Open(argv[1]))
     {
         return -1;
     }

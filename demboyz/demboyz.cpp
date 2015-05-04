@@ -44,13 +44,14 @@ void ParseDemoSequence(const std::vector<unsigned char>& sequenceData)
             // nothing
             break;
         case dem_consolecmd:
+            reader.ReadRawData(nullptr, 1024);
             break;
         case dem_usercmd:
-            reader.ReadUserCmd(buffer);
+            reader.ReadUserCmd(buffer, 256);
             break;
         case dem_datatables:
             // TODO: datatables
-            reader.ReadRawData(nullptr, 0);
+            reader.ReadRawData(nullptr, 64*1024);
             break;
         case dem_stop:
             // TODO assert frame and tick numbers
@@ -59,6 +60,7 @@ void ParseDemoSequence(const std::vector<unsigned char>& sequenceData)
             reader.ReadRawData(nullptr, 0);
             break;
         case dem_stringtables:
+            reader.ReadRawData(nullptr, 0);
             break;
         default:
             assert(false);

@@ -234,7 +234,7 @@ public:
 
     void    ReadCmdHeader(unsigned char &cmd, int32 &tick);
 
-    int32   ReadUserCmd(std::vector<unsigned char>& buf);
+    int32   ReadUserCmd(std::vector<unsigned char>& buf, const int32 maxReadSize = MAX_READ_SIZE);
 
 private:
     const std::vector<unsigned char>& m_sequenceData;

@@ -163,7 +163,8 @@ void DemoSequenceReader::ReadCmdHeader(unsigned char& cmd, int32& tick)
     m_dataReadOffset = currentReadOffset;
 }
 
-int32 DemoSequenceReader::ReadUserCmd(std::vector<unsigned char>& buf)
+int32 DemoSequenceReader::ReadUserCmd(std::vector<unsigned char>& buf,
+                                      const int32 maxReadSize /*= MAX_READ_SIZE*/)
 {
     if (m_sequenceData.empty())
     {
@@ -173,7 +174,7 @@ int32 DemoSequenceReader::ReadUserCmd(std::vector<unsigned char>& buf)
     const int32 outgoing_sequence = *reinterpret_cast<const int32*>(m_sequenceData.data() + m_dataReadOffset);
     m_dataReadOffset += sizeof(int32);
 
-    if (!ReadRawData(buf))
+    if (!ReadRawData(buf, maxReadSize))
     {
         return 0;
     }

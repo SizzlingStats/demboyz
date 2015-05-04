@@ -233,6 +233,29 @@ public:
     int64 ReadSignedVarInt64() { return bitbuf::ZigZagDecode64( ReadVarInt64() ); }
 };
 
+inline unsigned int CBitRead::PeekUBitLong(int numbits)
+{
+    int nSaveBA = m_nBitsAvail;
+    int nSaveW = m_nInBufWord;
+    uint32 const *pSaveP = m_pDataIn;
+    unsigned int nRet = ReadUBitLong(numbits);
+    m_nBitsAvail = nSaveBA;
+    m_nInBufWord = nSaveW;
+    m_pDataIn = pSaveP;
+    return nRet;
+}
+
+inline int CBitRead::ReadLong(void)
+{
+    return (int)ReadUBitLong(sizeof(long) << 3);
+}
+
+inline float CBitRead::ReadFloat(void)
+{
+    uint32 nUval = ReadUBitLong(sizeof(long) << 3);
+    return *((float *)&nUval);
+}
+
 #ifndef MIN
 #define MIN( a, b ) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif

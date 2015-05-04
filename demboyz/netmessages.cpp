@@ -134,6 +134,7 @@ void SVC_SendTable(CBitRead& bitbuf)
     bitbuf.SeekRelative(dataLengthBits);
 }
 
+// verified
 void SVC_ClassInfo(CBitRead& bitbuf)
 {
     typedef struct class_s
@@ -225,6 +226,7 @@ void SVC_UpdateStringTable(CBitRead& bitbuf)
     bitbuf.SeekRelative(lengthInBits);
 }
 
+// verified
 void SVC_VoiceInit(CBitRead& bitbuf)
 {
     char voiceCodec[MAX_OSPATH]; // used voice codec .dll

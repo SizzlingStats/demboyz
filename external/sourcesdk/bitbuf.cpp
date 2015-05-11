@@ -7,11 +7,8 @@
 //=============================================================================//
 
 #include "bitbuf.h"
-#include "coordsize.h"
-#include "mathlib/vector.h"
-#include "mathlib/mathlib.h"
-#include "tier1/strtools.h"
-#include "bitvec.h"
+#include <string.h>
+#include <math.h>
 
 // FIXME: Can't use this until we get multithreaded allocations in tier0 working for tools
 // This is used by VVIS and fails to link
@@ -476,7 +473,7 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 		int numbytes = nBitsLeft >> 3; 
 		int numbits = numbytes << 3;
 		
-		Q_memcpy( (char*)m_pData+(m_iCurBit>>3), pOut, numbytes );
+		memcpy( (char*)m_pData+(m_iCurBit>>3), pOut, numbytes );
 		pOut += numbytes;
 		nBitsLeft -= numbits;
 		m_iCurBit += numbits;
@@ -1446,7 +1443,7 @@ void bf_read::ExciseBits( int startbit, int bitstoremove )
 	m_nDataBytes = m_nDataBits >> 3;
 }
 
-int bf_read::CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffset, int numbits ) RESTRICT
+int bf_read::CompareBitsAt( int offset, bf_read * __restrict other, int otherOffset, int numbits ) __restrict
 {
 	extern unsigned long g_ExtraMasks[33];
 

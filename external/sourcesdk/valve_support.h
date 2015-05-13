@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <cassert>
 #include "vector.h"
 
@@ -24,8 +25,6 @@ using byte = char;
 #ifdef _WIN64
     #define PLATFORM_WINDOWS_PC64 1
 #endif
-
-#define NULL nullptr
 
 #define Assert(x) assert(x)
 #define AssertMsg(x, ...) assert(x)

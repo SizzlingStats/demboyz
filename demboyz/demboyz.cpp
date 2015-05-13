@@ -1,90 +1,100 @@
 
-#include "demofile.h"
-#include "demofilebitbuf.h"
-#include "netmessages.h"
-#include <assert.h>
-#include <vector>
+#include "idemowriter.h"
+#include "demoreader.h"
+#include <cstdio>
+#include <string>
 
-void ParsePacket(const std::vector<unsigned char>& packet)
+std::string GetExtension(const std::string& filename)
 {
-    assert(packet.size() <= NET_MAX_PAYLOAD);
-    CBitRead bitbuf(packet.data(), packet.size());
-    while (bitbuf.GetNumBitsLeft() >= NETMSG_TYPE_BITS)
+    size_t index = filename.find_last_of(".");
+    if (index != std::string::npos)
     {
-        uint32 typeId = bitbuf.ReadUBitLong(NETMSG_TYPE_BITS);
-        printf("%i\n", typeId);
-        ProcessNetMsg(typeId, bitbuf);
+        return filename.substr(index + 1);
     }
+    return std::string();
 }
 
-void ParseDemoSequence(const std::vector<unsigned char>& sequenceData)
+enum class FileType
 {
-    unsigned char cmd;
-    int32 tick;
-    int32 sequenceInfo1;
-    int32 sequenceInfo2;
-    democmdinfo_t cmdInfo;
-    std::vector<unsigned char> buffer;
+    None,
+    Dem,
+    Json
+};
 
-    DemoSequenceReader reader(sequenceData);
-    for (;;)
+FileType GetFileType(const std::string& filename)
+{
+    std::string ext = GetExtension(filename);
+    if (ext == "dem")
     {
-        reader.ReadCmdHeader(cmd, tick);
-        switch (cmd)
-        {
-        case dem_signon:
-        case dem_packet:
-            reader.ReadCmdInfo(cmdInfo);
-            reader.ReadSequenceInfo(sequenceInfo1, sequenceInfo2);
-            assert(sequenceInfo1 == sequenceInfo2);
-            reader.ReadRawData(buffer);
-            ParsePacket(buffer);
-            break;
-        case dem_synctick:
-            // nothing
-            break;
-        case dem_consolecmd:
-            reader.ReadRawData(nullptr, 1024);
-            break;
-        case dem_usercmd:
-            reader.ReadUserCmd(buffer, 256);
-            break;
-        case dem_datatables:
-            // TODO: datatables
-            reader.ReadRawData(nullptr, 64*1024);
-            break;
-        case dem_stop:
-            // TODO assert frame and tick numbers
-            break;
-        case dem_customdata:
-            reader.ReadRawData(nullptr, 0);
-            break;
-        case dem_stringtables:
-            reader.ReadRawData(nullptr, 0);
-            break;
-        default:
-            assert(false);
-            break;
-        }
+        return FileType::Dem;
     }
+    if (ext == "json")
+    {
+        return FileType::Json;
+    }
+    return FileType::None;
 }
 
 int main(const int argc, const char* argv[])
 {
-    if (argc < 2)
+    if (argc != 3)
     {
+        fprintf(stderr, "Usage: %s <in>.dem/json <out>.dem/json\n", argv[0]);
         return -1;
     }
 
-    CDemoFile demoFile;
-    if (!demoFile.Open(argv[1]))
+    std::string inputFile(argv[1]);
+    std::string outputFile(argv[2]);
+
+    FileType inputType = GetFileType(inputFile);
+    FileType outputType = GetFileType(outputFile);
+    if (inputType == FileType::None)
     {
+        fprintf(stderr, "Error: Bad type for input file\n");
+        return -1;
+    }
+    if (outputType == FileType::None)
+    {
+        fprintf(stderr, "Error: Bad type for output file\n");
         return -1;
     }
 
-    auto demoHeader = demoFile.GetDemoHeader();
-    ParseDemoSequence(demoFile.GetSignOnData());
-    ParseDemoSequence(demoFile.GetDemoData());
-    demoFile.Close();
+    FILE* inputFp = fopen(inputFile.c_str(), "rb");
+    if (!inputFp)
+    {
+        fprintf(stderr, "Error: Could not open input file\n");
+        return -1;
+    }
+
+    FILE* outputFp = fopen(outputFile.c_str(), "wb");
+    if (!outputFp)
+    {
+        fprintf(stderr, "Error: Could not open input file\n");
+        fclose(inputFp);
+        return -1;
+    }
+
+    IDemoWriter* writer;
+    if (outputType == FileType::Dem)
+    {
+        writer = IDemoWriter::CreateDemoWriter(outputFp);
+    }
+    else
+    {
+        writer = IDemoWriter::CreateJsonWriter(outputFp);
+    }
+
+    if (inputType == FileType::Dem)
+    {
+        DemoReader::ProcessDem(inputFp, writer);
+    }
+    else
+    {
+        DemoReader::ProcessJson(inputFp, writer);
+    }
+    fclose(inputFp);
+    fclose(outputFp);
+
+    IDemoWriter::FreeDemoWriter(writer);
     return 0;
 }

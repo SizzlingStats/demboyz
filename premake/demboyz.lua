@@ -6,16 +6,22 @@ solution "demboyz"
     configurations { "Debug", "Release" }
     platforms "x32"
     
-    vpaths
-    {
-        ["Header Files"] = { "../**.h" },
-        ["Source Files"] = { "../**.cpp" }
-    }
-    
     project "demboyz"
         kind "ConsoleApp"
         language "C++"
-        files { "../demboyz/**.h", "../demboyz/**.cpp" }
+        files
+        {
+            "../demboyz/*.h",
+            "../demboyz/*.cpp",
+            "../demboyz/netmessages/*.h",
+            "../demboyz/netmessages/*.cpp",
+            "../external/sourcesdk/*.h",
+            "../external/sourcesdk/*.cpp"
+        }
+        includedirs
+        {
+            "../external/sourcesdk"
+        }
 
         configuration "Debug"
             targetdir (_ACTION .. "/build/Debug")

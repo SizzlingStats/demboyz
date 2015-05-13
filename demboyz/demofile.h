@@ -1,280 +1,40 @@
-//====== Copyright (c) 2014, Valve Corporation, All rights reserved. ========//
-//
-// Redistribution and use in source and binary forms, with or without 
-// modification, are permitted provided that the following conditions are met:
-//
-// Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
-// Redistributions in binary form must reproduce the above copyright notice, 
-// this list of conditions and the following disclaimer in the documentation 
-// and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
-// THE POSSIBILITY OF SUCH DAMAGE.
-//===========================================================================//
 
-#ifndef DEMOFILE_H
-#define DEMOFILE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
-#include <vector>
+#include <cstdint>
+#include <cstdio>
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+struct demoheader_t;
+struct democmdinfo_t;
 
-#define DEMO_HEADER_ID      "HL2DEMO"
-#define DEMO_PROTOCOL       3
-
-#if !defined( MAX_OSPATH )
-#define MAX_OSPATH      260         // max length of a filesystem pathname
-#endif
-
-typedef int32_t         int32;
-typedef uint32_t        uint32;
-typedef int64_t         int64;
-typedef uint64_t        uint64;
-typedef unsigned long   CRC32_t;
-
-// Demo messages
-enum
-{
-    // it's a startup message, process as fast as possible
-    dem_signon  = 1,
-    // it's a normal network packet that we stored off
-    dem_packet,
-    // sync client clock to demo tick
-    dem_synctick,
-    // console command
-    dem_consolecmd,
-    // user input command
-    dem_usercmd,
-    // network data tables
-    dem_datatables,
-    // end of time.
-    dem_stop,
-    // a blob of binary data understood by a callback function
-    dem_customdata,
-
-    dem_stringtables,
-
-    // Last command
-    dem_lastcmd     = dem_stringtables
-};
-
-struct demoheader_t
-{
-    char    demofilestamp[ 8 ];             // Should be HL2DEMO
-    int32   demoprotocol;                   // Should be DEMO_PROTOCOL
-    int32   networkprotocol;                // Should be PROTOCOL_VERSION
-    char    servername[ MAX_OSPATH ];       // Name of server
-    char    clientname[ MAX_OSPATH ];       // Name of client who recorded the game
-    char    mapname[ MAX_OSPATH ];          // Name of map
-    char    gamedirectory[ MAX_OSPATH ];    // Name of game directory (com_gamedir)
-    float   playback_time;                  // Time of track
-    int32   playback_ticks;                 // # of ticks in track
-    int32   playback_frames;                // # of frames in track
-    int32   signonlength;                   // length of sigondata in bytes
-};
-
-#define FDEMO_NORMAL        0
-#define FDEMO_USE_ORIGIN2   ( 1 << 0 )
-#define FDEMO_USE_ANGLES2   ( 1 << 1 )
-#define FDEMO_NOINTERP      ( 1 << 2 )  // don't interpolate between this an last view
-
-#define MAX_SPLITSCREEN_CLIENTS 1
-
-struct QAngle
-{
-    float x, y, z;
-    void Init( void )
-    {
-        x = y = z = 0.0f;
-    }
-    void Init( float _x, float _y, float _z )
-    {
-        x = _x;
-        y = _y;
-        z = _z;
-    }
-};
-struct Vector
-{
-    float x, y, z;
-    void Init( void )
-    {
-        x = y = z = 0.0f;
-    }
-    void Init( float _x, float _y, float _z )
-    {
-        x = _x;
-        y = _y;
-        z = _z;
-    }
-};
-
-struct democmdinfo_t
-{
-    democmdinfo_t( void )
-    {
-    }
-
-    struct Split_t
-    {
-        Split_t( void )
-        {
-            flags = FDEMO_NORMAL;
-            viewOrigin.Init();
-            viewAngles.Init();
-            localViewAngles.Init();
-
-            // Resampled origin/angles
-            viewOrigin2.Init();
-            viewAngles2.Init();
-            localViewAngles2.Init();
-        }
-
-        Split_t&    operator=( const Split_t& src )
-        {
-            if ( this == &src )
-                return *this;
-
-            flags = src.flags;
-            viewOrigin = src.viewOrigin;
-            viewAngles = src.viewAngles;
-            localViewAngles = src.localViewAngles;
-            viewOrigin2 = src.viewOrigin2;
-            viewAngles2 = src.viewAngles2;
-            localViewAngles2 = src.localViewAngles2;
-
-            return *this;
-        }
-
-        const Vector& GetViewOrigin( void )
-        {
-            if ( flags & FDEMO_USE_ORIGIN2 )
-            {
-                return viewOrigin2;
-            }
-            return viewOrigin;
-        }
-
-        const QAngle& GetViewAngles( void )
-        {
-            if ( flags & FDEMO_USE_ANGLES2 )
-            {
-                return viewAngles2;
-            }
-            return viewAngles;
-        }
-        const QAngle& GetLocalViewAngles( void )
-        {
-            if ( flags & FDEMO_USE_ANGLES2 )
-            {
-                return localViewAngles2;
-            }
-            return localViewAngles;
-        }
-
-        void Reset( void )
-        {
-            flags = 0;
-            viewOrigin2 = viewOrigin;
-            viewAngles2 = viewAngles;
-            localViewAngles2 = localViewAngles;
-        }
-
-        int32       flags;
-
-        // original origin/viewangles
-        Vector      viewOrigin;
-        QAngle      viewAngles;
-        QAngle      localViewAngles;
-
-        // Resampled origin/viewangles
-        Vector      viewOrigin2;
-        QAngle      viewAngles2;
-        QAngle      localViewAngles2;
-    };
-
-    void Reset( void )
-    {
-        for ( int i = 0; i < MAX_SPLITSCREEN_CLIENTS; ++i )
-        {
-            u[ i ].Reset();
-        }
-    }
-
-    Split_t         u[ MAX_SPLITSCREEN_CLIENTS ];
-};
-
-class DemoSequenceReader
-{
-    static const int32 MAX_READ_SIZE = 1024 * 1024;
-public:
-    DemoSequenceReader(const std::vector<unsigned char>& sequenceData);
-
-    int32   ReadRawData(char *buffer, int32 length);
-
-    bool    ReadRawData(std::vector<unsigned char>& buf, const int32 maxReadSize = MAX_READ_SIZE);
-
-    void    ReadSequenceInfo(int32 &nSeqNrIn, int32 &nSeqNrOutAck);
-
-    void    ReadCmdInfo(democmdinfo_t& info);
-
-    void    ReadCmdHeader(unsigned char &cmd, int32 &tick);
-
-    int32   ReadUserCmd(std::vector<unsigned char>& buf, const int32 maxReadSize = MAX_READ_SIZE);
-
-private:
-    const std::vector<unsigned char>& m_sequenceData;
-    size_t m_dataReadOffset;
-};
-
-class CDemoFile
+class DemoFileReader
 {
 public:
-    CDemoFile();
-    ~CDemoFile();
+    DemoFileReader(FILE* fp);
 
-    bool    Open( const char *name );
-    void    Close();
-
-    const demoheader_t *GetDemoHeader() const;
-
-    const std::vector<unsigned char>& GetSignOnData() const;
-    const std::vector<unsigned char>& GetDemoData() const;
+    void ReadDemoHeader(demoheader_t& header);
+    int32_t ReadRawData(uint8_t* buffer, int32_t length);
+    void ReadSequenceInfo(int32_t& seqNum1, int32_t& seqNum2);
+    void ReadCmdInfo(democmdinfo_t& info);
+    void ReadCmdHeader(unsigned char& cmd, int32_t& tick);
+    int32_t ReadUserCmd(uint8_t* buffer, int32_t length);
 
 private:
-    demoheader_t    m_DemoHeader;  //general demo info
-
-    std::vector<unsigned char> m_signOnData;
-    std::vector<unsigned char> m_fileBuffer;
+    FILE* m_demoFp;
 };
 
-inline const demoheader_t *CDemoFile::GetDemoHeader() const
+class DemoFileWriter
 {
-    return &m_DemoHeader;
-}
+public:
+    DemoFileWriter(FILE* fp);
 
-inline const std::vector<unsigned char>& CDemoFile::GetSignOnData() const
-{
-    return m_signOnData;
-}
+    void WriteDemoHeader(const demoheader_t& header);
+    void WriteRawData(const uint8_t* buffer, int32_t length);
+    void WriteSequenceInfo(int32_t seqNum1, int32_t seqNum2);
+    void WriteCmdInfo(const democmdinfo_t& info);
+    void WriteCmdHeader(unsigned char cmd, int32_t tick);
+    void WriteUserCmd(int32_t sequenceNum, const uint8_t* buffer, int32_t length);
 
-inline const std::vector<unsigned char>& CDemoFile::GetDemoData() const
-{
-    return m_fileBuffer;
-}
-
-#endif // DEMOFILE_H
+private:
+    FILE* m_demoFp;
+};

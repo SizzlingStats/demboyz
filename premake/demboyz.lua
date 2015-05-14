@@ -12,6 +12,11 @@ solution "demboyz"
         ["Source Files"] = { "../**.cpp" }
     }
     
+    -- GCC specific build options.
+    configuration "gmake"
+        -- Enables C++11 support.
+        buildoptions { "-std=c++0x" }
+
     project "demboyz"
         kind "ConsoleApp"
         language "C++"

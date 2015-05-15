@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "idemowriter.h"
 #include "netmessages/nethandlers.h"
 #include "demotypes.h"

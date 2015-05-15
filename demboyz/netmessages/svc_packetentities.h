@@ -10,7 +10,7 @@ namespace NetMsg
     {
         std::unique_ptr<uint8_t[]> data;
         uint32_t dataLengthInBits;
-        uint32_t deltaFromTick;
+        int32_t deltaFromTick;
         uint16_t maxEntries;
         uint16_t numUpdatedEntries;
         uint8_t baselineIndex;

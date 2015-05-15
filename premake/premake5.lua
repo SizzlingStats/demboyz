@@ -11,7 +11,6 @@ solution "demboyz"
     configuration "gmake"
         -- Enables C++11 support.
         buildoptions { "-std=c++0x" }
-        toolset "clang"
 
     project "demboyz"
         kind "ConsoleApp"

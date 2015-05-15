@@ -78,6 +78,8 @@ namespace NetHandlers
 
     void SVC_ServerInfo_ToString_Internal(std::ostringstream& out, NetMsg::SVC_ServerInfo* data)
     {
-        out << "svc_ServerInfo: game \"" << data->gameDir << "\", map \"" << data->mapName << "\", max " << data->maxClients;
+        out << "svc_ServerInfo: game \"" << data->gameDir
+            << "\", map \"" << data->mapName
+            << "\", max " << static_cast<uint32_t>(data->maxClients);
     }
 }

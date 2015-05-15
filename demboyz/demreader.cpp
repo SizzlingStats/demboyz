@@ -118,6 +118,7 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
 
     do
     {
+        size_t rawDataSize = 0;
         reader.ReadCmdHeader(packet.cmd, packet.tick);
         switch (packet.cmd)
         {
@@ -126,7 +127,7 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
             reader.ReadCmdInfo(*packet.cmdInfo);
             reader.ReadSequenceInfo(packet.sequenceInfo1, packet.sequenceInfo2);
             assert(packet.sequenceInfo1 == packet.sequenceInfo2);
-            reader.ReadRawData(buffer.data(), buffer.size());
+            rawDataSize = reader.ReadRawData(buffer.data(), buffer.size());
             break;
         case dem_synctick:
             // nothing
@@ -157,7 +158,7 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
         writer->StartCommandPacket(packet);
         if (packet.cmd == dem_packet || packet.cmd == dem_signon)
         {
-            ParsePacket(buffer.data(), buffer.size(), context, writer);
+            ParsePacket(buffer.data(), rawDataSize, context, writer);
         }
         writer->EndCommandPacket();
     } while (packet.cmd != dem_stop);

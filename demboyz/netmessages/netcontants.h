@@ -31,7 +31,9 @@ enum constants
 
     DELTASIZE_BITS = 20,             // must be: 2^DELTASIZE_BITS > (NET_MAX_PAYLOAD * 8)
     EVENT_INDEX_BITS = 8,
-    MAX_SOUND_INDEX_BITS = 13,
+
+    MAX_SOUND_INDEX_BITS_OLD = 13,
+    MAX_SOUND_INDEX_BITS = 14,
 
     MAX_USER_MSG_DATA = 255,
 

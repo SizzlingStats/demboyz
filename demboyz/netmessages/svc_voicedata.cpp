@@ -15,7 +15,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_VoiceData_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_VoiceData* data)
+    bool SVC_VoiceData_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_VoiceData* data)
     {
         bitbuf.WriteByte(data->fromClientIndex);
         bitbuf.WriteByte(data->proximity);
@@ -29,7 +29,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_VoiceData_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_VoiceData* data)
+    bool SVC_VoiceData_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_VoiceData* data)
     {
         return true;
     }

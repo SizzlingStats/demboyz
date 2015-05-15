@@ -22,15 +22,15 @@ struct SourceGameContext
     namespace NetHandlers \
     { \
         bool msgname##_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-        bool msgname##_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        bool msgname##_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::##msgname* data); \
         bool msgname##_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-        bool msgname##_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        bool msgname##_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::##msgname* data); \
         void msgname##_ToString_Internal(std::ostringstream& out, NetMsg::##msgname* data); \
         inline bool msgname##_BitRead(bf_read& bitbuf, SourceGameContext& context, void* data) \
         { \
             return msgname##_BitRead_Internal(bitbuf, context, reinterpret_cast<NetMsg::##msgname*>(data)); \
         } \
-        inline bool msgname##_BitWrite(bf_write& bitbuf, SourceGameContext& context, void* data) \
+        inline bool msgname##_BitWrite(bf_write& bitbuf, const SourceGameContext& context, void* data) \
         { \
             return msgname##_BitWrite_Internal(bitbuf, context, reinterpret_cast<NetMsg::##msgname*>(data)); \
         } \
@@ -38,7 +38,7 @@ struct SourceGameContext
         { \
             return msgname##_JsonRead_Internal(jsonbuf, context, reinterpret_cast<NetMsg::##msgname*>(data)); \
         } \
-        inline bool msgname##_JsonWrite(JsonWrite& jsonbuf, SourceGameContext& context, void* data) \
+        inline bool msgname##_JsonWrite(JsonWrite& jsonbuf, const SourceGameContext& context, void* data) \
         { \
             return msgname##_JsonWrite_Internal(jsonbuf, context, reinterpret_cast<NetMsg::##msgname*>(data)); \
         } \
@@ -51,8 +51,8 @@ struct SourceGameContext
 namespace NetHandlers
 {
     bool NetMsg_BitRead(uint32_t type, bf_read& bitbuf, SourceGameContext& context, void* data);
-    bool NetMsg_BitWrite(uint32_t type, bf_write& bitbuf, SourceGameContext& context, void* data);
+    bool NetMsg_BitWrite(uint32_t type, bf_write& bitbuf, const SourceGameContext& context, void* data);
     bool NetMsg_JsonRead(uint32_t type, JsonRead& jsonbuf, SourceGameContext& context, void* data);
-    bool NetMsg_JsonWrite(uint32_t type, JsonWrite& jsonbuf, SourceGameContext& context, void* data);
+    bool NetMsg_JsonWrite(uint32_t type, JsonWrite& jsonbuf, const SourceGameContext& context, void* data);
     void NetMsg_ToString(uint32_t type, std::ostringstream& out, void* data);
 }

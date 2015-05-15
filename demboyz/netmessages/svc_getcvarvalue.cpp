@@ -11,7 +11,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_GetCvarValue_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
+    bool SVC_GetCvarValue_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
         bitbuf.WriteSBitLong(data->cookie, 32);
         bitbuf.WriteString(data->cvarName);
@@ -23,7 +23,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_GetCvarValue_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
+    bool SVC_GetCvarValue_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
         return true;
     }

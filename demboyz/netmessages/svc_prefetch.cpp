@@ -19,7 +19,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_Prefetch_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
+    bool SVC_Prefetch_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
         if (context.protocol > 23)
         {
@@ -37,7 +37,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_Prefetch_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
+    bool SVC_Prefetch_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
         return true;
     }

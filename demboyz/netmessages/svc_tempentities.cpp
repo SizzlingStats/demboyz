@@ -22,7 +22,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_TempEntities_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_TempEntities* data)
+    bool SVC_TempEntities_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_TempEntities* data)
     {
         bitbuf.WriteUBitLong(data->numEntries, EVENT_INDEX_BITS);
         if (context.protocol > 23)
@@ -42,7 +42,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_TempEntities_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_TempEntities* data)
+    bool SVC_TempEntities_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_TempEntities* data)
     {
         return true;
     }

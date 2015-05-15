@@ -16,7 +16,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_UpdateStringTable_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    bool SVC_UpdateStringTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
     {
         bitbuf.WriteUBitLong(data->tableID, math::log2(MAX_TABLES));
         if (data->numChangedEntries != 1)
@@ -38,7 +38,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_UpdateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    bool SVC_UpdateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
     {
         return true;
     }

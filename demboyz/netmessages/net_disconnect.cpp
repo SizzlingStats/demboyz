@@ -10,7 +10,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_Disconnect_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::Net_Disconnect* data)
+    bool Net_Disconnect_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
         bitbuf.WriteString(data->message);
         return !bitbuf.IsOverflowed();
@@ -21,7 +21,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_Disconnect_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::Net_Disconnect* data)
+    bool Net_Disconnect_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
         return true;
     }

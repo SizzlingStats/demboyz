@@ -17,7 +17,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_UserMessage_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_UserMessage* data)
+    bool SVC_UserMessage_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_UserMessage* data)
     {
         bitbuf.WriteByte(data->msgType);
         bitbuf.WriteUBitLong(data->dataLengthInBits, 11);
@@ -30,7 +30,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_UserMessage_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_UserMessage* data)
+    bool SVC_UserMessage_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_UserMessage* data)
     {
         return true;
     }

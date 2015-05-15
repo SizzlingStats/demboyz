@@ -35,7 +35,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_ServerInfo_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
+    bool SVC_ServerInfo_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
         bitbuf.WriteShort(data->protocol);
         bitbuf.WriteLong(data->serverCount);
@@ -71,7 +71,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_ServerInfo_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
+    bool SVC_ServerInfo_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
         return true;
     }

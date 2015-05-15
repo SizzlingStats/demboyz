@@ -8,7 +8,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_NOP_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::Net_NOP* data)
+    bool Net_NOP_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_NOP* data)
     {
         return true;
     }
@@ -18,7 +18,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_NOP_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::Net_NOP* data)
+    bool Net_NOP_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_NOP* data)
     {
         return true;
     }

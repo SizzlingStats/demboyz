@@ -41,9 +41,9 @@
     }
 
 typedef bool (*NetMsgBitReadFn)(bf_read& bitbuf, SourceGameContext& context, void* data);
-typedef bool (*NetMsgBitWriteFn)(bf_write& bitbuf, SourceGameContext& context, void* data);
+typedef bool (*NetMsgBitWriteFn)(bf_write& bitbuf, const SourceGameContext& context, void* data);
 typedef bool (*NetMsgJsonReadFn)(JsonRead& bitbuf, SourceGameContext& context, void* data);
-typedef bool (*NetMsgJsonWriteFn)(JsonWrite& bitbuf, SourceGameContext& context, void* data);
+typedef bool (*NetMsgJsonWriteFn)(JsonWrite& bitbuf, const SourceGameContext& context, void* data);
 typedef void (*NetMsgToStringFn)(std::ostringstream& out, void* data);
 
 bool NetHandlers::NetMsg_BitRead(uint32_t type, bf_read& bitbuf, SourceGameContext& context, void* data)
@@ -52,7 +52,7 @@ bool NetHandlers::NetMsg_BitRead(uint32_t type, bf_read& bitbuf, SourceGameConte
     return netHandlers[type](bitbuf, context, data);
 }
 
-bool NetHandlers::NetMsg_BitWrite(uint32_t type, bf_write& bitbuf, SourceGameContext& context, void* data)
+bool NetHandlers::NetMsg_BitWrite(uint32_t type, bf_write& bitbuf, const SourceGameContext& context, void* data)
 {
     static const NetMsgBitWriteFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(BitWrite);
     return netHandlers[type](bitbuf, context, data);
@@ -64,7 +64,7 @@ bool NetHandlers::NetMsg_JsonRead(uint32_t type, JsonRead& jsonbuf, SourceGameCo
     return netHandlers[type](jsonbuf, context, data);
 }
 
-bool NetHandlers::NetMsg_JsonWrite(uint32_t type, JsonWrite& jsonbuf, SourceGameContext& context, void* data)
+bool NetHandlers::NetMsg_JsonWrite(uint32_t type, JsonWrite& jsonbuf, const SourceGameContext& context, void* data)
 {
     static const NetMsgJsonWriteFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(JsonWrite);
     return netHandlers[type](jsonbuf, context, data);

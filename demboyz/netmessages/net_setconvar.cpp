@@ -17,7 +17,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_SetConVar_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
+    bool Net_SetConVar_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
         bitbuf.WriteUBitLong(data->cvars.size(), 8);
         for (cvar_t& cvar : data->cvars)
@@ -33,7 +33,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_SetConVar_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
+    bool Net_SetConVar_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
         return true;
     }

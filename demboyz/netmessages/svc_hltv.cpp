@@ -10,7 +10,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_HLTV_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_HLTV* data)
+    bool SVC_HLTV_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_HLTV* data)
     {
         assert(false);
         return true;
@@ -22,7 +22,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_HLTV_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_HLTV* data)
+    bool SVC_HLTV_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_HLTV* data)
     {
         assert(false);
         return true;

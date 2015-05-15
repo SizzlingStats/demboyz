@@ -10,7 +10,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SetPause_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_SetPause* data)
+    bool SVC_SetPause_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
         bitbuf.WriteOneBit(data->isPaused);
         return !bitbuf.IsOverflowed();
@@ -21,7 +21,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_SetPause_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_SetPause* data)
+    bool SVC_SetPause_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
         return true;
     }

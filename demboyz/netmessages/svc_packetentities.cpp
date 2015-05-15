@@ -27,7 +27,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_PacketEntities_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
+    bool SVC_PacketEntities_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
         bitbuf.WriteUBitLong(data->maxEntries, MAX_EDICT_BITS);
         if (data->isDelta)
@@ -47,7 +47,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_PacketEntities_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
+    bool SVC_PacketEntities_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
         return true;
     }

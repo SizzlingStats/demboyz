@@ -12,7 +12,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_File_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::Net_File* data)
+    bool Net_File_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_File* data)
     {
         bitbuf.WriteUBitLong(data->transferID, 32);
         bitbuf.WriteString(data->filename);
@@ -25,7 +25,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_File_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::Net_File* data)
+    bool Net_File_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_File* data)
     {
         return true;
     }

@@ -28,7 +28,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_GameEventList_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEventList* data)
+    bool SVC_GameEventList_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_GameEventList* data)
     {
         bitbuf.WriteUBitLong(data->eventDescriptors.size(), MAX_EVENT_BITS);
         bitbuf.WriteUBitLong(data->dataLengthInBits, 20);
@@ -51,7 +51,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_GameEventList_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_GameEventList* data)
+    bool SVC_GameEventList_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_GameEventList* data)
     {
         return true;
     }

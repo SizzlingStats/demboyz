@@ -12,7 +12,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_Tick_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::Net_Tick* data)
+    bool Net_Tick_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_Tick* data)
     {
         bitbuf.WriteUBitLong(data->tick, 32);
         bitbuf.WriteUBitLong(data->hostFrameTime, 16);
@@ -25,7 +25,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool Net_Tick_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::Net_Tick* data)
+    bool Net_Tick_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_Tick* data)
     {
         return true;
     }

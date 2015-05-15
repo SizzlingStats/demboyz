@@ -14,7 +14,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SendTable_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_SendTable* data)
+    bool SVC_SendTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SendTable* data)
     {
         bitbuf.WriteOneBit(data->needsDecoder);
         bitbuf.WriteShort(data->dataLengthInBits);
@@ -27,7 +27,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_SendTable_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_SendTable* data)
+    bool SVC_SendTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SendTable* data)
     {
         return true;
     }

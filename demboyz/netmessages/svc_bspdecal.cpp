@@ -23,7 +23,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_BSPDecal_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
+    bool SVC_BSPDecal_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
         bitbuf.WriteBitVec3Coord(data->position);
         bitbuf.WriteUBitLong(data->decalTextureIndex, MAX_DECAL_INDEX_BITS);
@@ -46,7 +46,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_BSPDecal_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
+    bool SVC_BSPDecal_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
         return true;
     }

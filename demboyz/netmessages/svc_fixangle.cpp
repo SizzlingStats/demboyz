@@ -14,7 +14,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_FixAngle_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
+    bool SVC_FixAngle_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         bitbuf.WriteOneBit(data->relative);
         bitbuf.WriteBitAngle(data->x, 16);
@@ -28,7 +28,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_FixAngle_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
+    bool SVC_FixAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         return true;
     }

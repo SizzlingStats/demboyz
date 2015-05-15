@@ -13,7 +13,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_CrosshairAngle_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
+    bool SVC_CrosshairAngle_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
         bitbuf.WriteBitAngle(data->x, 16);
         bitbuf.WriteBitAngle(data->y, 16);
@@ -26,7 +26,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_CrosshairAngle_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
+    bool SVC_CrosshairAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
         return true;
     }

@@ -52,7 +52,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_CreateStringTable_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
+    bool SVC_CreateStringTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
         if (data->isFileNames)
         {
@@ -88,7 +88,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_CreateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
+    bool SVC_CreateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
         return true;
     }

@@ -23,7 +23,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_Sounds_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_Sounds* data)
+    bool SVC_Sounds_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_Sounds* data)
     {
         if (data->reliableSound)
         {
@@ -45,7 +45,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_Sounds_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_Sounds* data)
+    bool SVC_Sounds_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Sounds* data)
     {
         return true;
     }

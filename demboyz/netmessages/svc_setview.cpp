@@ -11,7 +11,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SetView_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_SetView* data)
+    bool SVC_SetView_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
         bitbuf.WriteUBitLong(data->entIndex, MAX_EDICT_BITS);
         return !bitbuf.IsOverflowed();
@@ -22,7 +22,7 @@ namespace NetHandlers
         return true;
     }
 
-    bool SVC_SetView_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_SetView* data)
+    bool SVC_SetView_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
         return true;
     }

@@ -7,6 +7,11 @@ solution "demboyz"
     platforms "x32"
     flags "MultiProcessorCompile"
     
+    -- GCC specific build options.
+    configuration "gmake"
+        -- Enables C++11 support.
+        buildoptions { "-std=c++0x" }
+
     project "demboyz"
         kind "ConsoleApp"
         language "C++"

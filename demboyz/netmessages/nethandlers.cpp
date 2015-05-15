@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "nethandlers.h"
 #include "netmessages.h"
 

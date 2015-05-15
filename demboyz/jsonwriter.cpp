@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "idemowriter.h"
 #include <cstdio>
 

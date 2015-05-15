@@ -58,7 +58,10 @@ void ConLogWriter::WriteNetPacket(NetPacket& packet)
 {
     std::ostringstream ss;
     NetHandlers::NetMsg_ToString(packet.type, ss, packet.data);
-    ss << "\n";
-    fputs(ss.str().c_str(), m_outputFp);
-    std::clog << ss.str();
+    if (ss.tellp() > 0)
+    {
+        ss << "\n";
+        fputs(ss.str().c_str(), m_outputFp);
+        std::clog << ss.str();
+    }
 }

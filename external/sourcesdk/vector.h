@@ -40,12 +40,12 @@ public:
         y = _y;
         z = _z;
     }
-    float& Vector::operator[](int i)
+    float& operator[](int i)
     {
         assert( (i >= 0) && (i < 3) );
         return ((float*)this)[i];
     }
-    float Vector::operator[](int i) const
+    float operator[](int i) const
     {
         assert( (i >= 0) && (i < 3) );
         return ((float*)this)[i];

@@ -58,6 +58,6 @@ namespace NetHandlers
             << ", max " << data->maxEntries
             << ", changed " << data->numUpdatedEntries
             << "," << (data->updateBaseline ? " BL update," : "")
-            << " bytes" << math::BitsToBytes(data->dataLengthInBits);
+            << " bytes " << math::BitsToBytes(data->dataLengthInBits);
     }
 }

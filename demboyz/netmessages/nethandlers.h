@@ -21,14 +21,11 @@ struct SourceGameContext
 #define DECLARE_NET_HANDLERS(msgname) \
     namespace NetHandlers \
     { \
-        namespace \
-        { \
-            bool msgname##_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-            bool msgname##_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-            bool msgname##_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-            bool msgname##_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
-            void msgname##_ToString_Internal(std::ostringstream& out, NetMsg::##msgname* data); \
-        } \
+        bool msgname##_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        bool msgname##_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        bool msgname##_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        bool msgname##_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::##msgname* data); \
+        void msgname##_ToString_Internal(std::ostringstream& out, NetMsg::##msgname* data); \
         inline bool msgname##_BitRead(bf_read& bitbuf, SourceGameContext& context, void* data) \
         { \
             return msgname##_BitRead_Internal(bitbuf, context, reinterpret_cast<NetMsg::##msgname*>(data)); \

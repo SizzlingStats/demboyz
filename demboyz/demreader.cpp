@@ -15,7 +15,7 @@ typedef bool (*NetMsgReadFn)(bf_read& bitbuf, SourceGameContext& context, void* 
 static const NetMsgReadFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(BitRead);
 //static const void* netDataStructs[] = DECLARE_NET_DATA_ARRAY;
 
-void ParsePacket(uint8_t* packet, size_t length, IDemoWriter* writer)
+void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDemoWriter* writer)
 {
     assert(length <= NET_MAX_PAYLOAD);
     bf_read bitbuf(packet, length);
@@ -24,12 +24,21 @@ void ParsePacket(uint8_t* packet, size_t length, IDemoWriter* writer)
     {
         netPacket.type = bitbuf.ReadUBitLong(NETMSG_TYPE_BITS);
         //netPacket.data = netDataStructs[netPacket.type];
-        //netHandlers[netPacket.type](bitbuf, context, );
+        netHandlers[netPacket.type](bitbuf, context, nullptr);
     }
 }
 
-void ParseDemo(DemoFileReader& reader, IDemoWriter* writer)
+void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
 {
+    SourceGameContext context;
+    DemoFileReader reader(reinterpret_cast<FILE*>(inputFp));
+    {
+        demoheader_t header;
+        reader.ReadDemoHeader(header);
+        writer->StartWriting(header);
+        context.protocol = header.networkprotocol;
+    }
+    
     democmdinfo_t cmdInfo;
     CommandPacket packet;
     packet.cmdInfo = &cmdInfo;
@@ -77,20 +86,9 @@ void ParseDemo(DemoFileReader& reader, IDemoWriter* writer)
         writer->StartCommandPacket(packet);
         if (packet.cmd == dem_packet || packet.cmd == dem_signon)
         {
-            ParsePacket(buffer.data(), buffer.size(), writer);
+            ParsePacket(buffer.data(), buffer.size(), context, writer);
         }
         writer->EndCommandPacket();
     } while (packet.cmd != dem_stop);
-}
-
-void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
-{
-    DemoFileReader demoFile(reinterpret_cast<FILE*>(inputFp));
-    {
-        demoheader_t header;
-        demoFile.ReadDemoHeader(header);
-        writer->StartWriting(header);
-    }
-    ParseDemo(demoFile, writer);
     writer->EndWriting();
 }

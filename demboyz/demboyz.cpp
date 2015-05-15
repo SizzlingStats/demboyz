@@ -45,7 +45,7 @@ int main(const int argc, const char* argv[])
 {
     if (argc != 3)
     {
-        fprintf(stderr, "Usage: %s <in>.dem/json <out>.dem/json\n", argv[0]);
+        fprintf(stderr, "Usage: %s <in>.dem/json <out>.dem/json/con\n", argv[0]);
         return -1;
     }
 

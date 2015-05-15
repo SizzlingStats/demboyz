@@ -10,9 +10,6 @@
 #include <vector>
 #include <cstdint>
 
-typedef bool (*NetMsgReadFn)(bf_read& bitbuf, SourceGameContext& context, void* data);
-
-static const NetMsgReadFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(BitRead);
 static void* netDataStructs[32];
 
 static void CreateNetMsgStructs()
@@ -96,7 +93,8 @@ void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDe
     {
         netPacket.type = bitbuf.ReadUBitLong(NETMSG_TYPE_BITS);
         netPacket.data = netDataStructs[netPacket.type];
-        netHandlers[netPacket.type](bitbuf, context, netPacket.data);
+        NetHandlers::NetMsg_BitRead(netPacket.type, bitbuf, context, netPacket.data);
+        writer->WriteNetPacket(netPacket);
     }
 }
 

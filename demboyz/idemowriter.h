@@ -40,6 +40,7 @@ public:
 public:
     static IDemoWriter* CreateJsonWriter(void* outputFp);
     static IDemoWriter* CreateDemoWriter(void* outputFp);
+    static IDemoWriter* CreateConLogWriter(void* outputFp);
 
     static void FreeDemoWriter(IDemoWriter* writer)
     {

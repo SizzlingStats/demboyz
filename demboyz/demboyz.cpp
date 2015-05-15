@@ -3,6 +3,7 @@
 #include "demoreader.h"
 #include <cstdio>
 #include <string>
+#include <cassert>
 
 std::string GetExtension(const std::string& filename)
 {
@@ -18,7 +19,8 @@ enum class FileType
 {
     None,
     Dem,
-    Json
+    Json,
+    ConLog
 };
 
 FileType GetFileType(const std::string& filename)
@@ -31,6 +33,10 @@ FileType GetFileType(const std::string& filename)
     if (ext == "json")
     {
         return FileType::Json;
+    }
+    if (ext == "con")
+    {
+        return FileType::ConLog;
     }
     return FileType::None;
 }
@@ -74,23 +80,35 @@ int main(const int argc, const char* argv[])
         return -1;
     }
 
-    IDemoWriter* writer;
+    IDemoWriter* writer = nullptr;
     if (outputType == FileType::Dem)
     {
         writer = IDemoWriter::CreateDemoWriter(outputFp);
     }
-    else
+    else if (outputType == FileType::Json)
     {
         writer = IDemoWriter::CreateJsonWriter(outputFp);
+    }
+    else if (outputType == FileType::ConLog)
+    {
+        writer = IDemoWriter::CreateConLogWriter(outputFp);
+    }
+    else
+    {
+        assert(false);
     }
 
     if (inputType == FileType::Dem)
     {
         DemoReader::ProcessDem(inputFp, writer);
     }
-    else
+    else if (inputType == FileType::Json)
     {
         DemoReader::ProcessJson(inputFp, writer);
+    }
+    else
+    {
+        assert(false);
     }
     fclose(inputFp);
     fclose(outputFp);

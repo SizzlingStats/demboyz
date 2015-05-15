@@ -9,6 +9,7 @@
 #include "bitbuf.h"
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 // FIXME: Can't use this until we get multithreaded allocations in tier0 working for tools
 // This is used by VVIS and fails to link

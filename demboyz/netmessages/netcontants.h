@@ -9,8 +9,8 @@ enum constants
     // was 96000
     NET_MAX_PAYLOAD = 288000,       // largest message size in bytes
 
-    // was 17
-    NET_MAX_PAYLOAD_BITS = 19,     // 2^NET_MAX_PAYLOAD_BITS > NET_MAX_PAYLOAD
+    NET_MAX_PAYLOAD_BITS_OLD = 17,  // for old demos
+    NET_MAX_PAYLOAD_BITS = 19,      // 2^NET_MAX_PAYLOAD_BITS > NET_MAX_PAYLOAD
 
     // table index is sent in log2(MAX_TABLES) bits
     MAX_TABLES = 32,                // Table id is 4 bits

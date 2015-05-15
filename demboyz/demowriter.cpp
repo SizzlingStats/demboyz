@@ -26,3 +26,23 @@ IDemoWriter* IDemoWriter::CreateDemoWriter(void* outputFp)
 DemoWriter::DemoWriter(FILE* outputFp)
 {
 }
+
+void DemoWriter::StartWriting(demoheader_t& header)
+{
+}
+
+void DemoWriter::EndWriting()
+{
+}
+
+void DemoWriter::StartCommandPacket(CommandPacket& packet)
+{
+}
+
+void DemoWriter::EndCommandPacket()
+{
+}
+
+void DemoWriter::WriteNetPacket(NetPacket& packet)
+{
+}

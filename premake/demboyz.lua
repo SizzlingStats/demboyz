@@ -5,6 +5,7 @@ solution "demboyz"
     startproject "demboyz"
     configurations { "Debug", "Release" }
     platforms "x32"
+    flags "MultiProcessorCompile"
     
     project "demboyz"
         kind "ConsoleApp"

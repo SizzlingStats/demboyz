@@ -1,23 +1,9 @@
-
+/*
 #include "netmessages.h"
 #include "demofilebitbuf.h"
+#include "sourcenetcontants.h"
 #include <cassert>
-
-namespace math
-{
-    unsigned int log2(unsigned int value)
-    {
-        unsigned int res = 0;
-        while (value >>= 1)
-            ++res;
-        return res;
-    }
-
-    unsigned int Bits2Bytes(unsigned int bits)
-    {
-        return ((bits + 7) >> 3);
-    }
-}
+#include "netmath.h"
 
 void Net_NOP(CBitRead& bitbuf)
 {
@@ -81,6 +67,7 @@ void Net_SignonState(CBitRead& bitbuf)
     const int spawnCount = bitbuf.ReadLong();
 }
 
+// verified
 void SVC_Print(CBitRead& bitbuf)
 {
     char textBuffer[2048];
@@ -127,6 +114,7 @@ void SVC_ServerInfo(CBitRead& bitbuf)
     // }
 }
 
+// verified
 void SVC_SendTable(CBitRead& bitbuf)
 {
     const bool needsDecoder = bitbuf.ReadOneBit() != 0;
@@ -160,6 +148,7 @@ void SVC_ClassInfo(CBitRead& bitbuf)
     }
 }
 
+// verified
 void SVC_SetPause(CBitRead& bitbuf)
 {
     const bool paused = bitbuf.ReadOneBit() != 0;
@@ -191,7 +180,7 @@ void SVC_CreateStringTable(CBitRead& bitbuf)
     // }
     // else
     // {
-    //     const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PALYLOAD_BITS + 1);
+    //     const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS + 1);
     // }
     
     const bool userDataFixedSize = bitbuf.ReadOneBit() != 0;
@@ -234,6 +223,7 @@ void SVC_VoiceInit(CBitRead& bitbuf)
     const int quality = bitbuf.ReadByte(); // custom quality setting
 }
 
+// verified
 void SVC_VoiceData(CBitRead& bitbuf)
 {
     const int fromClientIndex = bitbuf.ReadByte();
@@ -266,6 +256,7 @@ void SVC_Sounds(CBitRead& bitbuf)
     bitbuf.SeekRelative(lengthInBits);
 }
 
+// verified
 void SVC_SetView(CBitRead& bitbuf)
 {
     const int entIndex = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
@@ -309,6 +300,7 @@ void SVC_TerrainMod(CBitRead& bitbuf)
     assert(false);
 }
 
+// verified
 void SVC_UserMessage(CBitRead& bitbuf)
 {
     const int msgType = bitbuf.ReadByte();
@@ -318,6 +310,7 @@ void SVC_UserMessage(CBitRead& bitbuf)
     bitbuf.SeekRelative(lengthInBits);
 }
 
+// verified
 void SVC_EntityMessage(CBitRead& bitbuf)
 {
     const int entIndex = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
@@ -328,6 +321,7 @@ void SVC_EntityMessage(CBitRead& bitbuf)
     bitbuf.SeekRelative(lengthInBits);
 }
 
+// verified
 void SVC_GameEvent(CBitRead& bitbuf)
 {
     const int lengthInBits = bitbuf.ReadUBitLong(11);
@@ -335,6 +329,7 @@ void SVC_GameEvent(CBitRead& bitbuf)
     bitbuf.SeekRelative(lengthInBits);
 }
 
+// verified
 void SVC_PacketEntities(CBitRead& bitbuf)
 {
     const int maxEntries = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
@@ -357,7 +352,7 @@ void SVC_PacketEntities(CBitRead& bitbuf)
 void SVC_TempEntities(CBitRead& bitbuf)
 {
     const int numEntries = bitbuf.ReadUBitLong(EVENT_INDEX_BITS);
-    const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PALYLOAD_BITS);
+    const int lengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS);
     bitbuf.SeekRelative(lengthInBits);
 }
 
@@ -391,17 +386,20 @@ void SVC_Menu(CBitRead& bitbuf)
 void SVC_GameEventList(CBitRead& bitbuf)
 {
     const int numEvents = bitbuf.ReadUBitLong(MAX_EVENT_BITS);
+    const int lengthInBits = bitbuf.ReadUBitLong(20);
     for (int i = 0; i < numEvents; ++i)
     {
         const int id = bitbuf.ReadUBitLong(MAX_EVENT_BITS);
         char name[MAX_EVENT_NAME_LENGTH];
         bitbuf.ReadString(name, sizeof(name));
         printf("%s\n", name);
-        assert(false);
+        while (bitbuf.ReadUBitLong(3) > 0)
+        {
+            bitbuf.ReadString(name, sizeof(name));
+        }
         // gameeventmanager.cpp ParseEventList
     }
-    const int lengthInBits = bitbuf.ReadUBitLong(20);
-    bitbuf.SeekRelative(lengthInBits);
+    //bitbuf.SeekRelative(lengthInBits);
 }
 
 void SVC_GetCvarValue(CBitRead& bitbuf)
@@ -411,48 +409,4 @@ void SVC_GetCvarValue(CBitRead& bitbuf)
     char cvarName[256];
     bitbuf.ReadString(cvarName, sizeof(cvarName));
 }
-
-static const int NUM_MESSAGES = static_cast<uint8_t>(NetMsg::SVC_LASTMSG) + 1;
-
-void ProcessNetMsg(const std::uint32_t msgType, CBitRead& bitbuf)
-{
-    static NetMsgFn netMsgHandler[NUM_MESSAGES] =
-    {
-        &Net_NOP,
-        &Net_Disconnect,
-        &Net_File,
-        &Net_Tick,
-        &Net_StringCmd,
-        &Net_SetConVar,
-        &Net_SignonState,
-
-        &SVC_Print,
-        &SVC_ServerInfo,
-        &SVC_SendTable,
-        &SVC_ClassInfo,
-        &SVC_SetPause,
-        &SVC_CreateStringTable,
-        &SVC_UpdateStringTable,
-        &SVC_VoiceInit,
-        &SVC_VoiceData,
-        &SVC_HLTV,
-        &SVC_Sounds,
-        &SVC_SetView,
-        &SVC_FixAngle,
-        &SVC_CrosshairAngle,
-        &SVC_BSPDecal,
-        &SVC_TerrainMod,
-        &SVC_UserMessage,
-        &SVC_EntityMessage,
-        &SVC_GameEvent,
-        &SVC_PacketEntities,
-        &SVC_TempEntities,
-        &SVC_Prefetch,
-        &SVC_Menu,
-        &SVC_GameEventList,
-        &SVC_GetCvarValue
-    };
-
-    assert(msgType < NUM_MESSAGES);
-    netMsgHandler[msgType](bitbuf);
-}
+*/

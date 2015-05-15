@@ -22,3 +22,27 @@ IDemoWriter* IDemoWriter::CreateJsonWriter(void* outputFp)
 {
     return new JsonWriter(reinterpret_cast<FILE*>(outputFp));
 }
+
+JsonWriter::JsonWriter(FILE* outputFp)
+{
+}
+
+void JsonWriter::StartWriting(demoheader_t& header)
+{
+}
+
+void JsonWriter::EndWriting()
+{
+}
+
+void JsonWriter::StartCommandPacket(CommandPacket& packet)
+{
+}
+
+void JsonWriter::EndCommandPacket()
+{
+}
+
+void JsonWriter::WriteNetPacket(NetPacket& packet)
+{
+}

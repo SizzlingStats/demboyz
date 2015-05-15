@@ -1,0 +1,52 @@
+
+#include "svc_updatestringtable.h"
+#include "bitbuf.h"
+#include "netmath.h"
+#include "netcontants.h"
+
+namespace NetHandlers
+{
+    bool SVC_UpdateStringTable_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    {
+        data->tableID = bitbuf.ReadUBitLong(math::log2(MAX_TABLES));
+        data->numChangedEntries = (bitbuf.ReadOneBit() != 0) ? bitbuf.ReadWord() : 1;
+        data->dataLengthInBits = bitbuf.ReadUBitLong(20);
+        data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
+        bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
+        return !bitbuf.IsOverflowed();
+    }
+
+    bool SVC_UpdateStringTable_BitWrite_Internal(bf_write& bitbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    {
+        bitbuf.WriteUBitLong(data->tableID, math::log2(MAX_TABLES));
+        if (data->numChangedEntries != 1)
+        {
+            bitbuf.WriteOneBit(1);
+            bitbuf.WriteWord(data->numChangedEntries);
+        }
+        else
+        {
+            bitbuf.WriteOneBit(0);
+        }
+        bitbuf.WriteUBitLong(data->dataLengthInBits, 20);
+        bitbuf.WriteBits(data->data.get(), data->dataLengthInBits);
+        return !bitbuf.IsOverflowed();
+    }
+
+    bool SVC_UpdateStringTable_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    {
+        return true;
+    }
+
+    bool SVC_UpdateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    {
+        return true;
+    }
+
+    void SVC_UpdateStringTable_ToString_Internal(std::ostringstream& out, NetMsg::SVC_UpdateStringTable* data)
+    {
+        out << "svc_UpdateStringTable: table " << data->tableID
+            << ", changed " << data->numChangedEntries
+            << ", bytes " << math::BitsToBytes(data->dataLengthInBits);
+    }
+}

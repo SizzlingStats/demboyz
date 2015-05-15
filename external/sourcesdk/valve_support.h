@@ -33,7 +33,7 @@ using byte = char;
 
 #define Q_memcpy memcpy
 
-bool is_little_endian()
+inline bool is_little_endian()
 {
     union {
         uint32 i;

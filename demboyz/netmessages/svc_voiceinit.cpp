@@ -31,6 +31,6 @@ namespace NetHandlers
     void SVC_VoiceInit_ToString_Internal(std::ostringstream& out, NetMsg::SVC_VoiceInit* data)
     {
         out << "svc_VoiceInit: codec \"" << data->voiceCodec
-            << "\", qualitty " << data->quality;
+            << "\", qualitty " << static_cast<uint32_t>(data->quality);
     }
 }

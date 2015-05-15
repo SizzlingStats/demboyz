@@ -37,7 +37,7 @@ namespace NetHandlers
 
     void SVC_UserMessage_ToString_Internal(std::ostringstream& out, NetMsg::SVC_UserMessage* data)
     {
-        out << "svc_UserMessage: type " << data->msgType
+        out << "svc_UserMessage: type " << static_cast<uint32_t>(data->msgType)
             << ", bytes " << math::BitsToBytes(data->dataLengthInBits);
     }
 }

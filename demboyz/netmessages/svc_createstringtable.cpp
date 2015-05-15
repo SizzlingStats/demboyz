@@ -99,6 +99,6 @@ namespace NetHandlers
             << ", entries " << data->numEntries
             << ", bytes " << math::BitsToBytes(data->dataLengthInBits)
             << " userdatasize " << data->userDataSize
-            << " userdatabits " << data->userDataSizeBits;
+            << " userdatabits " << static_cast<uint32_t>(data->userDataSizeBits);
     }
 }

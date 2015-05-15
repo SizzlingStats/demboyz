@@ -52,7 +52,7 @@ namespace NetHandlers
 
     void SVC_Sounds_ToString_Internal(std::ostringstream& out, NetMsg::SVC_Sounds* data)
     {
-        out << "svc_Sounds: number " << data->numSounds
+        out << "svc_Sounds: number " << static_cast<uint32_t>(data->numSounds)
             << (data->reliableSound ? ", reliable" : "")
             << ", bytes " << math::BitsToBytes(data->dataLengthInBits);
     }

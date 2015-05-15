@@ -36,7 +36,7 @@ namespace NetHandlers
 
     void SVC_VoiceData_ToString_Internal(std::ostringstream& out, NetMsg::SVC_VoiceData* data)
     {
-        out << "svc_VoiceData: client " << data->fromClientIndex
+        out << "svc_VoiceData: client " << static_cast<uint32_t>(data->fromClientIndex)
             << ", bytes " << math::BitsToBytes(data->dataLengthInBits);
     }
 }

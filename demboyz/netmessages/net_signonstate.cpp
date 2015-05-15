@@ -31,6 +31,7 @@ namespace NetHandlers
 
     void Net_SignonState_ToString_Internal(std::ostringstream& out, NetMsg::Net_SignonState* data)
     {
-        out << "net_SignonState: state " << data->signonState << ", count " << data->spawnCount;
+        out << "net_SignonState: state " << static_cast<uint32_t>(data->signonState)
+            << ", count " << data->spawnCount;
     }
 }

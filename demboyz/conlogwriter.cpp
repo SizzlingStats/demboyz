@@ -3,7 +3,6 @@
 #include "netmessages/nethandlers.h"
 #include "demotypes.h"
 #include <cstdio>
-#include <iostream>
 
 class ConLogWriter: public IDemoWriter
 {
@@ -38,10 +37,13 @@ void ConLogWriter::StartWriting(demoheader_t& header)
     //ss << "Playing demo from " <<  << ".\n";
     //fputs(ss.str().c_str(), m_outputFp);
     //std::clog << ss.str() << std::endl;
+    fflush(stdout);
+    setvbuf(stdout, NULL, _IOFBF, 1024*64);
 }
 
 void ConLogWriter::EndWriting()
 {
+    fflush(stdout);
 }
 
 void ConLogWriter::StartCommandPacket(CommandPacket& packet)
@@ -60,6 +62,6 @@ void ConLogWriter::WriteNetPacket(NetPacket& packet)
     {
         ss << "\n";
         fputs(ss.str().c_str(), m_outputFp);
-        std::clog << ss.str();
+        fputs(ss.str().c_str(), stdout);
     }
 }

@@ -41,6 +41,7 @@ namespace NetHandlers
             << " " << data->x
             << " " << data->y
             << " " << data->z
-            << std::defaultfloat << std::setprecision(oldPrecision);
+            << std::setprecision(oldPrecision);
+        out.unsetf(std::ios_base::floatfield);
     }
 }

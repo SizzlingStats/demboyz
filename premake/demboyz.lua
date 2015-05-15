@@ -5,7 +5,7 @@ solution "demboyz"
     startproject "demboyz"
     configurations { "Debug", "Release" }
     platforms "x32"
-    flags "MultiProcessorCompile"
+    flags { "MultiProcessorCompile", "Symbols" }
     
     -- GCC specific build options.
     configuration "gmake"

@@ -21,7 +21,7 @@ namespace NetMsg
             std::vector<EventValue> values;
         };
 
-        uint16_t dataLengthInBits;
+        uint32_t dataLengthInBits;
         std::vector<EventDescriptor> eventDescriptors;
     };
 }

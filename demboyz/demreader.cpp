@@ -145,9 +145,6 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
         case dem_stop:
             // TODO assert frame and tick numbers
             break;
-        case dem_customdata:
-            reader.ReadRawData(nullptr, 0);
-            break;
         case dem_stringtables:
             reader.ReadRawData(nullptr, 0);
             break;

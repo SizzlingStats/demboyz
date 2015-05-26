@@ -53,8 +53,6 @@ enum
     dem_datatables,
     // end of time.
     dem_stop,
-    // a blob of binary data understood by a callback function
-    dem_customdata,
 
     dem_stringtables,
 

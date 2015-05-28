@@ -13,7 +13,7 @@ public:
     virtual void StartCommandPacket(CommandPacket& packet) override final;
     virtual void EndCommandPacket() override final;
 
-    virtual void WriteNetPacket(NetPacket& packet) override final;
+    virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 };
 
 IDemoWriter* IDemoWriter::CreateJsonWriter(void* outputFp)
@@ -41,6 +41,6 @@ void JsonWriter::EndCommandPacket()
 {
 }
 
-void JsonWriter::WriteNetPacket(NetPacket& packet)
+void JsonWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
 }

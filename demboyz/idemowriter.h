@@ -7,6 +7,7 @@ struct democmdinfo_t;
 struct demoheader_t;
 struct CommandPacket;
 struct NetPacket;
+struct SourceGameContext;
 
 struct CommandPacket
 {
@@ -35,7 +36,7 @@ public:
     virtual void StartCommandPacket(CommandPacket& packet) = 0;
     virtual void EndCommandPacket() = 0;
 
-    virtual void WriteNetPacket(NetPacket& packet) = 0;
+    virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) = 0;
 
 public:
     static IDemoWriter* CreateJsonWriter(void* outputFp);

@@ -15,7 +15,7 @@ public:
     virtual void StartCommandPacket(CommandPacket& packet) override final;
     virtual void EndCommandPacket() override final;
 
-    virtual void WriteNetPacket(NetPacket& packet) override final;
+    virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 
 private:
     FILE* m_outputFp;
@@ -54,7 +54,7 @@ void ConLogWriter::EndCommandPacket()
 {
 }
 
-void ConLogWriter::WriteNetPacket(NetPacket& packet)
+void ConLogWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
     std::ostringstream ss;
     NetHandlers::NetMsg_ToString(packet.type, ss, packet.data);

@@ -13,7 +13,7 @@ public:
     virtual void StartCommandPacket(CommandPacket& packet) override final;
     virtual void EndCommandPacket() override final;
 
-    virtual void WriteNetPacket(NetPacket& packet) override final;
+    virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 };
 
 IDemoWriter* IDemoWriter::CreateDemoWriter(void* outputFp)
@@ -41,6 +41,6 @@ void DemoWriter::EndCommandPacket()
 {
 }
 
-void DemoWriter::WriteNetPacket(NetPacket& packet)
+void DemoWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
 }

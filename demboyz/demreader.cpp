@@ -94,7 +94,7 @@ void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDe
         netPacket.type = bitbuf.ReadUBitLong(NETMSG_TYPE_BITS);
         netPacket.data = netDataStructs[netPacket.type];
         NetHandlers::NetMsg_BitRead(netPacket.type, bitbuf, context, netPacket.data);
-        writer->WriteNetPacket(netPacket);
+        writer->WriteNetPacket(netPacket, context);
     }
 }
 

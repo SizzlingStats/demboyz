@@ -39,8 +39,9 @@
 // Demo messages
 enum
 {
+    dem_unknown = 0,
     // it's a startup message, process as fast as possible
-    dem_signon  = 1,
+    dem_signon,
     // it's a normal network packet that we stored off
     dem_packet,
     // sync client clock to demo tick

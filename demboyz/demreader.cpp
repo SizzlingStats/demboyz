@@ -136,7 +136,10 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
             reader.ReadRawData(nullptr, 1024);
             break;
         case dem_usercmd:
-            reader.ReadUserCmd(buffer.data(), 256);
+            {
+                int32_t sequenceNum;
+                reader.ReadUserCmd(sequenceNum, buffer.get(), 256);
+            }
             break;
         case dem_datatables:
             // TODO: datatables

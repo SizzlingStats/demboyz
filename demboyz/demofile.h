@@ -17,7 +17,7 @@ public:
     void ReadSequenceInfo(int32_t& seqNum1, int32_t& seqNum2);
     void ReadCmdInfo(democmdinfo_t& info);
     void ReadCmdHeader(unsigned char& cmd, int32_t& tick);
-    int32_t ReadUserCmd(uint8_t* buffer, int32_t length);
+    int32_t ReadUserCmd(int32_t& sequenceNum, uint8_t* buffer, int32_t length);
 
 private:
     FILE* m_demoFp;

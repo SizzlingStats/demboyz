@@ -60,15 +60,10 @@ void DemoFileReader::ReadCmdHeader(unsigned char& cmd, int32_t& tick)
     }
 }
 
-int32_t DemoFileReader::ReadUserCmd(uint8_t* buffer, int32_t length)
+int32_t DemoFileReader::ReadUserCmd(int32_t& sequenceNum, uint8_t* buffer, int32_t length)
 {
-    int32_t sequenceNum;
     fread(&sequenceNum, sizeof(int32_t), 1, m_demoFp);
-    if (ReadRawData(buffer, length) < 0)
-    {
-        return -1;
-    }
-    return sequenceNum;
+    return ReadRawData(buffer, length);
 }
 
 // DemoFileWriter

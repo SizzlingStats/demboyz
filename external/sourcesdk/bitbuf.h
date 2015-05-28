@@ -165,7 +165,7 @@ public:
 	void			WriteOneBitAt( int iBit, int nValue );
 	
 	// Write signed or unsigned. Range is only checked in debug.
-	void			WriteUBitLong( unsigned int data, int numbits, bool bCheckRange=true );
+	void			WriteUBitLong( unsigned int data, int numbits, bool bCheckRange=true ) __restrict;
 	void			WriteSBitLong( int data, int numbits );
 	
 	// Tell it whether or not the data is unsigned. If it's signed,

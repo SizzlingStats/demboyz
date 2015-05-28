@@ -98,6 +98,56 @@ void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDe
     }
 }
 
+void ReadStringTable(bf_read& bitbuf)
+{
+    std::vector<uint8_t> data;
+    size_t numEntries = bitbuf.ReadWord();
+    char entryName[4096];
+    while (numEntries--)
+    {
+        bitbuf.ReadString(entryName, sizeof(entryName));
+        printf("%s ", entryName);
+        if (bitbuf.ReadOneBit() != 0)
+        {
+            size_t numDataBytes = bitbuf.ReadWord();
+            data.resize(numDataBytes);
+            bitbuf.ReadBytes(data.data(), numDataBytes);
+            printf("bytes %i ", numDataBytes);
+        }
+        printf("\n");
+    }
+    if (bitbuf.ReadOneBit() == 0)
+    {
+        return;
+    }
+    while (numEntries--)
+    {
+        bitbuf.ReadString(entryName, sizeof(entryName));
+        printf("%s ", entryName);
+        if (bitbuf.ReadOneBit() != 0)
+        {
+            size_t numDataBytes = bitbuf.ReadWord();
+            data.resize(numDataBytes);
+            bitbuf.ReadBytes(data.data(), numDataBytes);
+            printf("bytes %i ", numDataBytes);
+        }
+        printf("\n");
+    }
+}
+
+void ParseStringTables(uint8_t* stringtables, size_t length, SourceGameContext& context, IDemoWriter* writer)
+{
+    bf_read bitbuf(stringtables, length);
+    size_t numTables = bitbuf.ReadByte();
+    char tablename[256];
+    while (numTables--)
+    {
+        bitbuf.ReadString(tablename, sizeof(tablename));
+        printf("stringtable %s\n", tablename);
+        ReadStringTable(bitbuf);
+    }
+}
+
 void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
 {
     CreateNetMsgStructs();
@@ -113,21 +163,25 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
     democmdinfo_t cmdInfo;
     CommandPacket packet;
     packet.cmdInfo = &cmdInfo;
-    std::vector<uint8_t> buffer;
-    buffer.resize(NET_MAX_PAYLOAD);
-
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[NET_MAX_PAYLOAD]);
     do
     {
         size_t rawDataSize = 0;
         reader.ReadCmdHeader(packet.cmd, packet.tick);
+        if (packet.cmd == dem_packet || packet.cmd == dem_signon)
+        {
+            reader.ReadCmdInfo(*packet.cmdInfo);
+            reader.ReadSequenceInfo(packet.sequenceInfo1, packet.sequenceInfo2);
+            assert(packet.sequenceInfo1 == packet.sequenceInfo2);
+        }
+
+        writer->StartCommandPacket(packet);
         switch (packet.cmd)
         {
         case dem_signon:
         case dem_packet:
-            reader.ReadCmdInfo(*packet.cmdInfo);
-            reader.ReadSequenceInfo(packet.sequenceInfo1, packet.sequenceInfo2);
-            assert(packet.sequenceInfo1 == packet.sequenceInfo2);
-            rawDataSize = reader.ReadRawData(buffer.data(), buffer.size());
+            rawDataSize = reader.ReadRawData(buffer.get(), NET_MAX_PAYLOAD);
+            ParsePacket(buffer.get(), rawDataSize, context, writer);
             break;
         case dem_synctick:
             // nothing
@@ -149,16 +203,16 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
             // TODO assert frame and tick numbers
             break;
         case dem_stringtables:
-            reader.ReadRawData(nullptr, 0);
+            {
+                uint8_t* stringtables = reinterpret_cast<uint8_t*>(malloc(MAX_STRINGTABLE_DATA));
+                size_t length = reader.ReadRawData(stringtables, MAX_STRINGTABLE_DATA);
+                ParseStringTables(stringtables, length, context, writer);
+                free(stringtables);
+            }
             break;
         default:
             assert(false);
             break;
-        }
-        writer->StartCommandPacket(packet);
-        if (packet.cmd == dem_packet || packet.cmd == dem_signon)
-        {
-            ParsePacket(buffer.data(), rawDataSize, context, writer);
         }
         writer->EndCommandPacket();
     } while (packet.cmd != dem_stop);

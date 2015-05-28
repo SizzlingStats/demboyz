@@ -44,5 +44,7 @@ enum constants
     SIGNONSTATE_PRESPAWN = 4, // received signon buffers
     SIGNONSTATE_SPAWN = 5, // ready to receive entity packets
     SIGNONSTATE_FULL = 6, // we are fully connected, first non-delta packet received
-    SIGNONSTATE_CHANGELEVEL = 7  // server is changing level, please wait
+    SIGNONSTATE_CHANGELEVEL = 7,  // server is changing level, please wait
+
+    MAX_STRINGTABLE_DATA = 524288   // 2^19
 };

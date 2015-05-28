@@ -8,7 +8,7 @@ namespace NetHandlers
 
     bool Net_SetConVar_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
-        data->cvars.resize(bitbuf.ReadUBitLong(8));
+        data->cvars.resize(bitbuf.ReadByte());
         for (cvar_t& cvar : data->cvars)
         {
             bitbuf.ReadString(cvar.name, sizeof(cvar.name));
@@ -19,7 +19,7 @@ namespace NetHandlers
 
     bool Net_SetConVar_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
-        bitbuf.WriteUBitLong(data->cvars.size(), 8);
+        bitbuf.WriteByte(data->cvars.size());
         for (cvar_t& cvar : data->cvars)
         {
             bitbuf.WriteString(cvar.name);

@@ -6,16 +6,16 @@ namespace NetHandlers
 {
     bool Net_SignonState_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_SignonState* data)
     {
-        data->signonState = bitbuf.ReadUBitLong(8);
-        data->spawnCount = bitbuf.ReadUBitLong(32);
+        data->signonState = bitbuf.ReadByte();
+        data->spawnCount = bitbuf.ReadLong();
         //assert(signonState >= SIGNONSTATE_NONE && signonState <= SIGNONSTATE_CHANGELEVEL);
         return !bitbuf.IsOverflowed();
     }
 
     bool Net_SignonState_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_SignonState* data)
     {
-        bitbuf.WriteUBitLong(data->signonState, 8);
-        bitbuf.WriteUBitLong(data->spawnCount, 32);
+        bitbuf.WriteByte(data->signonState);
+        bitbuf.WriteLong(data->spawnCount);
         return !bitbuf.IsOverflowed();
     }
 

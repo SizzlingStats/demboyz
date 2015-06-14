@@ -69,5 +69,6 @@ void DemoWriter::EndCommandPacket()
 
 void DemoWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
+    m_cmdPacketBuf.WriteUBitLong(packet.type, NETMSG_TYPE_BITS);
     NetHandlers::NetMsg_BitWrite(packet.type, m_cmdPacketBuf, context, packet.data);
 }

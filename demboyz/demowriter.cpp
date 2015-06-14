@@ -1,7 +1,7 @@
 
 #include "idemowriter.h"
-#include "demotypes.h"
-#include "demofile.h"
+#include "demofile/demotypes.h"
+#include "demofile/demofile.h"
 #include "netmessages/nethandlers.h"
 #include "netmessages/netcontants.h"
 #include "sourcesdk/bitbuf.h"

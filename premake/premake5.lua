@@ -17,10 +17,8 @@ solution "demboyz"
         language "C++"
         files
         {
-            "../demboyz/*.h",
-            "../demboyz/*.cpp",
-            "../demboyz/netmessages/*.h",
-            "../demboyz/netmessages/*.cpp",
+            "../demboyz/**.h",
+            "../demboyz/**.cpp",
             "../external/sourcesdk/*.h",
             "../external/sourcesdk/*.cpp"
         }

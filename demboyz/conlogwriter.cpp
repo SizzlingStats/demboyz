@@ -1,7 +1,7 @@
 
 #include "idemowriter.h"
 #include "netmessages/nethandlers.h"
-#include "demotypes.h"
+#include "demofile/demotypes.h"
 #include <cstdio>
 
 class ConLogWriter: public IDemoWriter

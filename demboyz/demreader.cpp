@@ -1,8 +1,8 @@
 
 #include "demoreader.h"
 #include "idemowriter.h"
-#include "demofile.h"
-#include "demotypes.h"
+#include "demofile/demofile.h"
+#include "demofile/demotypes.h"
 
 #include "netmessages/netmessages.h"
 #include "netmessages/netcontants.h"

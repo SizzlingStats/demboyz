@@ -40,8 +40,8 @@
 
 typedef bool (*NetMsgBitReadFn)(bf_read& bitbuf, SourceGameContext& context, void* data);
 typedef bool (*NetMsgBitWriteFn)(bf_write& bitbuf, const SourceGameContext& context, void* data);
-typedef bool (*NetMsgJsonReadFn)(JsonRead& bitbuf, SourceGameContext& context, void* data);
-typedef bool (*NetMsgJsonWriteFn)(JsonWrite& bitbuf, const SourceGameContext& context, void* data);
+typedef bool (*NetMsgJsonReadFn)(JsonRead& jsonbuf, SourceGameContext& context, void* data);
+typedef bool (*NetMsgJsonWriteFn)(JsonWrite& jsonbuf, const SourceGameContext& context, void* data);
 typedef void (*NetMsgToStringFn)(std::ostringstream& out, void* data);
 
 bool NetHandlers::NetMsg_BitRead(uint32_t type, bf_read& bitbuf, SourceGameContext& context, void* data)

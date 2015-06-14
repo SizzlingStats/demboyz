@@ -13,6 +13,7 @@ solution "demboyz"
     configuration "gmake"
         -- Enables C++11 support.
         buildoptions { "-std=c++0x" }
+    configuration {}
 
     project "demboyz"
         kind "ConsoleApp"
@@ -33,9 +34,9 @@ solution "demboyz"
         configuration "Debug"
             targetdir (_ACTION .. "/build/Debug")
             defines { "DEBUG" }
-            flags { "Symbols" }
 
         configuration "Release"
             targetdir (_ACTION .. "/build/Release")
             defines { "NDEBUG" }
             optimize "Full"
+        configuration {}

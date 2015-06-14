@@ -10,6 +10,11 @@ DemoFileReader::DemoFileReader(FILE* fp):
 {
 }
 
+void DemoFileReader::ReadDemoHeader(demoheader_t& header)
+{
+    fread(&header, sizeof(demoheader_t), 1, m_demoFp);
+}
+
 int32_t DemoFileReader::ReadRawData(uint8_t* buffer, int32_t maxLength)
 {
     FILE* fp = m_demoFp;
@@ -100,11 +105,6 @@ DemoFileWriter::DemoFileWriter(FILE* fp) :
 void DemoFileWriter::WriteDemoHeader(const demoheader_t& header)
 {
     fwrite(&header, sizeof(demoheader_t), 1, m_demoFp);
-}
-
-void DemoFileReader::ReadDemoHeader(demoheader_t& header)
-{
-    fread(&header, sizeof(demoheader_t), 1, m_demoFp);
 }
 
 void DemoFileWriter::WriteRawData(const uint8_t* buffer, int32_t length)

@@ -61,7 +61,10 @@ void DemoWriter::StartCommandPacket(CommandPacket& packet)
 
 void DemoWriter::EndCommandPacket()
 {
-    m_writer.WriteRawData(m_cmdPacketBuf.GetBasePointer(), m_cmdPacketBuf.GetNumBytesWritten());
+    if (m_cmdPacketBuf.GetNumBytesWritten() > 0)
+    {
+        m_writer.WriteRawData(m_cmdPacketBuf.GetBasePointer(), m_cmdPacketBuf.GetNumBytesWritten());
+    }
 }
 
 void DemoWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)

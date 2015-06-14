@@ -1,6 +1,7 @@
 
 #include "nethandlers.h"
 #include "netmessages.h"
+#include <cassert>
 
 #define DECLARE_NET_HANDLER_ARRAY(funcname) \
     { \
@@ -47,29 +48,34 @@ typedef void (*NetMsgToStringFn)(std::ostringstream& out, void* data);
 bool NetHandlers::NetMsg_BitRead(uint32_t type, bf_read& bitbuf, SourceGameContext& context, void* data)
 {
     static const NetMsgBitReadFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(BitRead);
+    assert(type < (sizeof(netHandlers) / sizeof(NetMsgBitReadFn)));
     return netHandlers[type](bitbuf, context, data);
 }
 
 bool NetHandlers::NetMsg_BitWrite(uint32_t type, bf_write& bitbuf, const SourceGameContext& context, void* data)
 {
     static const NetMsgBitWriteFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(BitWrite);
+    assert(type < (sizeof(netHandlers) / sizeof(NetMsgBitWriteFn)));
     return netHandlers[type](bitbuf, context, data);
 }
 
 bool NetHandlers::NetMsg_JsonRead(uint32_t type, JsonRead& jsonbuf, SourceGameContext& context, void* data)
 {
     static const NetMsgJsonReadFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(JsonRead);
+    assert(type < (sizeof(netHandlers) / sizeof(NetMsgJsonReadFn)));
     return netHandlers[type](jsonbuf, context, data);
 }
 
 bool NetHandlers::NetMsg_JsonWrite(uint32_t type, JsonWrite& jsonbuf, const SourceGameContext& context, void* data)
 {
     static const NetMsgJsonWriteFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(JsonWrite);
+    assert(type < (sizeof(netHandlers) / sizeof(NetMsgJsonWriteFn)));
     return netHandlers[type](jsonbuf, context, data);
 }
 
 void NetHandlers::NetMsg_ToString(uint32_t type, std::ostringstream& out, void* data)
 {
     static const NetMsgToStringFn netHandlers[] = DECLARE_NET_HANDLER_ARRAY(ToString);
+    assert(type < (sizeof(netHandlers) / sizeof(NetMsgToStringFn)));
     netHandlers[type](out, data);
 }

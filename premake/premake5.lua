@@ -6,6 +6,8 @@ solution "demboyz"
     configurations { "Debug", "Release" }
     platforms "x32"
     flags { "MultiProcessorCompile", "Symbols" }
+
+    defines "_CRT_SECURE_NO_WARNINGS"
     
     -- GCC specific build options.
     configuration "gmake"

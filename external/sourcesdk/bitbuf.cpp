@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>

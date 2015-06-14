@@ -1,6 +1,6 @@
 
 #include "svc_updatestringtable.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include "netmath.h"
 #include "netcontants.h"
 

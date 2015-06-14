@@ -27,7 +27,7 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-#include "vector.h"
+#include "sourcesdk/vector.h"
 
 #define DEMO_HEADER_ID      "HL2DEMO"
 #define DEMO_PROTOCOL       3

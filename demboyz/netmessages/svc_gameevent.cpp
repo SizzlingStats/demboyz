@@ -1,6 +1,6 @@
 
 #include "svc_gameevent.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include "netcontants.h"
 #include "netmath.h"
 

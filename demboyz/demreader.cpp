@@ -6,7 +6,7 @@
 
 #include "netmessages/netmessages.h"
 #include "netmessages/netcontants.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include <vector>
 #include <cstdint>
 

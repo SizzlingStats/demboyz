@@ -1,6 +1,6 @@
 
 #include "svc_crosshairangle.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include <iomanip>
 
 namespace NetHandlers

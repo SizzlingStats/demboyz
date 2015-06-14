@@ -26,7 +26,8 @@ solution "demboyz"
         }
         includedirs
         {
-            "../external/sourcesdk"
+            "../external",
+            "../demboyz"
         }
 
         configuration "Debug"

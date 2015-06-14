@@ -1,6 +1,6 @@
 
 #include "svc_classinfo.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include "netmath.h"
 
 using class_t = NetMsg::SVC_ClassInfo::class_t;

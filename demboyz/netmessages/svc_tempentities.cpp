@@ -1,6 +1,6 @@
 
 #include "svc_tempentities.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include "netcontants.h"
 #include "netmath.h"
 

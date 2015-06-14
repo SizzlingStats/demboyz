@@ -2,7 +2,7 @@
 #pragma once
 
 #include "nethandlers.h"
-#include "vector.h"
+#include "sourcesdk/vector.h"
 
 namespace NetMsg
 {

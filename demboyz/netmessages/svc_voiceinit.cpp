@@ -1,6 +1,6 @@
 
 #include "svc_voiceinit.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 
 namespace NetHandlers
 {

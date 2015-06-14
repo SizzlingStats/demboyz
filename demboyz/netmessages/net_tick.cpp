@@ -1,6 +1,6 @@
 
 #include "net_tick.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 
 namespace NetHandlers
 {

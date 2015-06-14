@@ -4,7 +4,7 @@
 #include "demofile.h"
 #include "netmessages/nethandlers.h"
 #include "netmessages/netcontants.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include <cstdio>
 #include <memory>
 

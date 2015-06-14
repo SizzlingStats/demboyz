@@ -1,6 +1,6 @@
 
 #include "svc_prefetch.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 #include "netcontants.h"
 
 namespace NetHandlers

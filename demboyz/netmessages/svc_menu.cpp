@@ -1,6 +1,6 @@
 
 #include "svc_menu.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 
 using DialogType = NetMsg::SVC_Menu::DialogType;
 

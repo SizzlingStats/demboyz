@@ -1,6 +1,6 @@
 
 #include "net_stringcmd.h"
-#include "bitbuf.h"
+#include "sourcesdk/bitbuf.h"
 
 namespace NetHandlers
 {

@@ -4,6 +4,7 @@
 #include "demofile/demofile.h"
 #include "netmessages/nethandlers.h"
 #include "netmessages/netcontants.h"
+#include "demmessages/demhandlers.h"
 #include "sourcesdk/bitbuf.h"
 #include <cstdio>
 #include <memory>
@@ -51,11 +52,7 @@ void DemoWriter::EndWriting()
 void DemoWriter::StartCommandPacket(CommandPacket& packet)
 {
     m_writer.WriteCmdHeader(packet.cmd, packet.tick);
-    if (packet.cmd == dem_packet || packet.cmd == dem_signon)
-    {
-        m_writer.WriteCmdInfo(*packet.cmdInfo);
-        m_writer.WriteSequenceInfo(packet.sequenceInfo1, packet.sequenceInfo2);
-    }
+    DemHandlers::DemMsg_FileWrite(packet.cmd, m_writer, packet.data);
     m_cmdPacketBuf.Reset();
 }
 

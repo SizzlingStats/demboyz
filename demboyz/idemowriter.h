@@ -14,9 +14,7 @@ struct CommandPacket
     unsigned char cmd;
     int32_t tick;
 
-    democmdinfo_t* cmdInfo;
-    int32_t sequenceInfo1;
-    int32_t sequenceInfo2;
+    void* data;
 };
 
 struct NetPacket

@@ -6,13 +6,14 @@
 
 #include "netmessages/netmessages.h"
 #include "netmessages/netcontants.h"
+#include "demmessages/demmessages.h"
+#include "demmessages/demhandlers.h"
 #include "sourcesdk/bitbuf.h"
 #include <vector>
 #include <cstdint>
+#include <memory>
 
-static void* netDataStructs[32];
-
-static void CreateNetMsgStructs()
+static void CreateNetMsgStructs(void* netDataStructs[32])
 {
     netDataStructs[0] = new NetMsg::Net_NOP();
     netDataStructs[1] = new NetMsg::Net_Disconnect();
@@ -48,7 +49,7 @@ static void CreateNetMsgStructs()
     netDataStructs[31] = new NetMsg::SVC_GetCvarValue();
 }
 
-static void DestroyNetMsgStructs()
+static void DestroyNetMsgStructs(void* netDataStructs[32])
 {
     delete reinterpret_cast<NetMsg::Net_NOP*>(netDataStructs[0]);
     delete reinterpret_cast<NetMsg::Net_Disconnect*>(netDataStructs[1]);
@@ -84,7 +85,35 @@ static void DestroyNetMsgStructs()
     delete reinterpret_cast<NetMsg::SVC_GetCvarValue*>(netDataStructs[31]);
 }
 
-void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDemoWriter* writer)
+static void CreateDemMsgStructs(void* demDataStructs[9])
+{
+    demDataStructs[0] = new DemMsg::Dem_Unknown();
+    demDataStructs[1] = new DemMsg::Dem_Packet();
+    demDataStructs[2] = new DemMsg::Dem_Packet();
+    demDataStructs[3] = new DemMsg::Dem_SyncTick();
+    demDataStructs[4] = new DemMsg::Dem_ConsoleCmd();
+    demDataStructs[5] = new DemMsg::Dem_UserCmd();
+    demDataStructs[6] = new DemMsg::Dem_DataTables();
+    demDataStructs[7] = new DemMsg::Dem_Stop();
+    demDataStructs[8] = new DemMsg::Dem_StringTables();
+}
+
+static void DestroyDemMsgStructs(void* demDataStructs[9])
+{
+    delete reinterpret_cast<DemMsg::Dem_Unknown*>(demDataStructs[0]);
+    delete reinterpret_cast<DemMsg::Dem_Packet*>(demDataStructs[1]);
+    delete reinterpret_cast<DemMsg::Dem_Packet*>(demDataStructs[2]);
+    delete reinterpret_cast<DemMsg::Dem_SyncTick*>(demDataStructs[3]);
+    delete reinterpret_cast<DemMsg::Dem_ConsoleCmd*>(demDataStructs[4]);
+    delete reinterpret_cast<DemMsg::Dem_UserCmd*>(demDataStructs[5]);
+    delete reinterpret_cast<DemMsg::Dem_DataTables*>(demDataStructs[6]);
+    delete reinterpret_cast<DemMsg::Dem_Stop*>(demDataStructs[7]);
+    delete reinterpret_cast<DemMsg::Dem_StringTables*>(demDataStructs[8]);
+}
+
+void ParsePacket(uint8_t* packet, size_t length,
+                 SourceGameContext& context, IDemoWriter* writer,
+                 void* netDataStructs[32])
 {
     assert(length <= NET_MAX_PAYLOAD);
     bf_read bitbuf(packet, length);
@@ -98,60 +127,14 @@ void ParsePacket(uint8_t* packet, size_t length, SourceGameContext& context, IDe
     }
 }
 
-void ReadStringTable(bf_read& bitbuf)
-{
-    std::vector<uint8_t> data;
-    size_t numEntries = bitbuf.ReadWord();
-    char entryName[4096];
-    while (numEntries--)
-    {
-        bitbuf.ReadString(entryName, sizeof(entryName));
-        printf("%s ", entryName);
-        if (bitbuf.ReadOneBit() != 0)
-        {
-            size_t numDataBytes = bitbuf.ReadWord();
-            data.resize(numDataBytes);
-            bitbuf.ReadBytes(data.data(), numDataBytes);
-            printf("bytes %i ", numDataBytes);
-        }
-        printf("\n");
-    }
-    if (bitbuf.ReadOneBit() == 0)
-    {
-        return;
-    }
-    while (numEntries--)
-    {
-        bitbuf.ReadString(entryName, sizeof(entryName));
-        printf("%s ", entryName);
-        if (bitbuf.ReadOneBit() != 0)
-        {
-            size_t numDataBytes = bitbuf.ReadWord();
-            data.resize(numDataBytes);
-            bitbuf.ReadBytes(data.data(), numDataBytes);
-            printf("bytes %i ", numDataBytes);
-        }
-        printf("\n");
-    }
-}
-
-void ParseStringTables(uint8_t* stringtables, size_t length, SourceGameContext& context, IDemoWriter* writer)
-{
-    bf_read bitbuf(stringtables, length);
-    size_t numTables = bitbuf.ReadByte();
-    char tablename[256];
-    while (numTables--)
-    {
-        bitbuf.ReadString(tablename, sizeof(tablename));
-        printf("stringtable %s\n", tablename);
-        ReadStringTable(bitbuf);
-    }
-}
-
 void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
 {
-    CreateNetMsgStructs();
-    SourceGameContext context;
+    void* netDataStructs[32];
+    void* demDataStructs[9];
+    CreateNetMsgStructs(netDataStructs);
+    CreateDemMsgStructs(demDataStructs);
+
+    SourceGameContext context = SourceGameContext();
     DemoFileReader reader(reinterpret_cast<FILE*>(inputFp));
     {
         demoheader_t header;
@@ -159,63 +142,25 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
         writer->StartWriting(header);
         context.protocol = header.networkprotocol;
     }
-    
-    democmdinfo_t cmdInfo;
+
     CommandPacket packet;
-    packet.cmdInfo = &cmdInfo;
-    std::unique_ptr<uint8_t[]> buffer(new uint8_t[NET_MAX_PAYLOAD]);
     do
     {
         size_t rawDataSize = 0;
         reader.ReadCmdHeader(packet.cmd, packet.tick);
-        if (packet.cmd == dem_packet || packet.cmd == dem_signon)
-        {
-            reader.ReadCmdInfo(*packet.cmdInfo);
-            reader.ReadSequenceInfo(packet.sequenceInfo1, packet.sequenceInfo2);
-            assert(packet.sequenceInfo1 == packet.sequenceInfo2);
-        }
+        packet.data = demDataStructs[packet.cmd];
+        DemHandlers::DemMsg_FileRead(packet.cmd, reader, packet.data);
 
         writer->StartCommandPacket(packet);
-        switch (packet.cmd)
+        if (packet.cmd == dem_packet || packet.cmd == dem_signon)
         {
-        case dem_signon:
-        case dem_packet:
-            rawDataSize = reader.ReadRawData(buffer.get(), NET_MAX_PAYLOAD);
-            ParsePacket(buffer.get(), rawDataSize, context, writer);
-            break;
-        case dem_synctick:
-            // nothing
-            break;
-        case dem_consolecmd:
-            reader.ReadRawData(nullptr, 1024);
-            break;
-        case dem_usercmd:
-            {
-                int32_t sequenceNum;
-                reader.ReadUserCmd(sequenceNum, buffer.get(), 256);
-            }
-            break;
-        case dem_datatables:
-            // TODO: datatables
-            reader.ReadRawData(nullptr, 64*1024);
-            break;
-        case dem_stop:
-            // TODO assert frame and tick numbers
-            break;
-        case dem_stringtables:
-            {
-                uint8_t* stringtables = reinterpret_cast<uint8_t*>(malloc(MAX_STRINGTABLE_DATA));
-                size_t length = reader.ReadRawData(stringtables, MAX_STRINGTABLE_DATA);
-                ParseStringTables(stringtables, length, context, writer);
-                free(stringtables);
-            }
-            break;
-        default:
-            assert(false);
-            break;
+            Array<uint8_t> buffer = reader.ReadRawData(NET_MAX_PAYLOAD);
+            ParsePacket(buffer.begin(), buffer.length(), context, writer, netDataStructs);
         }
         writer->EndCommandPacket();
     } while (packet.cmd != dem_stop);
     writer->EndWriting();
-    DestroyNetMsgStructs();
+
+    DestroyDemMsgStructs(demDataStructs);
+    DestroyNetMsgStructs(netDataStructs);
 }

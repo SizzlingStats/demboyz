@@ -10,14 +10,14 @@ DemoFileReader::DemoFileReader(FILE* fp):
 {
 }
 
-int32_t DemoFileReader::ReadRawData(uint8_t* buffer, int32_t length)
+int32_t DemoFileReader::ReadRawData(uint8_t* buffer, int32_t maxLength)
 {
     FILE* fp = m_demoFp;
 
     int32_t size;
     fread(&size, sizeof(int32_t), 1, fp);
 
-    if (buffer && (length < size))
+    if (buffer && (maxLength < size))
     {
         return -1;
     }
@@ -60,10 +60,10 @@ void DemoFileReader::ReadCmdHeader(unsigned char& cmd, int32_t& tick)
     }
 }
 
-int32_t DemoFileReader::ReadUserCmd(int32_t& sequenceNum, uint8_t* buffer, int32_t length)
+int32_t DemoFileReader::ReadUserCmd(int32_t& cmdNum, uint8_t* buffer, int32_t maxLength)
 {
-    fread(&sequenceNum, sizeof(int32_t), 1, m_demoFp);
-    return ReadRawData(buffer, length);
+    fread(&cmdNum, sizeof(int32_t), 1, m_demoFp);
+    return ReadRawData(buffer, maxLength);
 }
 
 // DemoFileWriter
@@ -109,8 +109,8 @@ void DemoFileWriter::WriteCmdHeader(unsigned char cmd, int32_t tick)
     fwrite(&tick, sizeof(int32_t), 1, fp);
 }
 
-void DemoFileWriter::WriteUserCmd(int32_t sequenceNum, const uint8_t* buffer, int32_t length)
+void DemoFileWriter::WriteUserCmd(int32_t cmdNum, const uint8_t* buffer, int32_t length)
 {
-    fwrite(&sequenceNum, sizeof(int32_t), 1, m_demoFp);
+    fwrite(&cmdNum, sizeof(int32_t), 1, m_demoFp);
     WriteRawData(buffer, length);
 }

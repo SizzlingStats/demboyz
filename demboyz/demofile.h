@@ -13,11 +13,11 @@ public:
     DemoFileReader(FILE* fp);
 
     void ReadDemoHeader(demoheader_t& header);
-    int32_t ReadRawData(uint8_t* buffer, int32_t length);
+    int32_t ReadRawData(uint8_t* buffer, int32_t maxLength);
     void ReadSequenceInfo(int32_t& seqNum1, int32_t& seqNum2);
     void ReadCmdInfo(democmdinfo_t& info);
     void ReadCmdHeader(unsigned char& cmd, int32_t& tick);
-    int32_t ReadUserCmd(int32_t& sequenceNum, uint8_t* buffer, int32_t length);
+    int32_t ReadUserCmd(int32_t& cmdNum, uint8_t* buffer, int32_t maxLength);
 
 private:
     FILE* m_demoFp;
@@ -33,7 +33,7 @@ public:
     void WriteSequenceInfo(int32_t seqNum1, int32_t seqNum2);
     void WriteCmdInfo(const democmdinfo_t& info);
     void WriteCmdHeader(unsigned char cmd, int32_t tick);
-    void WriteUserCmd(int32_t sequenceNum, const uint8_t* buffer, int32_t length);
+    void WriteUserCmd(int32_t cmdNum, const uint8_t* buffer, int32_t length);
 
 private:
     FILE* m_demoFp;

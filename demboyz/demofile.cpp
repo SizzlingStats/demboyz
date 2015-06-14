@@ -2,12 +2,18 @@
 #include "demofile.h"
 #include "demotypes.h"
 #include <cassert>
+#include <utility>
 
 // DemoFileReader
 
 DemoFileReader::DemoFileReader(FILE* fp):
     m_demoFp(fp)
 {
+}
+
+bool DemoFileReader::IsOk() const
+{
+    return ferror(m_demoFp) == 0;
 }
 
 void DemoFileReader::ReadDemoHeader(demoheader_t& header)
@@ -100,6 +106,11 @@ Array<uint8_t> DemoFileReader::ReadUserCmd(int32_t& cmdNum, int32_t maxLength)
 DemoFileWriter::DemoFileWriter(FILE* fp) :
     m_demoFp(fp)
 {
+}
+
+bool DemoFileWriter::IsOk() const
+{
+    return ferror(m_demoFp) == 0;
 }
 
 void DemoFileWriter::WriteDemoHeader(const demoheader_t& header)

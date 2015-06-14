@@ -13,6 +13,7 @@ class DemoFileReader
 public:
     DemoFileReader(FILE* fp);
 
+    bool IsOk() const;
     void ReadDemoHeader(demoheader_t& header);
     int32_t ReadRawData(uint8_t* buffer, int32_t maxLength);
     Array<uint8_t> ReadRawData(int32_t maxLength);
@@ -31,6 +32,7 @@ class DemoFileWriter
 public:
     DemoFileWriter(FILE* fp);
 
+    bool IsOk() const;
     void WriteDemoHeader(const demoheader_t& header);
     void WriteRawData(const uint8_t* buffer, int32_t length);
     void WriteSequenceInfo(int32_t seqNum1, int32_t seqNum2);

@@ -1,6 +1,6 @@
 
-#include "idemowriter.h"
-#include "demoreader.h"
+#include "io/idemowriter.h"
+#include "io/demoreader.h"
 #include <cstdio>
 #include <string>
 #include <cassert>

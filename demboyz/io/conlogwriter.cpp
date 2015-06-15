@@ -43,6 +43,7 @@ void ConLogWriter::StartWriting(demoheader_t& header)
 
 void ConLogWriter::EndWriting()
 {
+    fflush(m_outputFp);
     fflush(stdout);
 }
 

@@ -32,7 +32,12 @@ namespace NetHandlers
         bitbuf.WriteUBitLong(data->maxEntries, MAX_EDICT_BITS);
         if (data->isDelta)
         {
+            bitbuf.WriteOneBit(1);
             bitbuf.WriteLong(data->deltaFromTick);
+        }
+        else
+        {
+            bitbuf.WriteOneBit(0);
         }
         bitbuf.WriteUBitLong(data->baselineIndex, 1);
         bitbuf.WriteUBitLong(data->numUpdatedEntries, MAX_EDICT_BITS);

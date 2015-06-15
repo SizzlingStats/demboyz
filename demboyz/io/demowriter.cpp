@@ -18,7 +18,7 @@ public:
     virtual void EndWriting() override final;
 
     virtual void StartCommandPacket(CommandPacket& packet) override final;
-    virtual void EndCommandPacket() override final;
+    virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) override final;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 
@@ -56,8 +56,12 @@ void DemoWriter::StartCommandPacket(CommandPacket& packet)
     m_cmdPacketBuf.Reset();
 }
 
-void DemoWriter::EndCommandPacket()
+void DemoWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 {
+    if (trailingBits.numTrailingBits > 0)
+    {
+        m_cmdPacketBuf.WriteUBitLong(trailingBits.value, trailingBits.numTrailingBits);
+    }
     if (m_cmdPacketBuf.GetNumBytesWritten() > 0)
     {
         m_writer.WriteRawData(m_cmdPacketBuf.GetBasePointer(), m_cmdPacketBuf.GetNumBytesWritten());

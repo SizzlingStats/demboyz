@@ -11,7 +11,7 @@ public:
     virtual void EndWriting() override final;
 
     virtual void StartCommandPacket(CommandPacket& packet) override final;
-    virtual void EndCommandPacket() override final;
+    virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) override final;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 };
@@ -37,7 +37,7 @@ void JsonWriter::StartCommandPacket(CommandPacket& packet)
 {
 }
 
-void JsonWriter::EndCommandPacket()
+void JsonWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 {
 }
 

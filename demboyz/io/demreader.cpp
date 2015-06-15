@@ -111,9 +111,9 @@ static void DestroyDemMsgStructs(void* demDataStructs[9])
     delete reinterpret_cast<DemMsg::Dem_StringTables*>(demDataStructs[8]);
 }
 
-void ParsePacket(uint8_t* packet, size_t length,
-                 SourceGameContext& context, IDemoWriter* writer,
-                 void* netDataStructs[32])
+PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
+                               SourceGameContext& context, IDemoWriter* writer,
+                               void* netDataStructs[32])
 {
     assert(length <= NET_MAX_PAYLOAD);
     bf_read bitbuf(packet, length);
@@ -125,6 +125,18 @@ void ParsePacket(uint8_t* packet, size_t length,
         NetHandlers::NetMsg_BitRead(netPacket.type, bitbuf, context, netPacket.data);
         writer->WriteNetPacket(netPacket, context);
     }
+
+    PacketTrailingBits trailingBits;
+    trailingBits.numTrailingBits = bitbuf.GetNumBitsLeft();
+    if (trailingBits.numTrailingBits)
+    {
+        trailingBits.value = bitbuf.ReadUBitLong(trailingBits.numTrailingBits);
+    }
+    else
+    {
+        trailingBits.value = 0;
+    }
+    return trailingBits;
 }
 
 void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
@@ -151,13 +163,14 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
         packet.data = demDataStructs[packet.cmd];
         DemHandlers::DemMsg_FileRead(packet.cmd, reader, packet.data);
 
+        PacketTrailingBits trailingBits = PacketTrailingBits();
         writer->StartCommandPacket(packet);
         if (packet.cmd == dem_packet || packet.cmd == dem_signon)
         {
             Array<uint8_t> buffer = reader.ReadRawData(NET_MAX_PAYLOAD);
-            ParsePacket(buffer.begin(), buffer.length(), context, writer, netDataStructs);
+            trailingBits = ParsePacket(buffer.begin(), buffer.length(), context, writer, netDataStructs);
         }
-        writer->EndCommandPacket();
+        writer->EndCommandPacket(trailingBits);
     } while (packet.cmd != dem_stop);
     writer->EndWriting();
 

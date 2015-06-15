@@ -23,6 +23,12 @@ struct NetPacket
     void* data;
 };
 
+struct PacketTrailingBits
+{
+    uint32_t numTrailingBits;
+    uint32_t value;
+};
+
 class IDemoWriter
 {
 public:
@@ -32,7 +38,7 @@ public:
     virtual void EndWriting() = 0;
 
     virtual void StartCommandPacket(CommandPacket& packet) = 0;
-    virtual void EndCommandPacket() = 0;
+    virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) = 0;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) = 0;
 

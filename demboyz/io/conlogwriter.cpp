@@ -13,7 +13,7 @@ public:
     virtual void EndWriting() override final;
 
     virtual void StartCommandPacket(CommandPacket& packet) override final;
-    virtual void EndCommandPacket() override final;
+    virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) override final;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
 
@@ -51,7 +51,7 @@ void ConLogWriter::StartCommandPacket(CommandPacket& packet)
 {
 }
 
-void ConLogWriter::EndCommandPacket()
+void ConLogWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 {
 }
 

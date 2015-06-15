@@ -28,6 +28,7 @@ solution "demboyz"
         includedirs
         {
             "../external/sourcesdk/include",
+            "../external/rapidjson-1.0.2/include",
             "../demboyz"
         }
 

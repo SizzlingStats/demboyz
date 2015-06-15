@@ -22,12 +22,12 @@ solution "demboyz"
         {
             "../demboyz/**.h",
             "../demboyz/**.cpp",
-            "../external/sourcesdk/*.h",
-            "../external/sourcesdk/*.cpp"
+            "../external/**.h",
+            "../external/**.cpp"
         }
         includedirs
         {
-            "../external",
+            "../external/sourcesdk/include",
             "../demboyz"
         }
 

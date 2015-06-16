@@ -58,26 +58,10 @@ inline unsigned int CountTrailingZeros(unsigned int elem)
 #define FAST_BIT_SCAN 0
 #endif
 
-
-static BitBufErrorHandler g_BitBufErrorHandler = 0;
-
 inline int BitForBitnum(int bitnum)
 {
 	return GetBitForBitnum(bitnum);
 }
-
-void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName )
-{
-	if ( g_BitBufErrorHandler )
-		g_BitBufErrorHandler( errorType, pDebugName );
-}
-
-
-void SetBitBufErrorHandler( BitBufErrorHandler fn )
-{
-	g_BitBufErrorHandler = fn;
-}
-
 
 // #define BB_PROFILING
 
@@ -130,6 +114,7 @@ bf_write::bf_write()
 	m_bOverflow = false;
 	m_bAssertOnOverflow = true;
 	m_pDebugName = NULL;
+	m_errorHandler = NULL;
 }
 
 bf_write::bf_write( const char *pDebugName, void *pData, int nBytes, int nBits )
@@ -196,6 +181,19 @@ void bf_write::SetDebugName( const char *pDebugName )
 	m_pDebugName = pDebugName;
 }
 
+void bf_write::SetErrorHandler(IBitBufOverErrorHandler* handler)
+{
+	m_errorHandler = handler;
+}
+
+bool bf_write::CallErrorHandler(BitBufErrorType errorType)
+{
+	if (m_errorHandler)
+	{
+		return m_errorHandler->HandleError(errorType, GetDebugName());
+	}
+	return false;
+}
 
 void bf_write::SeekToBit( int bitPos )
 {
@@ -452,11 +450,14 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 	int nBitsLeft = nBits;
 
 	// Bounds checking..
-	if ( (m_iCurBit+nBits) > m_nDataBits )
+	if (GetNumBitsLeft() < nBits)
 	{
-		SetOverflowFlag();
-		CallErrorHandler( BITBUFERROR_BUFFER_OVERRUN, GetDebugName() );
-		return false;
+		const bool recovered = CallErrorHandler(BITBUFERROR_BUFFER_OVERRUN);
+		if (!recovered || (recovered && (GetNumBitsLeft() < nBits)))
+		{
+			SetOverflowFlag();
+			return false;
+		}
 	}
 
 	// Align output to dword boundary
@@ -794,6 +795,7 @@ bf_read::bf_read()
 	m_bOverflow = false;
 	m_bAssertOnOverflow = true;
 	m_pDebugName = NULL;
+	m_errorHandler = NULL;
 }
 
 bf_read::bf_read( const void *pData, int nBytes, int nBits )
@@ -845,6 +847,20 @@ void bf_read::SetAssertOnOverflow( bool bAssert )
 void bf_read::SetDebugName( const char *pName )
 {
 	m_pDebugName = pName;
+}
+
+void bf_read::SetErrorHandler(IBitBufOverErrorHandler* handler)
+{
+	m_errorHandler = handler;
+}
+
+bool bf_read::CallErrorHandler(BitBufErrorType errorType)
+{
+	if (m_errorHandler)
+	{
+		return m_errorHandler->HandleError(errorType, GetDebugName());
+	}
+	return false;
 }
 
 void bf_read::SetOverflowFlag()

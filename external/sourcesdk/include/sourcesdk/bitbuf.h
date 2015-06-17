@@ -216,9 +216,9 @@ public:
 	// How many bytes are filled in?
 	int				GetNumBytesWritten() const;
 	int				GetNumBitsWritten() const;
-	int				GetMaxNumBits();
-	int				GetNumBitsLeft();
-	int				GetNumBytesLeft();
+	int				GetMaxNumBits() const;
+	int				GetNumBitsLeft() const;
+	int				GetNumBytesLeft() const;
 	unsigned char*	GetData();
 	const unsigned char*	GetData() const;
 
@@ -254,32 +254,32 @@ private:
 //-----------------------------------------------------------------------------
 
 // How many bytes are filled in?
-inline int bf_write::GetNumBytesWritten() const	
+inline int bf_write::GetNumBytesWritten() const
 {
 	return BitByte(m_iCurBit);
 }
 
-inline int bf_write::GetNumBitsWritten() const	
+inline int bf_write::GetNumBitsWritten() const
 {
 	return m_iCurBit;
 }
 
-inline int bf_write::GetMaxNumBits()		
+inline int bf_write::GetMaxNumBits() const
 {
 	return m_nDataBits;
 }
 
-inline int bf_write::GetNumBitsLeft()	
+inline int bf_write::GetNumBitsLeft() const
 {
 	return m_nDataBits - m_iCurBit;
 }
 
-inline int bf_write::GetNumBytesLeft()	
+inline int bf_write::GetNumBytesLeft() const
 {
 	return GetNumBitsLeft() >> 3;
 }
 
-inline unsigned char* bf_write::GetData()			
+inline unsigned char* bf_write::GetData()
 {
 	return (unsigned char*) m_pData;
 }
@@ -624,9 +624,9 @@ public:
 
 // Status.
 public:
-	int				GetNumBytesLeft();
-	int				GetNumBytesRead();
-	int				GetNumBitsLeft();
+	int				GetNumBytesLeft() const;
+	int				GetNumBytesRead() const;
+	int				GetNumBitsLeft() const;
 	int				GetNumBitsRead() const;
 
 	// Has the buffer overflowed?
@@ -665,17 +665,17 @@ private:
 // Inlines.
 //-----------------------------------------------------------------------------
 
-inline int bf_read::GetNumBytesRead()	
+inline int bf_read::GetNumBytesRead() const
 {
 	return BitByte(m_iCurBit);
 }
 
-inline int bf_read::GetNumBitsLeft()	
+inline int bf_read::GetNumBitsLeft() const
 {
 	return m_nDataBits - m_iCurBit;
 }
 
-inline int bf_read::GetNumBytesLeft()	
+inline int bf_read::GetNumBytesLeft() const
 {
 	return GetNumBitsLeft() >> 3;
 }

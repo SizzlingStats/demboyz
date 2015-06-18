@@ -1,6 +1,6 @@
 
 #include "demoreader.h"
 
-void DemoReader::ProcessJson(void* inputFp, IDemoWriter* writer)
+void DemoReader::ProcessJson(std::FILE* inputFp, IDemoWriter* writer)
 {
 }

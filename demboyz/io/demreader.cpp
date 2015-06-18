@@ -139,7 +139,7 @@ PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
     return trailingBits;
 }
 
-void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
+void DemoReader::ProcessDem(std::FILE* inputFp, IDemoWriter* writer)
 {
     void* netDataStructs[32];
     void* demDataStructs[9];
@@ -147,7 +147,7 @@ void DemoReader::ProcessDem(void* inputFp, IDemoWriter* writer)
     CreateDemMsgStructs(demDataStructs);
 
     SourceGameContext context = SourceGameContext();
-    DemoFileReader reader(reinterpret_cast<FILE*>(inputFp));
+    DemoFileReader reader(inputFp);
     {
         demoheader_t header;
         reader.ReadDemoHeader(header);

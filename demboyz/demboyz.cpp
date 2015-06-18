@@ -110,9 +110,9 @@ int main(const int argc, const char* argv[])
     {
         assert(false);
     }
+    IDemoWriter::FreeDemoWriter(writer);
+
     fclose(inputFp);
     fclose(outputFp);
-
-    IDemoWriter::FreeDemoWriter(writer);
     return 0;
 }

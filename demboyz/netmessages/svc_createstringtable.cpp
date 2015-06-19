@@ -43,10 +43,6 @@ namespace NetHandlers
         {
             data->unk1 = bitbuf.ReadOneBit() != 0;
         }
-        else
-        {
-            data->unk1 = false;
-        }
         data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
         bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
         return !bitbuf.IsOverflowed();

@@ -1,6 +1,7 @@
 
 #include "io/idemowriter.h"
 #include "io/demoreader.h"
+#include "json_checker/JSON_checker.h"
 #include <cstdio>
 #include <string>
 #include <cassert>
@@ -114,5 +115,24 @@ int main(const int argc, const char* argv[])
 
     fclose(inputFp);
     fclose(outputFp);
+
+    if (outputType == FileType::Json)
+    {
+        FILE* outputFp = fopen(outputFile.c_str(), "rb");
+        JSON_checker jc = new_JSON_checker(20);
+        int next_char = 0;
+        while ((next_char = fgetc(outputFp)) > 0)
+        {
+            if (!JSON_checker_char(jc, next_char))
+            {
+                fprintf(stderr, "JSON_checker_char: syntax error\n");
+            }
+        }
+        if (!JSON_checker_done(jc))
+        {
+            fprintf(stderr, "JSON_checker_end: syntax error\n");
+        }
+        fclose(outputFp);
+    }
     return 0;
 }

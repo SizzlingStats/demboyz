@@ -17,7 +17,7 @@ public:
     virtual void StartWriting(demoheader_t& header) override final;
     virtual void EndWriting() override final;
 
-    virtual void StartCommandPacket(CommandPacket& packet) override final;
+    virtual void StartCommandPacket(const CommandPacket& packet) override final;
     virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) override final;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
@@ -49,7 +49,7 @@ void DemoWriter::EndWriting()
 {
 }
 
-void DemoWriter::StartCommandPacket(CommandPacket& packet)
+void DemoWriter::StartCommandPacket(const CommandPacket& packet)
 {
     m_writer.WriteCmdHeader(packet.cmd, packet.tick);
     DemHandlers::DemMsg_FileWrite(packet.cmd, m_writer, packet.data);

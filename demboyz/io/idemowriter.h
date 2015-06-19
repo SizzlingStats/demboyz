@@ -37,7 +37,7 @@ public:
     virtual void StartWriting(demoheader_t& header) = 0;
     virtual void EndWriting() = 0;
 
-    virtual void StartCommandPacket(CommandPacket& packet) = 0;
+    virtual void StartCommandPacket(const CommandPacket& packet) = 0;
     virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) = 0;
 
     virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) = 0;

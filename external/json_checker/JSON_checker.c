@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 #include <stdlib.h>
-#include "JSON_checker.h"
+#include "json_checker/JSON_checker.h"
 
 #define true  1
 #define false 0

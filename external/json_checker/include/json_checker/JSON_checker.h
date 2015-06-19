@@ -1,4 +1,11 @@
+
+#pragma once
+
 /* JSON_checker.h */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 typedef struct JSON_checker_struct {
     int state;
@@ -11,3 +18,7 @@ typedef struct JSON_checker_struct {
 extern JSON_checker new_JSON_checker(int depth);
 extern int  JSON_checker_char(JSON_checker jc, int next_char);
 extern int  JSON_checker_done(JSON_checker jc);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */

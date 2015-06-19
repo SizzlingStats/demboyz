@@ -23,10 +23,12 @@ solution "demboyz"
             "../demboyz/**.h",
             "../demboyz/**.cpp",
             "../external/**.h",
-            "../external/**.cpp"
+            "../external/**.cpp",
+            "../external/**.c"
         }
         includedirs
         {
+            "../external/json_checker/include",
             "../external/sourcesdk/include",
             "../external/rapidjson-1.0.2/include",
             "../demboyz"

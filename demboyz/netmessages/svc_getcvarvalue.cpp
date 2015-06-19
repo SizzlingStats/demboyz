@@ -4,14 +4,14 @@
 
 namespace NetHandlers
 {
-    bool SVC_GetCvarValue_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
+    bool SVC_GetCvarValue_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
         data->cookie = bitbuf.ReadSBitLong(32);
         bitbuf.ReadString(data->cvarName, sizeof(data->cvarName));
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_GetCvarValue_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
+    bool SVC_GetCvarValue_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
         bitbuf.WriteSBitLong(data->cookie, 32);
         bitbuf.WriteString(data->cvarName);

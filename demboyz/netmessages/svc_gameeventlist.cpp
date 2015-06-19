@@ -9,7 +9,7 @@ using EventValue = NetMsg::SVC_GameEventList::EventValue;
 
 namespace NetHandlers
 {
-    bool SVC_GameEventList_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEventList* data)
+    bool SVC_GameEventList_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEventList* data)
     {
         data->eventDescriptors.resize(bitbuf.ReadUBitLong(MAX_EVENT_BITS));
         data->dataLengthInBits = bitbuf.ReadUBitLong(20);
@@ -28,7 +28,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_GameEventList_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_GameEventList* data)
+    bool SVC_GameEventList_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_GameEventList* data)
     {
         bitbuf.WriteUBitLong(data->eventDescriptors.size(), MAX_EVENT_BITS);
         bitbuf.WriteUBitLong(data->dataLengthInBits, 20);

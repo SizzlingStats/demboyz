@@ -4,13 +4,13 @@
 
 namespace NetHandlers
 {
-    bool SVC_SetPause_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_SetPause* data)
+    bool SVC_SetPause_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
         data->isPaused = bitbuf.ReadOneBit() != 0;
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SetPause_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
+    bool SVC_SetPause_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
         bitbuf.WriteOneBit(data->isPaused);
         return !bitbuf.IsOverflowed();

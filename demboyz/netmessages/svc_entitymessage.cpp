@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_EntityMessage_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_EntityMessage* data)
+    bool SVC_EntityMessage_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_EntityMessage* data)
     {
         data->entIndex = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
         data->classID = bitbuf.ReadUBitLong(MAX_SERVER_CLASS_BITS);
@@ -16,7 +16,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_EntityMessage_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_EntityMessage* data)
+    bool SVC_EntityMessage_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_EntityMessage* data)
     {
         bitbuf.WriteUBitLong(data->entIndex, MAX_EDICT_BITS);
         bitbuf.WriteUBitLong(data->classID, MAX_SERVER_CLASS_BITS);

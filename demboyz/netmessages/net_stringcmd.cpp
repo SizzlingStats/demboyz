@@ -4,13 +4,13 @@
 
 namespace NetHandlers
 {
-    bool Net_StringCmd_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_StringCmd* data)
+    bool Net_StringCmd_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::Net_StringCmd* data)
     {
         bitbuf.ReadString(data->command, sizeof(data->command));
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_StringCmd_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_StringCmd* data)
+    bool Net_StringCmd_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_StringCmd* data)
     {
         bitbuf.WriteString(data->command);
         return !bitbuf.IsOverflowed();

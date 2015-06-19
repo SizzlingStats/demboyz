@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_UpdateStringTable_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    bool SVC_UpdateStringTable_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
     {
         data->tableID = bitbuf.ReadUBitLong(math::log2(MAX_TABLES));
         data->numChangedEntries = (bitbuf.ReadOneBit() != 0) ? bitbuf.ReadWord() : 1;
@@ -16,7 +16,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_UpdateStringTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
+    bool SVC_UpdateStringTable_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
     {
         bitbuf.WriteUBitLong(data->tableID, math::log2(MAX_TABLES));
         if (data->numChangedEntries != 1)

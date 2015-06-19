@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_Prefetch_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
+    bool SVC_Prefetch_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
         data->type = NetMsg::SVC_Prefetch::SOUND;
         if (context.protocol > 23)
@@ -19,7 +19,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_Prefetch_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
+    bool SVC_Prefetch_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
         if (context.protocol > 23)
         {

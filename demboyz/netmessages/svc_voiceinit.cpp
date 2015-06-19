@@ -4,14 +4,14 @@
 
 namespace NetHandlers
 {
-    bool SVC_VoiceInit_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
+    bool SVC_VoiceInit_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
     {
         bitbuf.ReadString(data->voiceCodec, sizeof(data->voiceCodec));
         data->quality = bitbuf.ReadByte();
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_VoiceInit_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
+    bool SVC_VoiceInit_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
     {
         bitbuf.WriteString(data->voiceCodec);
         bitbuf.WriteByte(data->quality);

@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_CreateStringTable_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
+    bool SVC_CreateStringTable_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
         if (bitbuf.PeekUBitLong(8) == ':')
         {
@@ -52,7 +52,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_CreateStringTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
+    bool SVC_CreateStringTable_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
         if (data->isFileNames)
         {

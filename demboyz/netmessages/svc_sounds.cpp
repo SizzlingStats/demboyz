@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_Sounds_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_Sounds* data)
+    bool SVC_Sounds_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_Sounds* data)
     {
         data->reliableSound = bitbuf.ReadOneBit() != 0;
         if (data->reliableSound)
@@ -23,7 +23,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_Sounds_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_Sounds* data)
+    bool SVC_Sounds_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_Sounds* data)
     {
         if (data->reliableSound)
         {

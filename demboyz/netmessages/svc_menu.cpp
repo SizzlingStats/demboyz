@@ -17,7 +17,7 @@ static const char* KeyValuesBin_GetName(uint8_t* data, size_t dataLength)
 
 namespace NetHandlers
 {
-    bool SVC_Menu_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_Menu* data)
+    bool SVC_Menu_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
         data->type = static_cast<DialogType>(bitbuf.ReadShort());
         data->dataLengthInBytes = bitbuf.ReadWord();
@@ -26,7 +26,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_Menu_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_Menu* data)
+    bool SVC_Menu_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
         bitbuf.WriteShort(static_cast<uint16_t>(data->type));
         bitbuf.WriteWord(data->dataLengthInBytes);

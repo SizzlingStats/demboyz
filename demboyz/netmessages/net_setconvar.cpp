@@ -6,7 +6,7 @@ namespace NetHandlers
 {
     using cvar_t = NetMsg::Net_SetConVar::cvar_t;
 
-    bool Net_SetConVar_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
+    bool Net_SetConVar_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
         data->cvars.resize(bitbuf.ReadByte());
         for (cvar_t& cvar : data->cvars)
@@ -17,7 +17,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_SetConVar_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
+    bool Net_SetConVar_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
         bitbuf.WriteByte(data->cvars.size());
         for (cvar_t& cvar : data->cvars)

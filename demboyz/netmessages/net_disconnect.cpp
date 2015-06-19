@@ -4,13 +4,13 @@
 
 namespace NetHandlers
 {
-    bool Net_Disconnect_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_Disconnect* data)
+    bool Net_Disconnect_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
         bitbuf.ReadString(data->message, sizeof(data->message));
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_Disconnect_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
+    bool Net_Disconnect_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
         bitbuf.WriteString(data->message);
         return !bitbuf.IsOverflowed();

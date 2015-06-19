@@ -4,7 +4,7 @@
 
 namespace NetHandlers
 {
-    bool Net_File_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_File* data)
+    bool Net_File_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::Net_File* data)
     {
         data->transferID = bitbuf.ReadUBitLong(32);
         bitbuf.ReadString(data->filename, sizeof(data->filename));
@@ -12,7 +12,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Net_File_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_File* data)
+    bool Net_File_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_File* data)
     {
         bitbuf.WriteUBitLong(data->transferID, 32);
         bitbuf.WriteString(data->filename);

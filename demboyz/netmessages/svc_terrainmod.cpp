@@ -4,13 +4,13 @@
 
 namespace NetHandlers
 {
-    bool SVC_TerrainMod_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_TerrainMod* data)
+    bool SVC_TerrainMod_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_TerrainMod* data)
     {
         assert(false);
         return true;
     }
 
-    bool SVC_TerrainMod_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_TerrainMod* data)
+    bool SVC_TerrainMod_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_TerrainMod* data)
     {
         assert(false);
         return true;

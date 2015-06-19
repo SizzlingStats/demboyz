@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_TempEntities_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_TempEntities* data)
+    bool SVC_TempEntities_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_TempEntities* data)
     {
         data->numEntries = bitbuf.ReadUBitLong(EVENT_INDEX_BITS);
         if (context.protocol > 23)
@@ -22,7 +22,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_TempEntities_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_TempEntities* data)
+    bool SVC_TempEntities_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_TempEntities* data)
     {
         bitbuf.WriteUBitLong(data->numEntries, EVENT_INDEX_BITS);
         if (context.protocol > 23)

@@ -4,13 +4,13 @@
 
 namespace NetHandlers
 {
-    bool SVC_HLTV_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_HLTV* data)
+    bool SVC_HLTV_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_HLTV* data)
     {
         assert(false);
         return true;
     }
 
-    bool SVC_HLTV_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_HLTV* data)
+    bool SVC_HLTV_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_HLTV* data)
     {
         assert(false);
         return true;

@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_VoiceData_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_VoiceData* data)
+    bool SVC_VoiceData_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_VoiceData* data)
     {
         data->fromClientIndex = bitbuf.ReadByte();
         data->proximity = !!bitbuf.ReadByte();
@@ -15,7 +15,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_VoiceData_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_VoiceData* data)
+    bool SVC_VoiceData_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_VoiceData* data)
     {
         bitbuf.WriteByte(data->fromClientIndex);
         bitbuf.WriteByte(data->proximity);

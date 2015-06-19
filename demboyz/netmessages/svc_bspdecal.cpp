@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_BSPDecal_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
+    bool SVC_BSPDecal_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
         bitbuf.ReadBitVec3Coord(data->position);
         data->decalTextureIndex = bitbuf.ReadUBitLong(MAX_DECAL_INDEX_BITS);
@@ -23,7 +23,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_BSPDecal_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
+    bool SVC_BSPDecal_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
         bitbuf.WriteBitVec3Coord(data->position);
         bitbuf.WriteUBitLong(data->decalTextureIndex, MAX_DECAL_INDEX_BITS);

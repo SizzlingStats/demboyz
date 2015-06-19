@@ -4,7 +4,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_ServerInfo_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
+    bool SVC_ServerInfo_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
         data->protocol = bitbuf.ReadShort();
         data->serverCount = bitbuf.ReadLong();
@@ -35,7 +35,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_ServerInfo_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
+    bool SVC_ServerInfo_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
         bitbuf.WriteShort(data->protocol);
         bitbuf.WriteLong(data->serverCount);

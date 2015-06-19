@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_SendTable_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_SendTable* data)
+    bool SVC_SendTable_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_SendTable* data)
     {
         data->needsDecoder = bitbuf.ReadOneBit() != 0;
         data->dataLengthInBits = bitbuf.ReadShort();
@@ -14,7 +14,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SendTable_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SendTable* data)
+    bool SVC_SendTable_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_SendTable* data)
     {
         bitbuf.WriteOneBit(data->needsDecoder);
         bitbuf.WriteShort(data->dataLengthInBits);

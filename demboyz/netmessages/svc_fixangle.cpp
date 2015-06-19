@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_FixAngle_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
+    bool SVC_FixAngle_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         data->relative = bitbuf.ReadOneBit() != 0;
         data->x = bitbuf.ReadBitAngle(16);
@@ -14,7 +14,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_FixAngle_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
+    bool SVC_FixAngle_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         bitbuf.WriteOneBit(data->relative);
         bitbuf.WriteBitAngle(data->x, 16);

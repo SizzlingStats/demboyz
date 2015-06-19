@@ -5,13 +5,13 @@
 
 namespace NetHandlers
 {
-    bool SVC_SetView_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_SetView* data)
+    bool SVC_SetView_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
         data->entIndex = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_SetView_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
+    bool SVC_SetView_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
         bitbuf.WriteUBitLong(data->entIndex, MAX_EDICT_BITS);
         return !bitbuf.IsOverflowed();

@@ -5,7 +5,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_CrosshairAngle_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
+    bool SVC_CrosshairAngle_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
         data->x = bitbuf.ReadBitAngle(16);
         data->y = bitbuf.ReadBitAngle(16);
@@ -13,7 +13,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_CrosshairAngle_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
+    bool SVC_CrosshairAngle_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
         bitbuf.WriteBitAngle(data->x, 16);
         bitbuf.WriteBitAngle(data->y, 16);

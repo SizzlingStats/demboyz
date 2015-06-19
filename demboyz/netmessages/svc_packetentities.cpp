@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_PacketEntities_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
+    bool SVC_PacketEntities_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
         data->maxEntries = bitbuf.ReadUBitLong(MAX_EDICT_BITS);
         data->isDelta = bitbuf.ReadOneBit() != 0;
@@ -27,7 +27,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_PacketEntities_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
+    bool SVC_PacketEntities_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
         bitbuf.WriteUBitLong(data->maxEntries, MAX_EDICT_BITS);
         if (data->isDelta)

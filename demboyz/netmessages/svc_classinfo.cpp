@@ -7,7 +7,7 @@ using class_t = NetMsg::SVC_ClassInfo::class_t;
 
 namespace NetHandlers
 {
-    bool SVC_ClassInfo_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
+    bool SVC_ClassInfo_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
     {
         const int16_t numServerClasses = bitbuf.ReadShort();
         const bool createOnClient = bitbuf.ReadOneBit() != 0;
@@ -27,7 +27,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_ClassInfo_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
+    bool SVC_ClassInfo_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
     {
         bitbuf.WriteShort(data->numServerClasses);
         bitbuf.WriteOneBit(data->createOnClient);

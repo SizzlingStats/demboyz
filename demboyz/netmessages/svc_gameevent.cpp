@@ -6,7 +6,7 @@
 
 namespace NetHandlers
 {
-    bool SVC_GameEvent_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEvent* data)
+    bool SVC_GameEvent_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEvent* data)
     {
         data->dataLengthInBits = bitbuf.ReadUBitLong(11);
         data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
@@ -14,7 +14,7 @@ namespace NetHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool SVC_GameEvent_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::SVC_GameEvent* data)
+    bool SVC_GameEvent_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_GameEvent* data)
     {
         bitbuf.WriteUBitLong(data->dataLengthInBits, 11);
         bitbuf.WriteBits(data->data.get(), data->dataLengthInBits);

@@ -3,12 +3,12 @@
 
 namespace NetHandlers
 {
-    bool Net_NOP_BitRead_Internal(bf_read& bitbuf, SourceGameContext& context, NetMsg::Net_NOP* data)
+    bool Net_NOP_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::Net_NOP* data)
     {
         return true;
     }
 
-    bool Net_NOP_BitWrite_Internal(bf_write& bitbuf, const SourceGameContext& context, NetMsg::Net_NOP* data)
+    bool Net_NOP_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_NOP* data)
     {
         return true;
     }

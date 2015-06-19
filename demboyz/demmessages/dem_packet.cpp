@@ -4,7 +4,7 @@
 
 namespace DemHandlers
 {
-    bool Dem_Packet_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_Packet* data)
+    bool Dem_Packet_FileRead_Internal(FileRead& demofile, DemMsg::Dem_Packet* data)
     {
         demofile.ReadCmdInfo(data->cmdInfo);
         demofile.ReadSequenceInfo(data->sequenceNum1, data->sequenceNum2);
@@ -12,7 +12,7 @@ namespace DemHandlers
         return demofile.IsOk();
     }
 
-    bool Dem_Packet_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_Packet* data)
+    bool Dem_Packet_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_Packet* data)
     {
         demofile.WriteCmdInfo(data->cmdInfo);
         demofile.WriteSequenceInfo(data->sequenceNum1, data->sequenceNum2);

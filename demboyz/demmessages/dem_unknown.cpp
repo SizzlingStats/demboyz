@@ -3,12 +3,12 @@
 
 namespace DemHandlers
 {
-    bool Dem_Unknown_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_Unknown* data)
+    bool Dem_Unknown_FileRead_Internal(FileRead& demofile, DemMsg::Dem_Unknown* data)
     {
         return true;
     }
 
-    bool Dem_Unknown_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_Unknown* data)
+    bool Dem_Unknown_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_Unknown* data)
     {
         return true;
     }

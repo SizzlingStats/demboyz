@@ -93,7 +93,7 @@ static void StringTable_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables::Str
 
 namespace DemHandlers
 {
-    bool Dem_StringTables_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_StringTables* data)
+    bool Dem_StringTables_FileRead_Internal(FileRead& demofile, DemMsg::Dem_StringTables* data)
     {
         using StringTable = DemMsg::Dem_StringTables::StringTable;
 
@@ -108,7 +108,7 @@ namespace DemHandlers
         return !bitbuf.IsOverflowed();
     }
 
-    bool Dem_StringTables_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_StringTables* data)
+    bool Dem_StringTables_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_StringTables* data)
     {
         using StringTable = DemMsg::Dem_StringTables::StringTable;
 

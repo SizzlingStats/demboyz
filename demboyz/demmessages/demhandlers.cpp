@@ -15,18 +15,18 @@
         &DemHandlers::Dem_StringTables_##funcname \
     }
 
-typedef bool (*DemMsgFileReadFn)(DemoFileReader& demofile, void* data);
-typedef bool (*DemMsgFileWriteFn)(DemoFileWriter& demofile, void* data);
+typedef bool (*DemMsgFileReadFn)(FileRead& demofile, void* data);
+typedef bool (*DemMsgFileWriteFn)(FileWrite& demofile, void* data);
 typedef bool (*DemMsgJsonReadFn)(JsonRead& jsonbuf, void* data);
 typedef bool (*DemMsgJsonWriteFn)(JsonWrite& jsonbuf, void* data);
 
-bool DemHandlers::DemMsg_FileRead(uint32_t type, DemoFileReader& demofile, void* data)
+bool DemHandlers::DemMsg_FileRead(uint32_t type, FileRead& demofile, void* data)
 {
     static const DemMsgFileReadFn demHandlers[] = DECLARE_DEM_HANDLER_ARRAY(FileRead);
     return demHandlers[type](demofile, data);
 }
 
-bool DemHandlers::DemMsg_FileWrite(uint32_t type, DemoFileWriter& demofile, void* data)
+bool DemHandlers::DemMsg_FileWrite(uint32_t type, FileWrite& demofile, void* data)
 {
     static const DemMsgFileWriteFn demHandlers[] = DECLARE_DEM_HANDLER_ARRAY(FileWrite);
     return demHandlers[type](demofile, data);

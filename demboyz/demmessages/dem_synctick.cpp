@@ -3,12 +3,12 @@
 
 namespace DemHandlers
 {
-    bool Dem_SyncTick_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_SyncTick* data)
+    bool Dem_SyncTick_FileRead_Internal(FileRead& demofile, DemMsg::Dem_SyncTick* data)
     {
         return true;
     }
 
-    bool Dem_SyncTick_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_SyncTick* data)
+    bool Dem_SyncTick_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_SyncTick* data)
     {
         return true;
     }

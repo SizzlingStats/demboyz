@@ -4,7 +4,7 @@
 
 namespace DemHandlers
 {
-    bool Dem_ConsoleCmd_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_ConsoleCmd* data)
+    bool Dem_ConsoleCmd_FileRead_Internal(FileRead& demofile, DemMsg::Dem_ConsoleCmd* data)
     {
         char command[DemMsg::Dem_ConsoleCmd::COMMAND_MAX_LENGTH];
         demofile.ReadRawData(reinterpret_cast<uint8_t*>(command), sizeof(command));
@@ -12,7 +12,7 @@ namespace DemHandlers
         return demofile.IsOk();
     }
 
-    bool Dem_ConsoleCmd_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_ConsoleCmd* data)
+    bool Dem_ConsoleCmd_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_ConsoleCmd* data)
     {
         const uint8_t* command = reinterpret_cast<const uint8_t*>(data->command.data());
         demofile.WriteRawData(command, data->command.length() + 1);

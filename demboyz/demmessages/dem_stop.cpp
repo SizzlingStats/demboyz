@@ -3,12 +3,12 @@
 
 namespace DemHandlers
 {
-    bool Dem_Stop_FileRead_Internal(DemoFileReader& demofile, DemMsg::Dem_Stop* data)
+    bool Dem_Stop_FileRead_Internal(FileRead& demofile, DemMsg::Dem_Stop* data)
     {
         return true;
     }
 
-    bool Dem_Stop_FileWrite_Internal(DemoFileWriter& demofile, DemMsg::Dem_Stop* data)
+    bool Dem_Stop_FileWrite_Internal(FileWrite& demofile, DemMsg::Dem_Stop* data)
     {
         return true;
     }

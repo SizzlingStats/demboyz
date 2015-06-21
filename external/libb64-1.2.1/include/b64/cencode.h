@@ -13,8 +13,14 @@ typedef enum
 	step_A, step_B, step_C
 } base64_encodestep;
 
+typedef enum
+{
+	BASE64_ENC_NO_NEWLINE_TERM = 0x1
+} base64_encodeflags;
+
 typedef struct
 {
+	base64_encodeflags flags;
 	base64_encodestep step;
 	char result;
 	int stepcount;

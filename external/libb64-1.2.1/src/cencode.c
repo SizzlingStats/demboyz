@@ -26,6 +26,7 @@ char base64_encode_value(char value_in)
 
 int base64_encode_block(const char* plaintext_in, int length_in, char* code_out, base64_encodestate* state_in)
 {
+	int stepcount = state_in->stepcount;
 	const char* plainchar = plaintext_in;
 	const char* const plaintextend = plaintext_in + length_in;
 	char* codechar = code_out;
@@ -42,6 +43,7 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 			if (plainchar == plaintextend)
 			{
 				state_in->step = step_A;
+				state_in->stepcount = stepcount;
 				state_in->result = result;
 				return codechar - code_out;
 			}
@@ -53,6 +55,7 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 			if (plainchar == plaintextend)
 			{
 				state_in->step = step_B;
+				state_in->stepcount = stepcount;
 				state_in->result = result;
 				return codechar - code_out;
 			}
@@ -64,6 +67,7 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 			if (plainchar == plaintextend)
 			{
 				state_in->step = step_C;
+				state_in->stepcount = stepcount;
 				state_in->result = result;
 				return codechar - code_out;
 			}
@@ -73,11 +77,10 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 			result  = (fragment & 0x03f) >> 0;
 			*codechar++ = base64_encode_value(result);
 			
-			++(state_in->stepcount);
-			if (state_in->stepcount == CHARS_PER_LINE/4)
+			if (++stepcount == CHARS_PER_LINE/4)
 			{
 				*codechar++ = '\n';
-				state_in->stepcount = 0;
+				stepcount = 0;
 			}
 		}
 	}

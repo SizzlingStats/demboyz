@@ -43,10 +43,8 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 	const char* plainchar = plaintext_in;
 	const char* const plaintextend = plaintext_in + length_in;
 	char* codechar = code_out;
-	char result;
+	char result = state_in->result;
 	char fragment;
-	
-	result = state_in->result;
 	
 	switch (state_in->step)
 	{

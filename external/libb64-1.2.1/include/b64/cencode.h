@@ -22,8 +22,8 @@ typedef struct
 {
 	base64_encodeflags flags;
 	base64_encodestep step;
-	char result;
 	int stepcount;
+	char result;
 } base64_encodestate;
 
 void base64_init_encodestate(base64_encodestate* state_in);

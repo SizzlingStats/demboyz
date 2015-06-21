@@ -13,8 +13,8 @@ void base64_init_encodestate(base64_encodestate* state_in)
 {
 	state_in->flags = 0;
 	state_in->step = step_A;
-	state_in->result = 0;
 	state_in->stepcount = 0;
+	state_in->result = 0;
 }
 
 char base64_encode_value(char value_in)
@@ -41,8 +41,8 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 	case step_A:
 			if (plainchar == plaintextend)
 			{
-				state_in->result = result;
 				state_in->step = step_A;
+				state_in->result = result;
 				return codechar - code_out;
 			}
 			fragment = *plainchar++;
@@ -52,8 +52,8 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 	case step_B:
 			if (plainchar == plaintextend)
 			{
-				state_in->result = result;
 				state_in->step = step_B;
+				state_in->result = result;
 				return codechar - code_out;
 			}
 			fragment = *plainchar++;
@@ -63,8 +63,8 @@ int base64_encode_block(const char* plaintext_in, int length_in, char* code_out,
 	case step_C:
 			if (plainchar == plaintextend)
 			{
-				state_in->result = result;
 				state_in->step = step_C;
+				state_in->result = result;
 				return codechar - code_out;
 			}
 			fragment = *plainchar++;

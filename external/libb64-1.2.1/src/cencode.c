@@ -24,6 +24,19 @@ char base64_encode_value(char value_in)
 	return encoding[(int)value_in];
 }
 
+/*
+	Output_size calculation from:
+	http://stackoverflow.com/questions/1533113/calculate-the-size-to-a-base-64-encoded-message
+	Never more than a byte larger than the actual encoded size.
+	Guaranteed equal to or larger than the actual encoded size.
+*/
+int base64_calc_buffer_length(int length_in, const base64_encodestate* state_in)
+{
+	const int blockend_newline = ((BASE64_ENC_NO_NEWLINE_TERM & state_in->flags) == 0);
+	const int output_length = ((((length_in - 1) / 3) * 4) + 4);
+	return output_length + blockend_newline + (output_length / CHARS_PER_LINE);
+}
+
 int base64_encode_block(const char* plaintext_in, int length_in, char* code_out, base64_encodestate* state_in)
 {
 	int stepcount = state_in->stepcount;

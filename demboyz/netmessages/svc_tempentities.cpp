@@ -1,6 +1,7 @@
 
 #include "svc_tempentities.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 #include "netmath.h"
 
@@ -44,6 +45,11 @@ namespace NetHandlers
 
     bool SVC_TempEntities_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_TempEntities* data)
     {
+        jsonbuf.StartObject("svc_tempentities");
+        jsonbuf.WriteUInt32("numEntries", data->numEntries);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

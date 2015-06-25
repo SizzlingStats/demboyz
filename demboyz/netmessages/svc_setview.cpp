@@ -1,6 +1,7 @@
 
 #include "svc_setview.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 
 namespace NetHandlers
@@ -24,6 +25,9 @@ namespace NetHandlers
 
     bool SVC_SetView_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
+        jsonbuf.StartObject("svc_setview");
+        jsonbuf.WriteUInt32("entIndex", data->entIndex);
+        jsonbuf.EndObject();
         return true;
     }
 

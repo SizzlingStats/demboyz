@@ -1,6 +1,7 @@
 
 #include "svc_print.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -23,6 +24,9 @@ namespace NetHandlers
 
     bool SVC_Print_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Print* data)
     {
+        jsonbuf.StartObject("svc_print");
+        jsonbuf.WriteString("text", data->text);
+        jsonbuf.EndObject();
         return true;
     }
 

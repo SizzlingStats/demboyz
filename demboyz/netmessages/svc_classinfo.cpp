@@ -1,6 +1,7 @@
 
 #include "svc_classinfo.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 
 using class_t = NetMsg::SVC_ClassInfo::class_t;
@@ -51,6 +52,21 @@ namespace NetHandlers
 
     bool SVC_ClassInfo_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
     {
+        jsonbuf.StartObject("svc_classinfo");
+        jsonbuf.WriteInt32("numServerClasses", data->numServerClasses);
+        jsonbuf.WriteBool("createOnClient", data->createOnClient);
+        if (!data->createOnClient)
+        {
+            jsonbuf.StartArray("serverClasses");
+            for (class_t& serverClass : data->serverClasses)
+            {
+                jsonbuf.WriteUInt32("classId", serverClass.classID);
+                jsonbuf.WriteString("className", serverClass.className);
+                jsonbuf.WriteString("dataTableName", serverClass.dataTableName);
+            }
+            jsonbuf.EndArray();
+        }
+        jsonbuf.EndObject();
         return true;
     }
 

@@ -1,6 +1,7 @@
 
 #include "net_stringcmd.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -23,6 +24,9 @@ namespace NetHandlers
 
     bool Net_StringCmd_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_StringCmd* data)
     {
+        jsonbuf.StartObject("net_stringcmd");
+        jsonbuf.WriteString("command", data->command);
+        jsonbuf.EndObject();
         return true;
     }
 

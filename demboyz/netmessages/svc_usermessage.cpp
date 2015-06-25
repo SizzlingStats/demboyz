@@ -1,6 +1,7 @@
 
 #include "svc_usermessage.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 #include "netcontants.h"
 #include <cassert>
@@ -32,6 +33,11 @@ namespace NetHandlers
 
     bool SVC_UserMessage_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_UserMessage* data)
     {
+        jsonbuf.StartObject("svc_usermessage");
+        jsonbuf.WriteUInt32("msgType", data->msgType);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

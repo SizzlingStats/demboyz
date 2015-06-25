@@ -1,6 +1,7 @@
 
 #include "svc_getcvarvalue.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -25,6 +26,10 @@ namespace NetHandlers
 
     bool SVC_GetCvarValue_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
+        jsonbuf.StartObject("svc_getcvarvalue");
+        jsonbuf.WriteInt32("cookie", data->cookie);
+        jsonbuf.WriteString("cvarName", data->cvarName);
+        jsonbuf.EndObject();
         return true;
     }
 

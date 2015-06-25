@@ -1,6 +1,7 @@
 
 #include "svc_sounds.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 
 namespace NetHandlers
@@ -47,6 +48,12 @@ namespace NetHandlers
 
     bool SVC_Sounds_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Sounds* data)
     {
+        jsonbuf.StartObject("svc_sounds");
+        jsonbuf.WriteBool("reliableSound", data->reliableSound);
+        jsonbuf.WriteUInt32("numSounds", data->numSounds);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

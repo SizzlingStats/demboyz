@@ -1,6 +1,7 @@
 
 #include "net_disconnect.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -23,6 +24,9 @@ namespace NetHandlers
 
     bool Net_Disconnect_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
+        jsonbuf.StartObject("net_disconnect");
+        jsonbuf.WriteString("message", data->message);
+        jsonbuf.EndObject();
         return true;
     }
 

@@ -1,6 +1,7 @@
 
 #include "svc_updatestringtable.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 #include "netcontants.h"
 
@@ -40,6 +41,12 @@ namespace NetHandlers
 
     bool SVC_UpdateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_UpdateStringTable* data)
     {
+        jsonbuf.StartObject("svc_updatestringtable");
+        jsonbuf.WriteUInt32("tableId", data->tableID);
+        jsonbuf.WriteUInt32("numChangedEntries", data->numChangedEntries);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

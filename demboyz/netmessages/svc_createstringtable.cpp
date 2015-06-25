@@ -1,6 +1,7 @@
 
 #include "svc_createstringtable.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 #include "netcontants.h"
 
@@ -86,6 +87,21 @@ namespace NetHandlers
 
     bool SVC_CreateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
+        jsonbuf.StartObject("svc_createstringtable");
+        jsonbuf.WriteBool("isFilenames", data->isFileNames);
+        jsonbuf.WriteString("tableName", data->tableName);
+        jsonbuf.WriteUInt32("maxEntries", data->maxEntries);
+        jsonbuf.WriteUInt32("numEntries", data->numEntries);
+        jsonbuf.WriteInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBool("isUserDataFixedSize", data->isUserDataFixedSize);
+        jsonbuf.WriteUInt32("userDataSize", data->userDataSize);
+        jsonbuf.WriteUInt32("userDataSizeBits", data->userDataSizeBits);
+        if (context.protocol > 14)
+        {
+            jsonbuf.WriteBool("unk1", data->unk1);
+        }
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

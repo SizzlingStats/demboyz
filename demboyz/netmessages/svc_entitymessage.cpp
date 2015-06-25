@@ -1,6 +1,7 @@
 
 #include "svc_entitymessage.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 #include "netmath.h"
 
@@ -32,6 +33,12 @@ namespace NetHandlers
 
     bool SVC_EntityMessage_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_EntityMessage* data)
     {
+        jsonbuf.StartObject("svc_entitymessage");
+        jsonbuf.WriteUInt32("entIndex", data->entIndex);
+        jsonbuf.WriteUInt32("classId", data->classID);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

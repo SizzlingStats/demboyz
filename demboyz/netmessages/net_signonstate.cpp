@@ -1,6 +1,7 @@
 
 #include "net_signonstate.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -26,6 +27,10 @@ namespace NetHandlers
 
     bool Net_SignonState_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_SignonState* data)
     {
+        jsonbuf.StartObject("net_signonstate");
+        jsonbuf.WriteUInt32("signonState", data->signonState);
+        jsonbuf.WriteUInt32("spawnCount", data->spawnCount);
+        jsonbuf.EndObject();
         return true;
     }
 

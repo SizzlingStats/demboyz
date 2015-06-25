@@ -1,6 +1,7 @@
 
 #include "svc_packetentities.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 #include "netmath.h"
 
@@ -54,6 +55,16 @@ namespace NetHandlers
 
     bool SVC_PacketEntities_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
+        jsonbuf.StartObject("svc_packetentities");
+        jsonbuf.WriteInt32("maxEntries", data->maxEntries);
+        jsonbuf.WriteBool("isDelta", data->isDelta);
+        jsonbuf.WriteInt32("deltaFromTick", data->deltaFromTick);
+        jsonbuf.WriteUInt32("baselineIndex", data->baselineIndex);
+        jsonbuf.WriteUInt32("numUpdatedEntries", data->numUpdatedEntries);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBool("updateBaseline", data->updateBaseline);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

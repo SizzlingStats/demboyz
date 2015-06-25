@@ -1,6 +1,7 @@
 
 #include "net_file.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -27,6 +28,11 @@ namespace NetHandlers
 
     bool Net_File_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_File* data)
     {
+        jsonbuf.StartObject("net_file");
+        jsonbuf.WriteUInt32("transferId", data->transferID);
+        jsonbuf.WriteString("filename", data->filename);
+        jsonbuf.WriteBool("isRequest", data->isRequest);
+        jsonbuf.EndObject();
         return true;
     }
 

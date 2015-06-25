@@ -1,6 +1,7 @@
 
 #include "svc_menu.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 using DialogType = NetMsg::SVC_Menu::DialogType;
 
@@ -41,6 +42,11 @@ namespace NetHandlers
 
     bool SVC_Menu_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
+        jsonbuf.StartObject("svc_menu");
+        jsonbuf.WriteInt32("dialogType", static_cast<int16_t>(data->type));
+        jsonbuf.WriteUInt32("dataLengthInBytes", data->dataLengthInBytes);
+        jsonbuf.WriteBytes("data", data->menuBinaryKeyValues.get(), data->dataLengthInBytes);
+        jsonbuf.EndObject();
         return true;
     }
 

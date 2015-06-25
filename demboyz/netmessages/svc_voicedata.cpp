@@ -1,6 +1,7 @@
 
 #include "svc_voicedata.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 
 namespace NetHandlers
@@ -31,6 +32,12 @@ namespace NetHandlers
 
     bool SVC_VoiceData_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_VoiceData* data)
     {
+        jsonbuf.StartObject("svc_voicedata");
+        jsonbuf.WriteUInt32("fromClientIndex", data->fromClientIndex);
+        jsonbuf.WriteBool("proximity", data->proximity);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

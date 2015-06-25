@@ -1,6 +1,7 @@
 
 #include "svc_sendtable.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netmath.h"
 
 namespace NetHandlers
@@ -29,6 +30,11 @@ namespace NetHandlers
 
     bool SVC_SendTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SendTable* data)
     {
+        jsonbuf.StartObject("svc_sendtable");
+        jsonbuf.WriteBool("needsDecoder", data->needsDecoder);
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

@@ -1,6 +1,7 @@
 
 #include "net_setconvar.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -35,6 +36,17 @@ namespace NetHandlers
 
     bool Net_SetConVar_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
+        jsonbuf.StartObject("net_setconvar");
+        jsonbuf.StartArray("cvars");
+        for (cvar_t& cvar : data->cvars)
+        {
+            jsonbuf.StartObject();
+            jsonbuf.WriteString("name", cvar.name);
+            jsonbuf.WriteString("value", cvar.value);
+            jsonbuf.EndObject();
+        }
+        jsonbuf.EndArray();
+        jsonbuf.EndObject();
         return true;
     }
 

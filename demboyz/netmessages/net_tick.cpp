@@ -1,6 +1,7 @@
 
 #include "net_tick.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -27,6 +28,11 @@ namespace NetHandlers
 
     bool Net_Tick_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_Tick* data)
     {
+        jsonbuf.StartObject("net_tick");
+        jsonbuf.WriteInt32("tick", data->tick);
+        jsonbuf.WriteUInt32("hostFrameTime", data->hostFrameTime);
+        jsonbuf.WriteUInt32("hostFrameTimeStdDev", data->hostFrameTimeStdDev);
+        jsonbuf.EndObject();
         return true;
     }
 

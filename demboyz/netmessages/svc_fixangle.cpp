@@ -1,6 +1,7 @@
 
 #include "svc_fixangle.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include <iomanip>
 
 namespace NetHandlers
@@ -30,6 +31,14 @@ namespace NetHandlers
 
     bool SVC_FixAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
+        jsonbuf.StartObject("svc_fixangle");
+        jsonbuf.WriteBool("relative", data->relative);
+        jsonbuf.StartObject("angle");
+        jsonbuf.WriteFloat("pitch", data->x);
+        jsonbuf.WriteFloat("yaw", data->y);
+        jsonbuf.WriteFloat("roll", data->z);
+        jsonbuf.EndObject();
+        jsonbuf.EndObject();
         return true;
     }
 

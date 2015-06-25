@@ -1,6 +1,7 @@
 
 #include "svc_serverinfo.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -73,6 +74,34 @@ namespace NetHandlers
 
     bool SVC_ServerInfo_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
+        jsonbuf.StartObject("svc_serverinfo");
+        jsonbuf.WriteInt32("protocol", data->protocol);
+        jsonbuf.WriteUInt32("serverCount", data->serverCount);
+        jsonbuf.WriteBool("isHltv", data->isHLTV);
+        jsonbuf.WriteBool("isDedicated", data->isDedicated);
+        jsonbuf.WriteUInt32("clientCrc", data->clientCRC);
+        jsonbuf.WriteUInt32("maxClasses", data->maxClasses);
+        if (context.protocol <= 17)
+        {
+            jsonbuf.WriteUInt32("mapCRC", data->mapCRC);
+        }
+        else
+        {
+            jsonbuf.WriteBytes("unk1", data->unk1, sizeof(data->unk1));
+        }
+        jsonbuf.WriteUInt32("playerSlot", data->playerSlot);
+        jsonbuf.WriteUInt32("maxClients", data->maxClients);
+        jsonbuf.WriteFloat("tickInterval", data->tickInterval);
+        jsonbuf.WriteString("os", &data->os, 1);
+        jsonbuf.WriteString("gameDir", data->gameDir);
+        jsonbuf.WriteString("mapName", data->mapName);
+        jsonbuf.WriteString("skyName", data->skyName);
+        jsonbuf.WriteString("hostName", data->hostName);
+        if (context.protocol > 15)
+        {
+            jsonbuf.WriteBool("unk2", data->unk2);
+        }
+        jsonbuf.EndObject();
         return true;
     }
 

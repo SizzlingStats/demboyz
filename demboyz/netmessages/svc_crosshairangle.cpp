@@ -1,6 +1,7 @@
 
 #include "svc_crosshairangle.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include <iomanip>
 
 namespace NetHandlers
@@ -28,6 +29,13 @@ namespace NetHandlers
 
     bool SVC_CrosshairAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
+        jsonbuf.StartObject("svc_crosshairangle");
+        jsonbuf.StartObject("angle");
+        jsonbuf.WriteFloat("pitch", data->x);
+        jsonbuf.WriteFloat("yaw", data->y);
+        jsonbuf.WriteFloat("roll", data->z);
+        jsonbuf.EndObject();
+        jsonbuf.EndObject();
         return true;
     }
 

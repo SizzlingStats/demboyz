@@ -1,6 +1,7 @@
 
 #include "svc_prefetch.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 
 namespace NetHandlers
@@ -39,6 +40,10 @@ namespace NetHandlers
 
     bool SVC_Prefetch_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
+        jsonbuf.StartObject("svc_prefetch");
+        jsonbuf.WriteUInt32("type", data->type);
+        jsonbuf.WriteUInt32("soundIndex", data->soundIndex);
+        jsonbuf.EndObject();
         return true;
     }
 

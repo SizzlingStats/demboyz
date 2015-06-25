@@ -1,6 +1,7 @@
 
 #include "svc_voiceinit.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -25,6 +26,10 @@ namespace NetHandlers
 
     bool SVC_VoiceInit_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
     {
+        jsonbuf.StartObject("svc_voiceinit");
+        jsonbuf.WriteString("voiceCodec", data->voiceCodec);
+        jsonbuf.WriteUInt32("quality", data->quality);
+        jsonbuf.EndObject();
         return true;
     }
 

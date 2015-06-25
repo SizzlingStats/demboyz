@@ -1,6 +1,7 @@
 
 #include "svc_setpause.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 
 namespace NetHandlers
 {
@@ -23,6 +24,9 @@ namespace NetHandlers
 
     bool SVC_SetPause_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
+        jsonbuf.StartObject("svc_setpause");
+        jsonbuf.WriteBool("isPaused", data->isPaused);
+        jsonbuf.EndObject();
         return true;
     }
 

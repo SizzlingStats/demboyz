@@ -4,13 +4,18 @@
 #include <cstdint>
 #include <sstream>
 
+namespace base
+{
+    class JsonWriterFile;
+}
+
 class bf_read;
 class bf_write;
 
 using BitRead = bf_read;
 using BitWrite = bf_write;
 class JsonRead;
-class JsonWrite;
+using JsonWrite = base::JsonWriterFile;
 
 struct SourceGameContext
 {

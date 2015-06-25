@@ -1,6 +1,7 @@
 
 #include "svc_gameevent.h"
-#include "sourcesdk/bitbuf.h"
+#include "base/bitfile.h"
+#include "base/jsonfile.h"
 #include "netcontants.h"
 #include "netmath.h"
 
@@ -28,6 +29,10 @@ namespace NetHandlers
 
     bool SVC_GameEvent_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_GameEvent* data)
     {
+        jsonbuf.StartObject("svc_gameevent");
+        jsonbuf.WriteUInt32("dataLengthInBits", data->dataLengthInBits);
+        jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
+        jsonbuf.EndObject();
         return true;
     }
 

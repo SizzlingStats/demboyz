@@ -8,6 +8,25 @@
 using EventDescriptor = NetMsg::SVC_GameEventList::EventDescriptor;
 using EventValue = NetMsg::SVC_GameEventList::EventValue;
 
+uint32_t CalculateNumDataBits(const std::vector<EventDescriptor>& eventDescriptors)
+{
+    uint32_t numBits = 0;
+    for (const EventDescriptor& event : eventDescriptors)
+    {
+        numBits += MAX_EVENT_BITS;
+        // +1 for null char
+        numBits += (8 * (1 + strlen(event.name)));
+        // +1 for null bits
+        numBits += (3 * (1 + event.values.size()));
+        for (const EventValue& value : event.values)
+        {
+            // +1 for null char
+            numBits += (8 * (1 + strlen(value.name)));
+        }
+    }
+    return numBits;
+}
+
 namespace NetHandlers
 {
     bool SVC_GameEventList_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEventList* data)

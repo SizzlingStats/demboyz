@@ -62,6 +62,11 @@ void DemoWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
     {
         m_cmdPacketBuf.WriteUBitLong(trailingBits.value, trailingBits.numTrailingBits);
     }
+    const int numBitsToWrite = m_cmdPacketBuf.GetNumBitsWritten() % 8;
+    if (numBitsToWrite != 0)
+    {
+        assert(false);
+    }
     if (m_cmdPacketBuf.GetNumBytesWritten() > 0)
     {
         m_writer.WriteRawData(m_cmdPacketBuf.GetBasePointer(), m_cmdPacketBuf.GetNumBytesWritten());

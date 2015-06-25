@@ -52,6 +52,11 @@ int main(const int argc, const char* argv[])
 
     std::string inputFile(argv[1]);
     std::string outputFile(argv[2]);
+    if (inputFile == outputFile)
+    {
+        fprintf(stderr, "Error: Input and output file cannot be the same!\n");
+        return -1;
+    }
 
     FileType inputType = GetFileType(inputFile);
     FileType outputType = GetFileType(outputFile);

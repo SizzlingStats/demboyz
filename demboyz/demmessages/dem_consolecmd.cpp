@@ -1,6 +1,7 @@
 
 #include "dem_consolecmd.h"
 #include "demofile/demofile.h"
+#include "base/jsonfile.h"
 
 namespace DemHandlers
 {
@@ -26,6 +27,7 @@ namespace DemHandlers
 
     bool Dem_ConsoleCmd_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_ConsoleCmd* data)
     {
+        jsonbuf.WriteString("command", data->command.c_str(), data->command.length());
         return true;
     }
 }

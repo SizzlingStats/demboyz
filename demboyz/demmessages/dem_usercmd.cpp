@@ -1,6 +1,7 @@
 
 #include "dem_usercmd.h"
 #include "demofile/demofile.h"
+#include "demofile/demojson.h"
 
 namespace DemHandlers
 {
@@ -23,6 +24,8 @@ namespace DemHandlers
 
     bool Dem_UserCmd_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_UserCmd* data)
     {
+        DemoJsonWriter::WriteUserCmd(jsonbuf, data->commandNum,
+                                     data->commandData.begin(), data->commandData.length());
         return true;
     }
 }

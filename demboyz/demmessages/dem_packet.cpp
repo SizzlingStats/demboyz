@@ -1,6 +1,7 @@
 
 #include "dem_packet.h"
 #include "demofile/demofile.h"
+#include "demofile/demojson.h"
 
 namespace DemHandlers
 {
@@ -27,6 +28,8 @@ namespace DemHandlers
 
     bool Dem_Packet_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_Packet* data)
     {
+        DemoJsonWriter::WriteCmdInfo(jsonbuf, data->cmdInfo);
+        DemoJsonWriter::WriteSequenceInfo(jsonbuf, data->sequenceNum1, data->sequenceNum2);
         return true;
     }
 }

@@ -1,6 +1,7 @@
 
 #include "dem_datatables.h"
 #include "demofile/demofile.h"
+#include "demofile/demojson.h"
 
 namespace DemHandlers
 {
@@ -23,6 +24,8 @@ namespace DemHandlers
 
     bool Dem_DataTables_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_DataTables* data)
     {
+        //jsonbuf.WriteInt32("dataLengthInBytes", data->data.length());
+        jsonbuf.WriteBytes("data", data->data.begin(), data->data.length());
         return true;
     }
 }

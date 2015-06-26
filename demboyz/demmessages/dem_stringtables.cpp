@@ -3,6 +3,7 @@
 #include "demofile/demofile.h"
 #include "netmessages/netcontants.h"
 #include "sourcesdk/bitbuf.h"
+#include "base/jsonfile.h"
 #include <memory>
 
 static void StringTableEntry_BitRead(bf_read& bitbuf, DemMsg::Dem_StringTables::StringTableEntry* data)
@@ -37,6 +38,14 @@ static void StringTableEntry_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables
         bitbuf.WriteWord(numDataBytes);
         bitbuf.WriteBytes(data->data.begin(), numDataBytes);
     }
+}
+
+static void StringTableEntry_JsonWrite(JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTableEntry* data)
+{
+    jsonbuf.StartObject(data->entryName.c_str());
+    //jsonbuf.WriteUInt32("dataLengthInBytes", data->data.length());
+    jsonbuf.WriteBytes("data", data->data.begin(), data->data.length());
+    jsonbuf.EndObject();
 }
 
 static void StringTable_BitRead(bf_read& bitbuf, DemMsg::Dem_StringTables::StringTable* data)
@@ -91,6 +100,19 @@ static void StringTable_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables::Str
     }
 }
 
+static void StringTable_JsonWrite(JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTable* data)
+{
+    using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
+    jsonbuf.StartArray(data->tableName.c_str());
+    for (const StringTableEntry& entry : data->entries1)
+    {
+        jsonbuf.StartObject();
+        StringTableEntry_JsonWrite(jsonbuf, &entry);
+        jsonbuf.EndObject();
+    }
+    jsonbuf.EndArray();
+}
+
 namespace DemHandlers
 {
     bool Dem_StringTables_FileRead_Internal(FileRead& demofile, DemMsg::Dem_StringTables* data)
@@ -131,6 +153,15 @@ namespace DemHandlers
 
     bool Dem_StringTables_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_StringTables* data)
     {
+        using StringTable = DemMsg::Dem_StringTables::StringTable;
+        jsonbuf.StartArray("tables");
+        for (const StringTable& table : data->stringtables)
+        {
+            jsonbuf.StartObject();
+            StringTable_JsonWrite(jsonbuf, &table);
+            jsonbuf.EndObject();
+        }
+        jsonbuf.EndArray();
         return true;
     }
 }

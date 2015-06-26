@@ -13,6 +13,7 @@ namespace base
     {
     public:
         JsonWriterFile(FILE* fp, char* buffer, std::size_t length);
+        ~JsonWriterFile();
 
         FILE* GetFp() const;
         void Flush();

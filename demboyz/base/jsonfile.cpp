@@ -12,6 +12,11 @@ namespace base
     {
     }
 
+    JsonWriterFile::~JsonWriterFile()
+    {
+        Flush();
+    }
+
     FILE* JsonWriterFile::GetFp() const
     {
         return m_fp;

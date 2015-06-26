@@ -61,6 +61,27 @@ enum
     dem_lastcmd     = dem_stringtables
 };
 
+inline const char* DemoCmdToString(unsigned int cmd)
+{
+    static const char* cmdNames[] = 
+    {
+        "dem_unknown",
+        "dem_signon",
+        "dem_packet",
+        "dem_synctick",
+        "dem_consolecmd",
+        "dem_usercmd",
+        "dem_datatables",
+        "dem_stop",
+        "dem_stringtables"
+    };
+    if (cmd > (sizeof(cmdNames) / sizeof(const char*)))
+    {
+        return "";
+    }
+    return cmdNames[cmd];
+}
+
 struct demoheader_t
 {
     char    demofilestamp[ 8 ];             // Should be HL2DEMO

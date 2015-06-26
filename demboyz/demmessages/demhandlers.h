@@ -3,12 +3,20 @@
 
 #include <cstdint>
 
+namespace base
+{
+    class JsonWriterFile;
+}
+
 class DemoFileReader;
 class DemoFileWriter;
+class DemoFileReader2;
+class DemoFileWriter2;
+
 using FileRead = DemoFileReader;
 using FileWrite = DemoFileWriter;
 class JsonRead;
-class JsonWrite;
+using JsonWrite = base::JsonWriterFile;
 
 #define DECLARE_DEM_HANDLERS(msgname) \
     namespace DemHandlers \

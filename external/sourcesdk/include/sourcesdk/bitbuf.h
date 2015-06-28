@@ -36,7 +36,7 @@ typedef enum
 	BITBUFERROR_NUM_ERRORS
 } BitBufErrorType;
 
-class IBitBufOverErrorHandler
+class IBitBufErrorHandler
 {
 public:
 	virtual bool HandleError(BitBufErrorType errorType, const char *pDebugName) = 0;
@@ -140,7 +140,7 @@ public:
 	const char*		GetDebugName();
 	void			SetDebugName( const char *pDebugName );
 
-	void			SetErrorHandler(IBitBufOverErrorHandler* handler);
+	void			SetErrorHandler(IBitBufErrorHandler* handler);
 	bool			CallErrorHandler(BitBufErrorType errorType);
 
 // Seek to a specific position.
@@ -245,7 +245,7 @@ private:
 
 	bool			m_bAssertOnOverflow;
 	const char		*m_pDebugName;
-	IBitBufOverErrorHandler* m_errorHandler;
+	IBitBufErrorHandler* m_errorHandler;
 };
 
 
@@ -508,7 +508,7 @@ public:
 	const char*		GetDebugName() const { return m_pDebugName; }
 	void			SetDebugName( const char *pName );
 
-	void			SetErrorHandler(IBitBufOverErrorHandler* handler);
+	void			SetErrorHandler(IBitBufErrorHandler* handler);
 	bool			CallErrorHandler(BitBufErrorType errorType);
 
 	void			ExciseBits( int startbit, int bitstoremove );
@@ -658,7 +658,7 @@ private:
 	bool			m_bAssertOnOverflow;
 
 	const char		*m_pDebugName;
-	IBitBufOverErrorHandler* m_errorHandler;
+	IBitBufErrorHandler* m_errorHandler;
 };
 
 //-----------------------------------------------------------------------------

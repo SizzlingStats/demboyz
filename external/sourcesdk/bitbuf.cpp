@@ -181,7 +181,7 @@ void bf_write::SetDebugName( const char *pDebugName )
 	m_pDebugName = pDebugName;
 }
 
-void bf_write::SetErrorHandler(IBitBufOverErrorHandler* handler)
+void bf_write::SetErrorHandler(IBitBufErrorHandler* handler)
 {
 	m_errorHandler = handler;
 }
@@ -849,7 +849,7 @@ void bf_read::SetDebugName( const char *pName )
 	m_pDebugName = pName;
 }
 
-void bf_read::SetErrorHandler(IBitBufOverErrorHandler* handler)
+void bf_read::SetErrorHandler(IBitBufErrorHandler* handler)
 {
 	m_errorHandler = handler;
 }

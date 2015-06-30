@@ -9,6 +9,30 @@
 #include <cstdio>
 #include <memory>
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+#include <sys/stat.h>
+
+int truncate(FILE* fp, int relative_offset)
+{
+    fflush(fp);
+#ifdef _WIN32
+    const int fd = _fileno(fp);
+#else
+    const int fd = fileno(fp);
+#endif
+    struct stat statbuf;
+    fstat(fd, &statbuf);
+#ifdef _WIN32
+    return _chsize_s(fd, statbuf.st_size + relative_offset);
+#else
+    return ftruncate(fd, statbuf.st_size + relative_offset);
+#endif
+}
+
 class DemoWriter: public IDemoWriter
 {
 public:
@@ -47,6 +71,9 @@ void DemoWriter::StartWriting(demoheader_t& header)
 
 void DemoWriter::EndWriting()
 {
+    // stv demos have a byte chopped off of the end
+    // i dunno why, just doit
+    truncate(m_writer.GetFp(), -1);
 }
 
 void DemoWriter::StartCommandPacket(const CommandPacket& packet)

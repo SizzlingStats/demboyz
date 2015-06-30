@@ -108,6 +108,11 @@ DemoFileWriter::DemoFileWriter(FILE* fp) :
 {
 }
 
+FILE* DemoFileWriter::GetFp() const
+{
+    return m_demoFp;
+}
+
 bool DemoFileWriter::IsOk() const
 {
     return ferror(m_demoFp) == 0;

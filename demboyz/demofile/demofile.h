@@ -32,6 +32,7 @@ class DemoFileWriter
 public:
     DemoFileWriter(FILE* fp);
 
+    FILE* GetFp() const;
     bool IsOk() const;
     void WriteDemoHeader(const demoheader_t& header);
     void WriteRawData(const uint8_t* buffer, int32_t length);

@@ -27,6 +27,8 @@ namespace DemMsg
         };
 
         Array<StringTable> stringtables;
+        uint16_t numTrailingBits;
+        uint16_t trailingBitsValue;
     };
 }
 

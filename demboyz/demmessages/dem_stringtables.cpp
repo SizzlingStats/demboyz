@@ -127,6 +127,15 @@ namespace DemHandlers
         {
             StringTable_BitRead(bitbuf, &table);
         }
+
+        // copy trailing bits for binary completeness
+        const unsigned int numBitsLeft = bitbuf.GetNumBitsLeft();
+        assert(numBitsLeft < 8);
+        data->numTrailingBits = numBitsLeft;
+        if (numBitsLeft > 0)
+        {
+            data->trailingBitsValue = bitbuf.ReadUBitLong(numBitsLeft);
+        }
         return !bitbuf.IsOverflowed();
     }
 
@@ -141,6 +150,10 @@ namespace DemHandlers
         for (StringTable& table : data->stringtables)
         {
             StringTable_BitWrite(bitbuf, &table);
+        }
+        if (data->numTrailingBits > 0)
+        {
+            bitbuf.WriteUBitLong(data->trailingBitsValue, data->numTrailingBits);
         }
         demofile.WriteRawData(bitbuf.GetBasePointer(), bitbuf.GetNumBytesWritten());
         return !bitbuf.IsOverflowed();
@@ -162,6 +175,15 @@ namespace DemHandlers
             jsonbuf.EndObject();
         }
         jsonbuf.EndArray();
+        jsonbuf.WriteUInt32("numTrailingBits", data->numTrailingBits);
+        if (data->numTrailingBits > 0)
+        {
+            jsonbuf.WriteUInt32("trailingBitsValue", data->trailingBitsValue);
+        }
+        else
+        {
+            jsonbuf.WriteNull("trailingBitsValue");
+        }
         return true;
     }
 }

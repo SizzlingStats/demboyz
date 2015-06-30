@@ -58,22 +58,22 @@ static void StringTable_BitRead(bf_read& bitbuf, DemMsg::Dem_StringTables::Strin
         data->tableName.assign(tableName);
     }
 
-    data->entries1.reset(bitbuf.ReadWord());
-    for (StringTableEntry& entry : data->entries1)
+    data->entries.reset(bitbuf.ReadWord());
+    for (StringTableEntry& entry : data->entries)
     {
         StringTableEntry_BitRead(bitbuf, &entry);
     }
     if (bitbuf.ReadOneBit() != 0)
     {
-        data->entries2.reset(bitbuf.ReadWord());
-        for (StringTableEntry& entry : data->entries2)
+        data->entriesClientSide.reset(bitbuf.ReadWord());
+        for (StringTableEntry& entry : data->entriesClientSide)
         {
             StringTableEntry_BitRead(bitbuf, &entry);
         }
     }
     else
     {
-        data->entries2.reset(0);
+        data->entriesClientSide.reset(0);
     }
 }
 
@@ -82,18 +82,18 @@ static void StringTable_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables::Str
     using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
     bitbuf.WriteString(data->tableName.c_str());
 
-    bitbuf.WriteWord(data->entries1.length());
-    for (StringTableEntry& entry : data->entries1)
+    bitbuf.WriteWord(data->entries.length());
+    for (StringTableEntry& entry : data->entries)
     {
         StringTableEntry_BitWrite(bitbuf, &entry);
     }
 
-    const int32_t entries2Count = data->entries2.length();
-    bitbuf.WriteOneBit(entries2Count > 0);
-    if (entries2Count > 0)
+    const int32_t numEntriesClientSide = data->entriesClientSide.length();
+    bitbuf.WriteOneBit(numEntriesClientSide > 0);
+    if (numEntriesClientSide > 0)
     {
-        bitbuf.WriteWord(entries2Count);
-        for (StringTableEntry& entry : data->entries2)
+        bitbuf.WriteWord(numEntriesClientSide);
+        for (StringTableEntry& entry : data->entriesClientSide)
         {
             StringTableEntry_BitWrite(bitbuf, &entry);
         }
@@ -104,7 +104,7 @@ static void StringTable_JsonWrite(JsonWrite& jsonbuf, const DemMsg::Dem_StringTa
 {
     using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
     jsonbuf.StartArray(data->tableName.c_str());
-    for (const StringTableEntry& entry : data->entries1)
+    for (const StringTableEntry& entry : data->entries)
     {
         jsonbuf.StartObject();
         StringTableEntry_JsonWrite(jsonbuf, &entry);

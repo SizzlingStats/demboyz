@@ -22,8 +22,8 @@ namespace DemMsg
             static const int TABLENAME_MAX_LENGTH = 256;
 
             std::string tableName;
-            Array<StringTableEntry> entries1;
-            Array<StringTableEntry> entries2;
+            Array<StringTableEntry> entries;
+            Array<StringTableEntry> entriesClientSide;
         };
 
         Array<StringTable> stringtables;

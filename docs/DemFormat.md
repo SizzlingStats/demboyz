@@ -1,9 +1,11 @@
 Source Engine DEM format
 =======
 
-This document applies to the version of TF2 as of July 1, 2015.
+This document applies to the version of TF2 as of July 1, 2015.  
+Demo Protocol v3.  
+Network Protocol v24.  
 
-### DEM Format
+#### DEM Format
 The Source Engine DEM format at a high level:
 
 [Demo Header]  
@@ -13,7 +15,7 @@ The Source Engine DEM format at a high level:
 [Command Header = dem_stop]  
 ~fin
 
-### Demo Header
+#### Demo Header
 | Type | Name | Description | Example |
 |------|------|-------------|---------|
 | char[8] | Demo File Stamp | Demo file identifier. | "HL2DEMO" |
@@ -30,14 +32,14 @@ The Source Engine DEM format at a high level:
 
 Note: Examples are from a short demo recording, hence the 9 second playback time.
 
-### Command Header
+#### Command Header
 | Type | Name | Description |
 |------|------|-------------|
 | int8 | Command Type | Type of the next command packet. |
 | int32 | Tick | Game tick of the next command packet. |
 
-### Command Type
-| Type | Value | Description |
+#### Command Type
+| Name | Value | Description |
 |------|-------|-------------|
 | dem_signon | 1 | Signon packet. Same format as a network packet. |
 | dem_packet | 2 | Network packet. |
@@ -48,3 +50,65 @@ Note: Examples are from a short demo recording, hence the 9 second playback time
 | dem_stop | 7 | Signals the end of demo messages. |
 | dem_stringtables | 8 | Stringtables. |
 
+#### Command Packets
+##### dem_signon/dem_packet
+| Type | Name | Description |
+|------|------|-------------|
+| democmdinfo_t | Demo Command Info | Describes view angles of the current point of view. |
+| int32 | Sequence Number In | Input sequence number of packet. |
+| int32 | Sequence Number Out | Output sequence number of packet. |
+| RawData | Netpackets | RawData structure containing a series of netpackets. |
+
+##### dem_synctick
+Command Packet of size 0 bytes.
+
+##### dem_consolecmd
+| Type | Name | Description |
+|------|------|-------------|
+| char[1023] | Command String | Console command string of max length 1023 (including null char). |
+
+Note: A typo in the code that writes out console commands likely meant for a string of length 1024 (including null char).
+
+##### dem_usercmd
+##### dem_datatables
+##### dem_stop
+Command Packet of size 0 bytes.
+
+##### dem_stringtables
+
+#### Types Appendix
+##### Vector
+| Type | Name | Description |
+|------|------|-------------|
+| float32 | x | |
+| float32 | y | |
+| float32 | z | |
+
+##### QAngle
+| Type | Name | Description |
+|------|------|-------------|
+| float32 | pitch | |
+| float32 | yaw | |
+| float32 | roll | |
+
+##### Split_t
+| Type | Name | Description |
+|------|------|-------------|
+| int32 | Flags | |
+| Vector | View Origin | |
+| QAngle | View Angles | |
+| QAngle | Local View Angles | |
+| Vector | View Origin 2 | |
+| QAngle | View Angles 2 | |
+| QAngle | Local View Angles 2 | |
+
+##### democmdinfo_t
+| Type | Name | Description |
+|------|------|-------------|
+| Split_t[1] | POV angles | Array of Split_t. Constant length of 1 for demo protocol 3. |
+
+##### RawData
+| Type | Name | Description |
+|------|------|-------------|
+| int32 | Size | Size in bytes of the following data chunk. |
+| uchar[Size] | Data | Data chunk of Size bytes. |

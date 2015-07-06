@@ -17,6 +17,7 @@ namespace base
 
         FILE* GetFp() const;
         void Flush();
+        void Reset();
         bool IsComplete() const;
 
         void StartObject(const char* name = nullptr);
@@ -28,8 +29,10 @@ namespace base
         void WriteNull(const char* name);
         void WriteBool(const char* name, bool value);
         void WriteInt32(const char* name, std::int32_t value);
+        void WriteInt32(const char* name, std::int32_t value, bool writeCondition);
         void WriteInt64(const char* name, std::int64_t value);
         void WriteUInt32(const char* name, std::uint32_t value);
+        void WriteUInt32(const char* name, std::uint32_t value, bool writeCondition);
         void WriteUint64(const char* name, std::uint64_t value);
         void WriteString(const char* name, const char* value);
         void WriteString(const char* name, const char* value, std::int32_t length);

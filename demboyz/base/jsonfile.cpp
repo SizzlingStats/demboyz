@@ -25,6 +25,10 @@ namespace base
     void JsonWriterFile::Flush()
     {
         m_fileStream.Flush();
+
+    void JsonWriterFile::Reset()
+    {
+        m_writer.Reset(m_fileStream);
     }
 
     bool JsonWriterFile::IsComplete() const
@@ -62,6 +66,13 @@ namespace base
         m_writer.EndArray();
     }
 
+    void JsonWriterFile::WriteNull(const char* name)
+    {
+        auto& writer = m_writer;
+        writer.String(name);
+        writer.Null();
+    }
+
     void JsonWriterFile::WriteBool(const char* name, bool value)
     {
         auto& writer = m_writer;
@@ -76,6 +87,20 @@ namespace base
         writer.Int(value);
     }
 
+    void JsonWriterFile::WriteInt32(const char* name, std::int32_t value, bool writeCondition)
+    {
+        auto& writer = m_writer;
+        writer.String(name);
+        if (writeCondition)
+        {
+            writer.Int(value);
+        }
+        else
+        {
+            writer.Null();
+        }
+    }
+
     void JsonWriterFile::WriteInt64(const char* name, std::int64_t value)
     {
         auto& writer = m_writer;
@@ -88,6 +113,20 @@ namespace base
         auto& writer = m_writer;
         writer.String(name);
         writer.Uint(value);
+    }
+
+    void JsonWriterFile::WriteUInt32(const char* name, std::uint32_t value, bool writeCondition)
+    {
+        auto& writer = m_writer;
+        writer.String(name);
+        if (writeCondition)
+        {
+            writer.Uint(value);
+        }
+        else
+        {
+            writer.Null();
+        }
     }
 
     void JsonWriterFile::WriteUint64(const char* name, std::uint64_t value)

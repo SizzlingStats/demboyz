@@ -41,50 +41,63 @@ JsonWriter::JsonWriter(FILE* outputFp):
 void JsonWriter::StartWriting(demoheader_t& header)
 {
     auto& jsonFile = m_jsonFile;
+    jsonFile.Reset();
     jsonFile.StartObject();
-
     DemoJsonWriter::WriteDemoHeader(jsonFile, header);
-    jsonFile.StartArray("demmessages");
+    jsonFile.EndObject();
 }
 
 void JsonWriter::EndWriting()
 {
     auto& jsonFile = m_jsonFile;
-    jsonFile.EndArray();
-    jsonFile.EndObject();
+    jsonFile.Flush();
     assert(jsonFile.IsComplete());
 }
 
 void JsonWriter::StartCommandPacket(const CommandPacket& packet)
 {
     auto& jsonFile = m_jsonFile;
+    jsonFile.Reset();
     jsonFile.StartObject();
     jsonFile.WriteInt32("tick", packet.tick);
-    jsonFile.StartObject(DemoCmdToString(packet.cmd));
+    jsonFile.WriteString("cmd", DemoCmdToString(packet.cmd));
+    jsonFile.EndObject();
+
+    jsonFile.Reset();
+    jsonFile.StartObject();
     DemHandlers::DemMsg_JsonWrite(packet.cmd, jsonFile, packet.data);
+    jsonFile.EndObject();
+    assert(jsonFile.IsComplete());
+
     if (packet.cmd == dem_packet || packet.cmd == dem_signon)
     {
         m_writingNetPackets = true;
-        jsonFile.StartArray("netpackets");
     }
 }
 
 void JsonWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 {
-    auto& jsonFile = m_jsonFile;
     if (m_writingNetPackets)
     {
         m_writingNetPackets = false;
-        jsonFile.EndArray();
+        auto& jsonFile = m_jsonFile;
+        jsonFile.Reset();
+        jsonFile.StartObject();
+        jsonFile.StartObject("netpackets_end");
+        jsonFile.WriteInt32("numTrailingBits", trailingBits.numTrailingBits);
+        jsonFile.WriteInt32("trailingBitsValue", trailingBits.value, (trailingBits.numTrailingBits > 0));
+        jsonFile.EndObject();
+        jsonFile.EndObject();
+        assert(jsonFile.IsComplete());
     }
-    jsonFile.EndObject();
-    jsonFile.EndObject();
 }
 
 void JsonWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
     auto& jsonFile = m_jsonFile;
+    jsonFile.Reset();
     jsonFile.StartObject();
     NetHandlers::NetMsg_JsonWrite(packet.type, jsonFile, context, packet.data);
     jsonFile.EndObject();
+    assert(jsonFile.IsComplete());
 }

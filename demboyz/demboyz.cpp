@@ -121,7 +121,7 @@ int main(const int argc, const char* argv[])
     fclose(inputFp);
     fclose(outputFp);
 
-    if (outputType == FileType::Json)
+    /*if (outputType == FileType::Json)
     {
         FILE* outputFp = fopen(outputFile.c_str(), "rb");
         JSON_checker jc = new_JSON_checker(20);
@@ -138,6 +138,6 @@ int main(const int argc, const char* argv[])
             fprintf(stderr, "JSON_checker_end: syntax error\n");
         }
         fclose(outputFp);
-    }
+    }*/
     return 0;
 }

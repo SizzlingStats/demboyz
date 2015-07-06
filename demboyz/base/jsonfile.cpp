@@ -25,6 +25,8 @@ namespace base
     void JsonWriterFile::Flush()
     {
         m_fileStream.Flush();
+        fflush(m_fp);
+    }
 
     void JsonWriterFile::Reset()
     {

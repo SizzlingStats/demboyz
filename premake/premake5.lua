@@ -29,7 +29,7 @@ solution "demboyz"
         includedirs
         {
             "../external/json_checker/include",
-            "../external/libb64-1.2.1/include",
+            "../external/cbase64-1.0/include",
             "../external/sourcesdk/include",
             "../external/rapidjson-1.0.2/include",
             "../demboyz"

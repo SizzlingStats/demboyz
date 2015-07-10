@@ -1,7 +1,9 @@
 
 #include "jsonfile.h"
-#include "b64/encode.h"
 #include <cstdlib>
+
+#define CBASE64_IMPLEMENTATION
+#include "cbase64/cbase64.h"
 
 namespace base
 {
@@ -164,29 +166,28 @@ namespace base
         auto& writer = m_writer;
         writer.String(name);
 
-        base64::base64_encodestate state;
-        base64::base64_init_encodestate(&state);
-        state.flags = base64::BASE64_ENC_NO_NEWLINE_TERM;
+        cbase64_encodestate state;
+        cbase64_init_encodestate(&state);
 
         const std::size_t numBytes = ((numBits + 7) >> 3);
-        const int encodedLenMax = base64::base64_calc_buffer_length(numBytes, &state);
+        const int encodedLength = cbase64_calc_encoded_length(numBytes);
 
-        char* const encoded = (char*)calloc(encodedLenMax, 1);
+        char* const encoded = (char*)malloc(encodedLength);
         char* encodedCurOut = encoded;
 
         const std::size_t numTrailingBits = (numBits & 7);
         if (numTrailingBits > 0)
         {
             const std::size_t numBytesWithoutBits = (numBits >> 3);
-            encodedCurOut += base64::base64_encode_block((const char*)data, numBytesWithoutBits, encodedCurOut, &state);
-            const char lastByteClean = data[numBytesWithoutBits] & ~(0xFF >> numTrailingBits);
-            encodedCurOut += base64::base64_encode_block(&lastByteClean, 1, encodedCurOut, &state);
+            encodedCurOut += cbase64_encode_block(data, numBytesWithoutBits, encodedCurOut, &state);
+            const unsigned char lastByteClean = data[numBytesWithoutBits] & ~(0xFF >> numTrailingBits);
+            encodedCurOut += cbase64_encode_block(&lastByteClean, 1, encodedCurOut, &state);
         }
         else
         {
-            encodedCurOut += base64::base64_encode_block((const char*)data, numBytes, encodedCurOut, &state);
+            encodedCurOut += cbase64_encode_block(data, numBytes, encodedCurOut, &state);
         }
-        encodedCurOut += base64::base64_encode_blockend(encodedCurOut, &state);
+        encodedCurOut += cbase64_encode_blockend(encodedCurOut, &state);
 
         writer.String(encoded, encodedCurOut - encoded);
         free(encoded);

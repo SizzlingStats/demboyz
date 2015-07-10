@@ -1,5 +1,27 @@
-b64: Base64 Encoding/Decoding Routines
+cbase64: Base64 Encoding/Decoding Routines
 ======================================
+
+Forked from libb64-1.2.1.
+* Removed c++ helpers
+* Made header only
+* Added output length calculation functions
+* Removed chars per line limit
+* Removed ending newline
+
+### Usage  
+```
+#define CBASE64_IMPLEMENTATION
+```
+before you include this file in *one* C or C++ file to create the implementation.  
+
+```
+// i.e. it should look like this:
+#include ...
+#include ...
+#include ...
+#define CBASE64_IMPLEMENTATION
+#include "cbase64.h"
+```
 
 Overview:
 --------
@@ -60,6 +82,7 @@ Programming:
 Some C++ wrappers are provided as well, so you don't have to get your hands
 dirty. Encoding from standard input to standard output is as simple as
 
+```
 	#include <b64/encode.h>
 	#include <iostream>
 	int main()
@@ -68,6 +91,7 @@ dirty. Encoding from standard input to standard output is as simple as
 		E.encode(std::cin, std::cout);
 		return 0;
 	}
+```
 
 Both standalone executables and a static library is provided in the package,
 
@@ -91,6 +115,7 @@ this method, can be found in the above mentioned "Coroutines in C", by Simon
 Tatham: http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
 
 For example, an RLE decompressing routine, adapted from the article:
+```
 1	static int STATE = 0;
 2	static int len, c;
 3	switch (STATE)
@@ -115,6 +140,7 @@ For example, an RLE decompressing routine, adapted from the article:
 22			}
 23		}
 24	}
+```
 
 As can be seen from this example, a coroutine depends on a state variable,
 which it sets directly before exiting (lines 14 and 119). The next time the

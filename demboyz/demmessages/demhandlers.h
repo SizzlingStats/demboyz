@@ -45,6 +45,9 @@ using JsonWrite = base::JsonWriterFile;
 
 namespace DemHandlers
 {
+    void CreateDemMsgStructs(void* demDataStructs[9]);
+    void DestroyDemMsgStructs(void* demDataStructs[9]);
+
     bool DemMsg_FileRead(uint32_t type, FileRead& demofile, void* data);
     bool DemMsg_FileWrite(uint32_t type, FileWrite& demofile, void* data);
     bool DemMsg_JsonRead(uint32_t type, JsonRead& jsonbuf, void* data);

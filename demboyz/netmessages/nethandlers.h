@@ -58,6 +58,9 @@ struct SourceGameContext
 
 namespace NetHandlers
 {
+    void CreateNetMsgStructs(void* netDataStructs[32]);
+    void DestroyNetMsgStructs(void* netDataStructs[32]);
+
     bool NetMsg_BitRead(uint32_t type, BitRead& bitbuf, SourceGameContext& context, void* data);
     bool NetMsg_BitWrite(uint32_t type, BitWrite& bitbuf, const SourceGameContext& context, void* data);
     bool NetMsg_JsonRead(uint32_t type, JsonRead& jsonbuf, SourceGameContext& context, void* data);

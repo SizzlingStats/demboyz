@@ -29,7 +29,7 @@ namespace NetHandlers
 
     bool SVC_Menu_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
-        bitbuf.WriteShort(static_cast<uint16_t>(data->type));
+        bitbuf.WriteShort(static_cast<int16_t>(data->type));
         bitbuf.WriteWord(data->dataLengthInBytes);
         bitbuf.WriteBytes(data->menuBinaryKeyValues.get(), data->dataLengthInBytes);
         return !bitbuf.IsOverflowed();
@@ -55,7 +55,7 @@ namespace NetHandlers
         // binary keyvalues in form [type][name][value]
         //                          [char][cstr][type]
         const char* name = KeyValuesBin_GetName(data->menuBinaryKeyValues.get(), data->dataLengthInBytes);
-        out << "svc_Menu: " << static_cast<uint16_t>(data->type)
+        out << "svc_Menu: " << static_cast<int16_t>(data->type)
             << " \"" << (name ? name : "No KeyValues")
             << "\" (len:" << data->dataLengthInBytes << ")";
     }

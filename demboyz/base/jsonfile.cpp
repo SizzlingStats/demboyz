@@ -84,6 +84,15 @@ namespace base
         writer.Bool(value);
     }
 
+    void JsonWriterFile::WriteChar(const char* name, char value)
+    {
+        auto& writer = m_writer;
+        writer.String(name);
+
+        char temp[2] = { value, '\0' };
+        writer.String(temp);
+    }
+
     void JsonWriterFile::WriteInt32(const char* name, std::int32_t value)
     {
         auto& writer = m_writer;

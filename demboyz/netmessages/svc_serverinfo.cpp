@@ -92,7 +92,7 @@ namespace NetHandlers
         jsonbuf.WriteUInt32("playerSlot", data->playerSlot);
         jsonbuf.WriteUInt32("maxClients", data->maxClients);
         jsonbuf.WriteFloat("tickInterval", data->tickInterval);
-        jsonbuf.WriteString("os", &data->os, 1);
+        jsonbuf.WriteChar("os", data->os);
         jsonbuf.WriteString("gameDir", data->gameDir);
         jsonbuf.WriteString("mapName", data->mapName);
         jsonbuf.WriteString("skyName", data->skyName);

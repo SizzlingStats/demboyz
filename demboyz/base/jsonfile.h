@@ -28,6 +28,7 @@ namespace base
 
         void WriteNull(const char* name);
         void WriteBool(const char* name, bool value);
+        void WriteChar(const char* name, char value);
         void WriteInt32(const char* name, std::int32_t value);
         void WriteInt32(const char* name, std::int32_t value, bool writeCondition);
         void WriteInt64(const char* name, std::int64_t value);

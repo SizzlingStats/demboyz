@@ -59,6 +59,7 @@ IDemoWriter* IDemoWriter::CreateDemoWriter(void* outputFp)
 
 DemoWriter::DemoWriter(FILE* outputFp):
     m_writer(outputFp),
+    m_cmdPacketBuf(),
     m_packetBuffer(new uint8_t[NET_MAX_PAYLOAD])
 {
     m_cmdPacketBuf.StartWriting(m_packetBuffer.get(), NET_MAX_PAYLOAD);

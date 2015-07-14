@@ -2,15 +2,14 @@
 #pragma once
 
 #include "nethandlers.h"
+#include "sourcesdk/vector.h"
 
 namespace NetMsg
 {
     struct SVC_FixAngle
     {
         bool relative;
-        float x;
-        float y;
-        float z;
+        QAngle angle;
     };
 }
 

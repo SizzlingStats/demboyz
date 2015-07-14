@@ -2,6 +2,7 @@
 #include "svc_fixangle.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "demofile/demojson.h"
 #include <iomanip>
 
 namespace NetHandlers
@@ -9,18 +10,18 @@ namespace NetHandlers
     bool SVC_FixAngle_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         data->relative = bitbuf.ReadOneBit() != 0;
-        data->x = bitbuf.ReadBitAngle(16);
-        data->y = bitbuf.ReadBitAngle(16);
-        data->z = bitbuf.ReadBitAngle(16);
+        data->angle.x = bitbuf.ReadBitAngle(16);
+        data->angle.y = bitbuf.ReadBitAngle(16);
+        data->angle.z = bitbuf.ReadBitAngle(16);
         return !bitbuf.IsOverflowed();
     }
 
     bool SVC_FixAngle_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
         bitbuf.WriteOneBit(data->relative);
-        bitbuf.WriteBitAngle(data->x, 16);
-        bitbuf.WriteBitAngle(data->y, 16);
-        bitbuf.WriteBitAngle(data->z, 16);
+        bitbuf.WriteBitAngle(data->angle.x, 16);
+        bitbuf.WriteBitAngle(data->angle.y, 16);
+        bitbuf.WriteBitAngle(data->angle.z, 16);
         return !bitbuf.IsOverflowed();
     }
 
@@ -33,11 +34,7 @@ namespace NetHandlers
     {
         jsonbuf.StartObject("svc_fixangle");
         jsonbuf.WriteBool("relative", data->relative);
-        jsonbuf.StartObject("angle");
-        jsonbuf.WriteFloat("pitch", data->x);
-        jsonbuf.WriteFloat("yaw", data->y);
-        jsonbuf.WriteFloat("roll", data->z);
-        jsonbuf.EndObject();
+        DemoJsonWriter::WriteAngle(jsonbuf, "angle", data->angle);
         jsonbuf.EndObject();
         return true;
     }
@@ -47,9 +44,9 @@ namespace NetHandlers
         const std::streamsize oldPrecision = out.precision();
         out << "svc_FixAngle: " << (data->relative ? "relative" : "absolute")
             << std::setprecision(1) << std::fixed
-            << " " << data->x
-            << " " << data->y
-            << " " << data->z
+            << " " << data->angle.x
+            << " " << data->angle.y
+            << " " << data->angle.z
             << std::setprecision(oldPrecision);
         out.unsetf(std::ios_base::floatfield);
     }

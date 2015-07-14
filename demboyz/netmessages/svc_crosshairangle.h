@@ -2,14 +2,13 @@
 #pragma once
 
 #include "nethandlers.h"
+#include "sourcesdk/vector.h"
 
 namespace NetMsg
 {
     struct SVC_CrosshairAngle
     {
-        float x;
-        float y;
-        float z;
+        QAngle angle;
     };
 }
 

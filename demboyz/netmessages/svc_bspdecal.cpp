@@ -2,6 +2,7 @@
 #include "svc_bspdecal.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "demofile/demojson.h"
 #include "netcontants.h"
 
 namespace NetHandlers
@@ -50,11 +51,7 @@ namespace NetHandlers
     bool SVC_BSPDecal_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
         jsonbuf.StartObject("svc_bspdecal");
-        jsonbuf.StartObject("position");
-        jsonbuf.WriteFloat("x", data->position.x);
-        jsonbuf.WriteFloat("y", data->position.y);
-        jsonbuf.WriteFloat("z", data->position.z);
-        jsonbuf.EndObject();
+        DemoJsonWriter::WriteVector(jsonbuf, "position", data->position);
         jsonbuf.WriteUInt32("decalTextureIndex", data->decalTextureIndex);
         jsonbuf.WriteUInt32("entIndex", data->entIndex);
         jsonbuf.WriteUInt32("modelIndex", data->modelIndex);

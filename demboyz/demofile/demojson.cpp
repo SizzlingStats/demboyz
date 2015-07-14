@@ -33,11 +33,11 @@ void DemoJsonWriter::WriteCmdInfo(base::JsonWriterFile& writer,
     writer.StartObject("democmdinfo");
     writer.WriteInt32("flags", split.flags);
     WriteVector(writer, "viewOrigin", split.viewOrigin);
-    WriteAngles(writer, "viewAngles", split.viewAngles);
-    WriteAngles(writer, "localViewAngles", split.localViewAngles);
+    WriteAngle(writer, "viewAngles", split.viewAngles);
+    WriteAngle(writer, "localViewAngles", split.localViewAngles);
     WriteVector(writer, "viewOrigin2", split.viewOrigin2);
-    WriteAngles(writer, "viewAngles2", split.viewAngles2);
-    WriteAngles(writer, "localViewAngles2", split.localViewAngles2);
+    WriteAngle(writer, "viewAngles2", split.viewAngles2);
+    WriteAngle(writer, "localViewAngles2", split.localViewAngles2);
     writer.EndObject();
 }
 
@@ -59,7 +59,7 @@ void DemoJsonWriter::WriteVector(base::JsonWriterFile& writer, const char* name,
     writer.EndObject();
 }
 
-void DemoJsonWriter::WriteAngles(base::JsonWriterFile& writer, const char* name, const QAngle& angles)
+void DemoJsonWriter::WriteAngle(base::JsonWriterFile& writer, const char* name, const QAngle& angles)
 {
     writer.StartObject(name);
     writer.WriteFloat("pitch", angles.x);

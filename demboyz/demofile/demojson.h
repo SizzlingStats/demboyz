@@ -17,5 +17,5 @@ namespace DemoJsonWriter
     void WriteCmdInfo(base::JsonWriterFile& writer, const democmdinfo_t& info);
     void WriteUserCmd(base::JsonWriterFile& writer, int32_t cmdNum, const uint8_t* buffer, int32_t length);
     void WriteVector(base::JsonWriterFile& writer, const char* name, const Vector& vec);
-    void WriteAngles(base::JsonWriterFile& writer, const char* name, const QAngle& angles);
-};
+    void WriteAngle(base::JsonWriterFile& writer, const char* name, const QAngle& angle);
+}

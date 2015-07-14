@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstddef>
+#include <string>
 
 namespace base
 {
@@ -36,7 +37,8 @@ namespace base
         void WriteUInt32(const char* name, std::uint32_t value, bool writeCondition);
         void WriteUint64(const char* name, std::uint64_t value);
         void WriteString(const char* name, const char* value);
-        void WriteString(const char* name, const char* value, std::int32_t length);
+        void WriteString(const char* name, const char* value, std::size_t length);
+        void WriteString(const char* name, const std::string& value);
         void WriteFloat(const char* name, const double value);
 
         void WriteBits(const char* name, const unsigned char* data, std::size_t numBits);

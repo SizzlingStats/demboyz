@@ -156,11 +156,18 @@ namespace base
         writer.String(value);
     }
 
-    void JsonWriterFile::WriteString(const char* name, const char* value, std::int32_t length)
+    void JsonWriterFile::WriteString(const char* name, const char* value, std::size_t length)
     {
         auto& writer = m_writer;
         writer.String(name);
         writer.String(value, length);
+    }
+
+    void JsonWriterFile::WriteString(const char* name, const std::string& value)
+    {
+        auto& writer = m_writer;
+        writer.String(name);
+        writer.String(value.c_str(), value.length());
     }
 
     void JsonWriterFile::WriteFloat(const char* name, const double value)

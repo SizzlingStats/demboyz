@@ -46,7 +46,7 @@ namespace base
 
     private:
         rapidjson::FileWriteStream m_fileStream;
-        rapidjson::Writer<rapidjson::FileWriteStream> m_writer;
+        rapidjson::Writer<rapidjson::FileWriteStream, rapidjson::ASCII<>> m_writer;
         FILE* m_fp;
     };
 }

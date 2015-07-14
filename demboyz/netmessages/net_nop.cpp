@@ -21,8 +21,6 @@ namespace NetHandlers
 
     bool Net_NOP_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_NOP* data)
     {
-        jsonbuf.StartObject("net_nop");
-        jsonbuf.EndObject();
         return true;
     }
 

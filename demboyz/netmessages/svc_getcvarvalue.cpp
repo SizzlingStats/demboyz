@@ -21,16 +21,21 @@ namespace NetHandlers
 
     bool SVC_GetCvarValue_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->cookie = reader.ReadInt32("cookie");
+        reader.ReadString("cvarName", data->cvarName, sizeof(data->cvarName));
+        return !reader.HasReadError();
     }
 
     bool SVC_GetCvarValue_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_GetCvarValue* data)
     {
-        jsonbuf.StartObject("svc_getcvarvalue");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteInt32("cookie", data->cookie);
         jsonbuf.WriteString("cvarName", data->cvarName);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_GetCvarValue_ToString_Internal(std::ostringstream& out, NetMsg::SVC_GetCvarValue* data)

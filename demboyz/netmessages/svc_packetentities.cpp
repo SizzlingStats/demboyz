@@ -50,12 +50,24 @@ namespace NetHandlers
 
     bool SVC_PacketEntities_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->maxEntries = reader.ReadInt32("maxEntries");
+        data->isDelta = reader.ReadBool("isDelta");
+        data->deltaFromTick = reader.ReadInt32("deltaFromTick");
+        data->baselineIndex = reader.ReadUInt32("baselineIndex");
+        data->numUpdatedEntries = reader.ReadUInt32("numUpdatedEntries");
+        data->dataLengthInBits = reader.ReadUInt32("dataLengthInBits");
+        data->updateBaseline = reader.ReadBool("updateBaseline");
+        data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
+        reader.ReadBits("data", data->data.get(), data->dataLengthInBits);
+        return !reader.HasReadError();
     }
 
     bool SVC_PacketEntities_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_PacketEntities* data)
     {
-        jsonbuf.StartObject("svc_packetentities");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteInt32("maxEntries", data->maxEntries);
         jsonbuf.WriteBool("isDelta", data->isDelta);
         jsonbuf.WriteInt32("deltaFromTick", data->deltaFromTick);
@@ -65,7 +77,7 @@ namespace NetHandlers
         jsonbuf.WriteBool("updateBaseline", data->updateBaseline);
         jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_PacketEntities_ToString_Internal(std::ostringstream& out, NetMsg::SVC_PacketEntities* data)

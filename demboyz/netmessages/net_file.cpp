@@ -23,17 +23,23 @@ namespace NetHandlers
 
     bool Net_File_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::Net_File* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->transferID = reader.ReadUInt32("transferId");
+        reader.ReadString("filename", data->filename, sizeof(data->filename));
+        data->isRequest = reader.ReadBool("isRequest");
+        return !reader.HasReadError();
     }
 
     bool Net_File_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_File* data)
     {
-        jsonbuf.StartObject("net_file");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteUInt32("transferId", data->transferID);
         jsonbuf.WriteString("filename", data->filename);
         jsonbuf.WriteBool("isRequest", data->isRequest);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void Net_File_ToString_Internal(std::ostringstream& out, NetMsg::Net_File* data)

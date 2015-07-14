@@ -22,12 +22,21 @@ namespace DemHandlers
 
     bool Dem_ConsoleCmd_JsonRead_Internal(JsonRead& jsonbuf, DemMsg::Dem_ConsoleCmd* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+
+        char command[DemMsg::Dem_ConsoleCmd::COMMAND_MAX_LENGTH];
+        reader.ReadString("command", command, sizeof(command));
+        data->command.assign(command);
+        return !reader.HasReadError();
     }
 
     bool Dem_ConsoleCmd_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_ConsoleCmd* data)
     {
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteString("command", data->command);
-        return true;
+        jsonbuf.EndObject();
+        return jsonbuf.IsComplete();
     }
 }

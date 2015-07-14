@@ -35,16 +35,21 @@ namespace NetHandlers
 
     bool SVC_Prefetch_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->type = reader.ReadUInt32("type");
+        data->soundIndex = reader.ReadUInt32("soundIndex");
+        return !reader.HasReadError();
     }
 
     bool SVC_Prefetch_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
-        jsonbuf.StartObject("svc_prefetch");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();;
         jsonbuf.WriteUInt32("type", data->type);
         jsonbuf.WriteUInt32("soundIndex", data->soundIndex);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_Prefetch_ToString_Internal(std::ostringstream& out, NetMsg::SVC_Prefetch* data)

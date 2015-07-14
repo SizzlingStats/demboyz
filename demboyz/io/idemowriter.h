@@ -19,7 +19,7 @@ struct CommandPacket
 
 struct NetPacket
 {
-    uint32_t type;
+    int32_t type;
     void* data;
 };
 

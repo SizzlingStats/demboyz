@@ -22,16 +22,21 @@ namespace NetHandlers
 
     bool Net_SignonState_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::Net_SignonState* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->signonState = reader.ReadUInt32("signonState");
+        data->spawnCount = reader.ReadUInt32("spawnCount");
+        return !reader.HasReadError();
     }
 
     bool Net_SignonState_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_SignonState* data)
     {
-        jsonbuf.StartObject("net_signonstate");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteUInt32("signonState", data->signonState);
         jsonbuf.WriteUInt32("spawnCount", data->spawnCount);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void Net_SignonState_ToString_Internal(std::ostringstream& out, NetMsg::Net_SignonState* data)

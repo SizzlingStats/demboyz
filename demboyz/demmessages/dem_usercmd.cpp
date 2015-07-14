@@ -19,13 +19,21 @@ namespace DemHandlers
 
     bool Dem_UserCmd_JsonRead_Internal(JsonRead& jsonbuf, DemMsg::Dem_UserCmd* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+
+        DemoJsonReader::ReadUserCmd(reader, data->commandNum,
+                                    data->commandData, DemMsg::Dem_UserCmd::COMMANDDATA_MAX_LENGTH);
+        return !reader.HasReadError();
     }
 
     bool Dem_UserCmd_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_UserCmd* data)
     {
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         DemoJsonWriter::WriteUserCmd(jsonbuf, data->commandNum,
                                      data->commandData.begin(), data->commandData.length());
-        return true;
+        jsonbuf.EndObject();
+        return jsonbuf.IsComplete();
     }
 }

@@ -47,12 +47,27 @@ namespace NetHandlers
 
     bool SVC_ClassInfo_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->numServerClasses = reader.ReadInt32("numServerClasses");
+        data->createOnClient = reader.ReadBool("createOnClient");
+        if (!data->createOnClient)
+        {
+            base::JsonReaderArray serverClasses = reader.ReadArray("serverClasses");
+            serverClasses.TransformTo(data->serverClasses, [](base::JsonReaderObject& obj, class_t& serverClass)
+            {
+                serverClass.classID = obj.ReadUInt32("classId");
+                obj.ReadString("className", serverClass.className, sizeof(serverClass.className));
+                obj.ReadString("dataTableName", serverClass.dataTableName, sizeof(serverClass.dataTableName));
+            });
+        }
+        return !reader.HasReadError();
     }
 
     bool SVC_ClassInfo_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_ClassInfo* data)
     {
-        jsonbuf.StartObject("svc_classinfo");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteInt32("numServerClasses", data->numServerClasses);
         jsonbuf.WriteBool("createOnClient", data->createOnClient);
         if (!data->createOnClient)
@@ -67,7 +82,7 @@ namespace NetHandlers
             jsonbuf.EndArray();
         }
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_ClassInfo_ToString_Internal(std::ostringstream& out, NetMsg::SVC_ClassInfo* data)

@@ -5,6 +5,7 @@
 
 namespace base
 {
+    class JsonReaderFile;
     class JsonWriterFile;
 }
 
@@ -13,10 +14,13 @@ class DemoFileWriter;
 class DemoFileReader2;
 class DemoFileWriter2;
 
-using FileRead = DemoFileReader;
-using FileWrite = DemoFileWriter;
-class JsonRead;
-using JsonWrite = base::JsonWriterFile;
+namespace DemHandlers
+{
+    using FileRead = DemoFileReader;
+    using FileWrite = DemoFileWriter;
+    using JsonRead = base::JsonReaderFile;
+    using JsonWrite = base::JsonWriterFile;
+}
 
 #define DECLARE_DEM_HANDLERS(msgname) \
     namespace DemHandlers \

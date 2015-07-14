@@ -21,7 +21,7 @@ namespace NetHandlers
     bool Net_SetConVar_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
         bitbuf.WriteByte(data->cvars.size());
-        for (cvar_t& cvar : data->cvars)
+        for (const cvar_t& cvar : data->cvars)
         {
             bitbuf.WriteString(cvar.name);
             bitbuf.WriteString(cvar.value);
@@ -31,14 +31,24 @@ namespace NetHandlers
 
     bool Net_SetConVar_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+
+        base::JsonReaderArray cvars = reader.ReadArray("cvars");
+        cvars.TransformTo(data->cvars, [](base::JsonReaderObject& obj, cvar_t& cvar)
+        {
+            obj.ReadString("name", cvar.name, sizeof(cvar.name));
+            obj.ReadString("value", cvar.value, sizeof(cvar.value));
+        });
+        return !reader.HasReadError();
     }
 
     bool Net_SetConVar_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_SetConVar* data)
     {
-        jsonbuf.StartObject("net_setconvar");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.StartArray("cvars");
-        for (cvar_t& cvar : data->cvars)
+        for (const cvar_t& cvar : data->cvars)
         {
             jsonbuf.StartObject();
             jsonbuf.WriteString("name", cvar.name);
@@ -47,7 +57,7 @@ namespace NetHandlers
         }
         jsonbuf.EndArray();
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void Net_SetConVar_ToString_Internal(std::ostringstream& out, NetMsg::Net_SetConVar* data)

@@ -19,15 +19,19 @@ namespace NetHandlers
 
     bool Net_StringCmd_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::Net_StringCmd* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        reader.ReadString("command", data->command, sizeof(data->command));
+        return !reader.HasReadError();
     }
 
     bool Net_StringCmd_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_StringCmd* data)
     {
-        jsonbuf.StartObject("net_stringcmd");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteString("command", data->command);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void Net_StringCmd_ToString_Internal(std::ostringstream& out, NetMsg::Net_StringCmd* data)

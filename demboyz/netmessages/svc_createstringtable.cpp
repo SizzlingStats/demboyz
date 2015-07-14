@@ -82,12 +82,29 @@ namespace NetHandlers
 
     bool SVC_CreateStringTable_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->isFileNames = reader.ReadBool("isFilenames");
+        reader.ReadString("tableName", data->tableName, sizeof(data->tableName));
+        data->maxEntries = reader.ReadUInt32("maxEntries");
+        data->numEntries = reader.ReadUInt32("numEntries");
+        data->dataLengthInBits = reader.ReadInt32("dataLengthInBits");
+        data->isUserDataFixedSize = reader.ReadBool("isUserDataFixedSize");
+        data->userDataSize = reader.ReadUInt32("userDataSize");
+        data->userDataSizeBits = reader.ReadUInt32("userDataSizeBits");
+        if (context.protocol > 14)
+        {
+            data->unk1 = reader.ReadBool("unk1");
+        }
+        data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
+        reader.ReadBits("data", data->data.get(), data->dataLengthInBits);
+        return !reader.HasReadError();
     }
 
     bool SVC_CreateStringTable_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
     {
-        jsonbuf.StartObject("svc_createstringtable");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteBool("isFilenames", data->isFileNames);
         jsonbuf.WriteString("tableName", data->tableName);
         jsonbuf.WriteUInt32("maxEntries", data->maxEntries);
@@ -102,7 +119,7 @@ namespace NetHandlers
         }
         jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_CreateStringTable_ToString_Internal(std::ostringstream& out, NetMsg::SVC_CreateStringTable* data)

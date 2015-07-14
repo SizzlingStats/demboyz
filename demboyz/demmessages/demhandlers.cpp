@@ -41,10 +41,10 @@ void DemHandlers::DestroyDemMsgStructs(void* demDataStructs[9])
         &DemHandlers::Dem_StringTables_##funcname \
     }
 
-typedef bool (*DemMsgFileReadFn)(FileRead& demofile, void* data);
-typedef bool (*DemMsgFileWriteFn)(FileWrite& demofile, void* data);
-typedef bool (*DemMsgJsonReadFn)(JsonRead& jsonbuf, void* data);
-typedef bool (*DemMsgJsonWriteFn)(JsonWrite& jsonbuf, void* data);
+typedef bool (*DemMsgFileReadFn)(DemHandlers::FileRead& demofile, void* data);
+typedef bool (*DemMsgFileWriteFn)(DemHandlers::FileWrite& demofile, void* data);
+typedef bool (*DemMsgJsonReadFn)(DemHandlers::JsonRead& jsonbuf, void* data);
+typedef bool (*DemMsgJsonWriteFn)(DemHandlers::JsonWrite& jsonbuf, void* data);
 
 bool DemHandlers::DemMsg_FileRead(uint32_t type, FileRead& demofile, void* data)
 {

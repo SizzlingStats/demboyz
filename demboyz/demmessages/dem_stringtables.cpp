@@ -40,12 +40,22 @@ static void StringTableEntry_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables
     }
 }
 
-static void StringTableEntry_JsonWrite(JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTableEntry* data)
+static void StringTableEntry_JsonRead(base::JsonReaderObject& jsonbuf, DemMsg::Dem_StringTables::StringTableEntry* data)
 {
-    jsonbuf.StartObject(data->entryName.c_str());
-    //jsonbuf.WriteUInt32("dataLengthInBytes", data->data.length());
+    using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
+    {
+        char entryName[StringTableEntry::ENTRYNAME_MAX_LENGTH];
+        jsonbuf.ReadString("name", entryName, sizeof(entryName));
+        data->entryName.assign(entryName);
+    }
+    data->data.reset(jsonbuf.ReadBytes("data", nullptr, 0));
+    jsonbuf.ReadBytes("data", data->data.begin(), data->data.length());
+}
+
+static void StringTableEntry_JsonWrite(DemHandlers::JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTableEntry* data)
+{
+    jsonbuf.WriteString("name", data->entryName);
     jsonbuf.WriteBytes("data", data->data.begin(), data->data.length());
-    jsonbuf.EndObject();
 }
 
 static void StringTable_BitRead(bf_read& bitbuf, DemMsg::Dem_StringTables::StringTable* data)
@@ -100,11 +110,47 @@ static void StringTable_BitWrite(bf_write& bitbuf, DemMsg::Dem_StringTables::Str
     }
 }
 
-static void StringTable_JsonWrite(JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTable* data)
+static void StringTable_JsonRead(base::JsonReaderObject& jsonbuf, DemMsg::Dem_StringTables::StringTable* data)
+{
+    using StringTable = DemMsg::Dem_StringTables::StringTable;
+    using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
+    {
+        char tableName[StringTable::TABLENAME_MAX_LENGTH];
+        jsonbuf.ReadString("tableName", tableName, sizeof(tableName));
+        data->tableName.assign(tableName);
+    }
+
+    {
+        base::JsonReaderArray entries = jsonbuf.ReadArray("entries");
+        entries.TransformTo(data->entries, [](base::JsonReaderObject& obj, StringTableEntry& entry)
+        {
+            StringTableEntry_JsonRead(obj, &entry);
+        });
+    }
+    {
+        base::JsonReaderArray entriesClientSide = jsonbuf.ReadArray("entriesClientSide");
+        entriesClientSide.TransformTo(data->entriesClientSide, [](base::JsonReaderObject& obj, StringTableEntry& entry)
+        {
+            StringTableEntry_JsonRead(obj, &entry);
+        });
+    }
+}
+
+static void StringTable_JsonWrite(DemHandlers::JsonWrite& jsonbuf, const DemMsg::Dem_StringTables::StringTable* data)
 {
     using StringTableEntry = DemMsg::Dem_StringTables::StringTableEntry;
-    jsonbuf.StartArray(data->tableName.c_str());
+    jsonbuf.WriteString("tableName", data->tableName);
+    jsonbuf.StartArray("entries");
     for (const StringTableEntry& entry : data->entries)
+    {
+        jsonbuf.StartObject();
+        StringTableEntry_JsonWrite(jsonbuf, &entry);
+        jsonbuf.EndObject();
+    }
+    jsonbuf.EndArray();
+
+    jsonbuf.StartArray("entriesClientSide");
+    for (const StringTableEntry& entry : data->entriesClientSide)
     {
         jsonbuf.StartObject();
         StringTableEntry_JsonWrite(jsonbuf, &entry);
@@ -161,29 +207,43 @@ namespace DemHandlers
 
     bool Dem_StringTables_JsonRead_Internal(JsonRead& jsonbuf, DemMsg::Dem_StringTables* data)
     {
+        using StringTable = DemMsg::Dem_StringTables::StringTable;
+        {
+            base::JsonReaderObject reader = jsonbuf.ParseObject();
+            assert(!reader.HasReadError());
+
+            data->stringtables.reset(reader.ReadInt32("numStringTables"));
+            data->numTrailingBits = reader.ReadUInt32("numTrailingBits");
+            data->trailingBitsValue = reader.ReadUInt32("trailingBitsValue");
+        }
+        {
+            for (StringTable& table : data->stringtables)
+            {
+                base::JsonReaderObject reader = jsonbuf.ParseObject();
+                assert(!reader.HasReadError());
+                StringTable_JsonRead(reader, &table);
+            }
+        }
         return true;
     }
 
     bool Dem_StringTables_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_StringTables* data)
     {
         using StringTable = DemMsg::Dem_StringTables::StringTable;
-        jsonbuf.StartArray("tables");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
+        jsonbuf.WriteInt32("numStringTables", data->stringtables.length());
+        jsonbuf.WriteUInt32("numTrailingBits", data->numTrailingBits);
+        jsonbuf.WriteUInt32("trailingBitsValue", data->trailingBitsValue, (data->numTrailingBits > 0));
+        jsonbuf.EndObject();
+
         for (const StringTable& table : data->stringtables)
         {
+            jsonbuf.Reset();
             jsonbuf.StartObject();
             StringTable_JsonWrite(jsonbuf, &table);
             jsonbuf.EndObject();
         }
-        jsonbuf.EndArray();
-        jsonbuf.WriteUInt32("numTrailingBits", data->numTrailingBits);
-        if (data->numTrailingBits > 0)
-        {
-            jsonbuf.WriteUInt32("trailingBitsValue", data->trailingBitsValue);
-        }
-        else
-        {
-            jsonbuf.WriteNull("trailingBitsValue");
-        }
-        return true;
+        return jsonbuf.IsComplete();
     }
 }

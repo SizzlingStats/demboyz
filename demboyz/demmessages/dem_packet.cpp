@@ -2,6 +2,7 @@
 #include "dem_packet.h"
 #include "demofile/demofile.h"
 #include "demofile/demojson.h"
+#include "netmessages/nethandlers.h"
 
 namespace DemHandlers
 {
@@ -9,7 +10,6 @@ namespace DemHandlers
     {
         demofile.ReadCmdInfo(data->cmdInfo);
         demofile.ReadSequenceInfo(data->sequenceNum1, data->sequenceNum2);
-        //data->dataLengthInBytes = demofile.ReadRawData(data->data, sizeof(data->data));
         return demofile.IsOk();
     }
 
@@ -17,19 +17,26 @@ namespace DemHandlers
     {
         demofile.WriteCmdInfo(data->cmdInfo);
         demofile.WriteSequenceInfo(data->sequenceNum1, data->sequenceNum2);
-        //demofile.WriteRawData(data->data, data->dataLengthInBytes);
         return demofile.IsOk();
     }
 
     bool Dem_Packet_JsonRead_Internal(JsonRead& jsonbuf, DemMsg::Dem_Packet* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+
+        bool readError = DemoJsonReader::ReadCmdInfo(reader, data->cmdInfo);
+        readError |= DemoJsonReader::ReadSequenceInfo(reader, data->sequenceNum1, data->sequenceNum2);
+        return !readError && !reader.HasReadError();
     }
 
     bool Dem_Packet_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_Packet* data)
     {
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         DemoJsonWriter::WriteCmdInfo(jsonbuf, data->cmdInfo);
         DemoJsonWriter::WriteSequenceInfo(jsonbuf, data->sequenceNum1, data->sequenceNum2);
-        return true;
+        jsonbuf.EndObject();
+        return jsonbuf.IsComplete();
     }
 }

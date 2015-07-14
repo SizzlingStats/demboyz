@@ -59,14 +59,10 @@ void JsonWriter::StartCommandPacket(const CommandPacket& packet)
     auto& jsonFile = m_jsonFile;
     jsonFile.Reset();
     jsonFile.StartObject();
-    jsonFile.WriteInt32("tick", packet.tick);
-    jsonFile.WriteString("cmd", DemoCmdToString(packet.cmd));
+    DemoJsonWriter::WriteCmdHeader(jsonFile, packet.cmd, packet.tick);
     jsonFile.EndObject();
 
-    jsonFile.Reset();
-    jsonFile.StartObject();
     DemHandlers::DemMsg_JsonWrite(packet.cmd, jsonFile, packet.data);
-    jsonFile.EndObject();
     assert(jsonFile.IsComplete());
 
     if (packet.cmd == dem_packet || packet.cmd == dem_signon)
@@ -83,10 +79,13 @@ void JsonWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
         auto& jsonFile = m_jsonFile;
         jsonFile.Reset();
         jsonFile.StartObject();
-        jsonFile.StartObject("netpackets_end");
+        jsonFile.WriteInt32("netpacket", -1);
+        jsonFile.EndObject();
+
+        jsonFile.Reset();
+        jsonFile.StartObject();
         jsonFile.WriteInt32("numTrailingBits", trailingBits.numTrailingBits);
         jsonFile.WriteInt32("trailingBitsValue", trailingBits.value, (trailingBits.numTrailingBits > 0));
-        jsonFile.EndObject();
         jsonFile.EndObject();
         assert(jsonFile.IsComplete());
     }
@@ -97,7 +96,9 @@ void JsonWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
     auto& jsonFile = m_jsonFile;
     jsonFile.Reset();
     jsonFile.StartObject();
-    NetHandlers::NetMsg_JsonWrite(packet.type, jsonFile, context, packet.data);
+    jsonFile.WriteInt32("netpacket", packet.type);
     jsonFile.EndObject();
+
+    NetHandlers::NetMsg_JsonWrite(packet.type, jsonFile, context, packet.data);
     assert(jsonFile.IsComplete());
 }

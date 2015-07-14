@@ -6,16 +6,22 @@
 
 namespace base
 {
+    class JsonReaderFile;
     class JsonWriterFile;
+    class BitFileRead;
+    class BitFileWrite;
 }
 
 class bf_read;
 class bf_write;
 
-using BitRead = bf_read;
-using BitWrite = bf_write;
-class JsonRead;
-using JsonWrite = base::JsonWriterFile;
+namespace NetHandlers
+{
+    using BitRead = bf_read;
+    using BitWrite = bf_write;
+    using JsonRead = base::JsonReaderFile;
+    using JsonWrite = base::JsonWriterFile;
+}
 
 struct SourceGameContext
 {

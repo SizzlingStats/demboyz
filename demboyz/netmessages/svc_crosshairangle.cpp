@@ -25,15 +25,19 @@ namespace NetHandlers
 
     bool SVC_CrosshairAngle_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        DemoJsonReader::ReadAngle(reader, "angle", data->angle);
+        return !reader.HasReadError();
     }
 
     bool SVC_CrosshairAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_CrosshairAngle* data)
     {
-        jsonbuf.StartObject("svc_crosshairangle");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         DemoJsonWriter::WriteAngle(jsonbuf, "angle", data->angle);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_CrosshairAngle_ToString_Internal(std::ostringstream& out, NetMsg::SVC_CrosshairAngle* data)

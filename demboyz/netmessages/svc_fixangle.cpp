@@ -27,16 +27,21 @@ namespace NetHandlers
 
     bool SVC_FixAngle_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->relative = reader.ReadBool("relative");
+        DemoJsonReader::ReadAngle(reader, "angle", data->angle);
+        return !reader.HasReadError();
     }
 
     bool SVC_FixAngle_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_FixAngle* data)
     {
-        jsonbuf.StartObject("svc_fixangle");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteBool("relative", data->relative);
         DemoJsonWriter::WriteAngle(jsonbuf, "angle", data->angle);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_FixAngle_ToString_Internal(std::ostringstream& out, NetMsg::SVC_FixAngle* data)

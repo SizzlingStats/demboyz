@@ -69,12 +69,41 @@ namespace NetHandlers
 
     bool SVC_ServerInfo_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->protocol = reader.ReadInt32("protocol");
+        data->serverCount = reader.ReadUInt32("serverCount");
+        data->isHLTV = reader.ReadBool("isHltv");
+        data->isDedicated = reader.ReadBool("isDedicated");
+        data->clientCRC = reader.ReadUInt32("clientCrc");
+        data->maxClasses = reader.ReadUInt32("maxClasses");
+        if (context.protocol <= 17)
+        {
+            data->mapCRC = reader.ReadUInt32("mapCRC");
+        }
+        else
+        {
+            reader.ReadBytes("unk1", data->unk1, sizeof(data->unk1));
+        }
+        data->playerSlot = reader.ReadUInt32("playerSlot");
+        data->maxClients = reader.ReadUInt32("maxClients");
+        data->tickInterval = reader.ReadFloat("tickInterval");
+        data->os = reader.ReadChar("os");
+        reader.ReadString("gameDir", data->gameDir, sizeof(data->gameDir));
+        reader.ReadString("mapName", data->mapName, sizeof(data->mapName));
+        reader.ReadString("skyName", data->skyName, sizeof(data->skyName));
+        reader.ReadString("hostName", data->hostName, sizeof(data->hostName));
+        if (context.protocol > 15)
+        {
+            data->unk2 = reader.ReadBool("unk2");
+        }
+        return !reader.HasReadError();
     }
 
     bool SVC_ServerInfo_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_ServerInfo* data)
     {
-        jsonbuf.StartObject("svc_serverinfo");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteInt32("protocol", data->protocol);
         jsonbuf.WriteUInt32("serverCount", data->serverCount);
         jsonbuf.WriteBool("isHltv", data->isHLTV);
@@ -102,7 +131,7 @@ namespace NetHandlers
             jsonbuf.WriteBool("unk2", data->unk2);
         }
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_ServerInfo_ToString_Internal(std::ostringstream& out, NetMsg::SVC_ServerInfo* data)

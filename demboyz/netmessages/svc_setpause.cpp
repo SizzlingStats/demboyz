@@ -19,15 +19,19 @@ namespace NetHandlers
 
     bool SVC_SetPause_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->isPaused = reader.ReadBool("isPaused");
+        return !reader.HasReadError();
     }
 
     bool SVC_SetPause_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetPause* data)
     {
-        jsonbuf.StartObject("svc_setpause");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteBool("isPaused", data->isPaused);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_SetPause_ToString_Internal(std::ostringstream& out, NetMsg::SVC_SetPause* data)

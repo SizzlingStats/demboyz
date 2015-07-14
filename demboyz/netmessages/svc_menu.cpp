@@ -37,17 +37,24 @@ namespace NetHandlers
 
     bool SVC_Menu_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->type = static_cast<DialogType>(reader.ReadInt32("dialogType"));
+        data->dataLengthInBytes = reader.ReadUInt32("dataLengthInBytes");
+        data->menuBinaryKeyValues.reset(new uint8_t[data->dataLengthInBytes]);
+        reader.ReadBytes("data", data->menuBinaryKeyValues.get(), data->dataLengthInBytes);
+        return !reader.HasReadError();
     }
 
     bool SVC_Menu_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_Menu* data)
     {
-        jsonbuf.StartObject("svc_menu");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteInt32("dialogType", static_cast<int16_t>(data->type));
         jsonbuf.WriteUInt32("dataLengthInBytes", data->dataLengthInBytes);
         jsonbuf.WriteBytes("data", data->menuBinaryKeyValues.get(), data->dataLengthInBytes);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_Menu_ToString_Internal(std::ostringstream& out, NetMsg::SVC_Menu* data)

@@ -19,13 +19,20 @@ namespace DemHandlers
 
     bool Dem_DataTables_JsonRead_Internal(JsonRead& jsonbuf, DemMsg::Dem_DataTables* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+
+        data->data.reset(reader.ReadBytes("data", nullptr, 0));
+        reader.ReadBytes("data", data->data.begin(), DemMsg::Dem_DataTables::DATA_MAX_LENGTH);
+        return !reader.HasReadError();
     }
 
     bool Dem_DataTables_JsonWrite_Internal(JsonWrite& jsonbuf, DemMsg::Dem_DataTables* data)
     {
-        //jsonbuf.WriteInt32("dataLengthInBytes", data->data.length());
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteBytes("data", data->data.begin(), data->data.length());
-        return true;
+        jsonbuf.EndObject();
+        return jsonbuf.IsComplete();
     }
 }

@@ -20,15 +20,19 @@ namespace NetHandlers
 
     bool SVC_SetView_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        data->entIndex = reader.ReadUInt32("entIndex");
+        return !reader.HasReadError();
     }
 
     bool SVC_SetView_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_SetView* data)
     {
-        jsonbuf.StartObject("svc_setview");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteUInt32("entIndex", data->entIndex);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_SetView_ToString_Internal(std::ostringstream& out, NetMsg::SVC_SetView* data)

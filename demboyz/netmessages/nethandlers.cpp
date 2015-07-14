@@ -111,10 +111,10 @@ void NetHandlers::DestroyNetMsgStructs(void* netDataStructs[32])
         &NetHandlers::SVC_GetCvarValue_##funcname \
     }
 
-typedef bool (*NetMsgBitReadFn)(BitRead& bitbuf, SourceGameContext& context, void* data);
-typedef bool (*NetMsgBitWriteFn)(BitWrite& bitbuf, const SourceGameContext& context, void* data);
-typedef bool (*NetMsgJsonReadFn)(JsonRead& jsonbuf, SourceGameContext& context, void* data);
-typedef bool (*NetMsgJsonWriteFn)(JsonWrite& jsonbuf, const SourceGameContext& context, void* data);
+typedef bool (*NetMsgBitReadFn)(NetHandlers::BitRead& bitbuf, SourceGameContext& context, void* data);
+typedef bool (*NetMsgBitWriteFn)(NetHandlers::BitWrite& bitbuf, const SourceGameContext& context, void* data);
+typedef bool (*NetMsgJsonReadFn)(NetHandlers::JsonRead& jsonbuf, SourceGameContext& context, void* data);
+typedef bool (*NetMsgJsonWriteFn)(NetHandlers::JsonWrite& jsonbuf, const SourceGameContext& context, void* data);
 typedef void (*NetMsgToStringFn)(std::ostringstream& out, void* data);
 
 bool NetHandlers::NetMsg_BitRead(uint32_t type, BitRead& bitbuf, SourceGameContext& context, void* data)

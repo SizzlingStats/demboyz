@@ -45,19 +45,27 @@ namespace NetHandlers
 
     bool SVC_BSPDecal_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        DemoJsonReader::ReadVector(reader, "position", data->position);
+        data->decalTextureIndex = reader.ReadUInt32("decalTextureIndex");
+        data->entIndex = reader.ReadUInt32("entIndex");
+        data->modelIndex = reader.ReadUInt32("modelIndex");
+        data->lowPriority = reader.ReadBool("lowPriority");
+        return !reader.HasReadError();
     }
 
     bool SVC_BSPDecal_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_BSPDecal* data)
     {
-        jsonbuf.StartObject("svc_bspdecal");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         DemoJsonWriter::WriteVector(jsonbuf, "position", data->position);
         jsonbuf.WriteUInt32("decalTextureIndex", data->decalTextureIndex);
         jsonbuf.WriteUInt32("entIndex", data->entIndex);
         jsonbuf.WriteUInt32("modelIndex", data->modelIndex);
         jsonbuf.WriteBool("lowPriority", data->lowPriority);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_BSPDecal_ToString_Internal(std::ostringstream& out, NetMsg::SVC_BSPDecal* data)

@@ -19,15 +19,19 @@ namespace NetHandlers
 
     bool Net_Disconnect_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        reader.ReadString("message", data->message, sizeof(data->message));
+        return !reader.HasReadError();
     }
 
     bool Net_Disconnect_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::Net_Disconnect* data)
     {
-        jsonbuf.StartObject("net_disconnect");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteString("message", data->message);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void Net_Disconnect_ToString_Internal(std::ostringstream& out, NetMsg::Net_Disconnect* data)

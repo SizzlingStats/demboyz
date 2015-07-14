@@ -21,16 +21,21 @@ namespace NetHandlers
 
     bool SVC_VoiceInit_JsonRead_Internal(JsonRead& jsonbuf, SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
     {
-        return true;
+        base::JsonReaderObject reader = jsonbuf.ParseObject();
+        assert(!reader.HasReadError());
+        reader.ReadString("voiceCodec", data->voiceCodec, sizeof(data->voiceCodec));
+        data->quality = reader.ReadUInt32("quality");
+        return !reader.HasReadError();
     }
 
     bool SVC_VoiceInit_JsonWrite_Internal(JsonWrite& jsonbuf, const SourceGameContext& context, NetMsg::SVC_VoiceInit* data)
     {
-        jsonbuf.StartObject("svc_voiceinit");
+        jsonbuf.Reset();
+        jsonbuf.StartObject();
         jsonbuf.WriteString("voiceCodec", data->voiceCodec);
         jsonbuf.WriteUInt32("quality", data->quality);
         jsonbuf.EndObject();
-        return true;
+        return jsonbuf.IsComplete();
     }
 
     void SVC_VoiceInit_ToString_Internal(std::ostringstream& out, NetMsg::SVC_VoiceInit* data)

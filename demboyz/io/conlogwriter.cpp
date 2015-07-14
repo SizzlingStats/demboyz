@@ -33,18 +33,11 @@ ConLogWriter::ConLogWriter(FILE* outputFp):
 
 void ConLogWriter::StartWriting(demoheader_t& header)
 {
-    //std::ostringstream ss;
-    //ss << "Playing demo from " <<  << ".\n";
-    //fputs(ss.str().c_str(), m_outputFp);
-    //std::clog << ss.str() << std::endl;
-    fflush(stdout);
-    setvbuf(stdout, NULL, _IOFBF, 1024*64);
 }
 
 void ConLogWriter::EndWriting()
 {
     fflush(m_outputFp);
-    fflush(stdout);
 }
 
 void ConLogWriter::StartCommandPacket(const CommandPacket& packet)
@@ -63,6 +56,5 @@ void ConLogWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
     {
         ss << "\n";
         fputs(ss.str().c_str(), m_outputFp);
-        fputs(ss.str().c_str(), stdout);
     }
 }

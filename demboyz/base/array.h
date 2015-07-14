@@ -46,12 +46,17 @@ public:
             m_array = new T[length];
             m_length = length;
         }
-        else if (length <= 0)
+        else // if (length <= 0)
         {
             m_array = nullptr;
             m_length = 0;
         }
         return (length >= 0);
+    }
+
+    bool resize(SizeType length)
+    {
+        return reset(length);
     }
 
     T* begin() const

@@ -77,13 +77,9 @@ void DemoFileReader::ReadCmdInfo(democmdinfo_t& info)
 void DemoFileReader::ReadCmdHeader(unsigned char& cmd, int32_t& tick)
 {
     FILE* fp = m_demoFp;
-    fread(&cmd, sizeof(unsigned char), 1, fp);
-    fread(&tick, sizeof(int32_t), 1, fp);
-    if (cmd >= 0)
-    {
-        assert(cmd <= dem_lastcmd);
-    }
-    else
+    fread(&cmd, 1, sizeof(unsigned char), fp);
+    fread(&tick, 1, sizeof(int32_t), fp);
+    if (cmd > dem_lastcmd)
     {
         cmd = dem_stop;
     }

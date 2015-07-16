@@ -59,7 +59,7 @@ namespace base
         using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
 
     public:
-        explicit JsonReaderIterator(JsonValue* value);
+        explicit JsonReaderIterator(JsonValue* value, bool& hasReadError);
 
         JsonReaderObject operator*() const;
         JsonReaderIterator& operator++();
@@ -68,6 +68,7 @@ namespace base
 
     private:
         JsonValue* m_value;
+        bool& m_hasReadError;
     };
 
     class JsonReaderArray
@@ -76,7 +77,7 @@ namespace base
         using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
 
     public:
-        explicit JsonReaderArray(JsonValue& value, bool parseError);
+        explicit JsonReaderArray(JsonValue& value, bool& parseError);
 
         bool HasReadError() const;
 
@@ -89,7 +90,7 @@ namespace base
         {
             c.resize(m_value.Size());
             std::size_t index = 0;
-            for (base::JsonReaderObject& obj : *this)
+            for (base::JsonReaderObject obj : *this)
             {
                 fn(obj, c[index++]);
             }
@@ -97,7 +98,7 @@ namespace base
 
     private:
         JsonValue& m_value;
-        bool m_hasReadError;
+        bool& m_hasReadError;
     };
 
     class JsonReaderObject
@@ -106,7 +107,7 @@ namespace base
         using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
 
     public:
-        explicit JsonReaderObject(JsonValue& value, bool parseError);
+        explicit JsonReaderObject(JsonValue& value, bool& parseError);
 
         bool HasReadError() const;
 
@@ -128,7 +129,7 @@ namespace base
 
     private:
         JsonValue& m_value;
-        bool m_hasReadError;
+        bool& m_hasReadError;
     };
 
     class JsonReaderFile
@@ -138,8 +139,13 @@ namespace base
 
         JsonReaderObject ParseObject();
 
+        bool HasParseError() const;
+        bool HasReadError() const;
+
     private:
         rapidjson::FileReadStream m_fileStream;
         rapidjson::GenericDocument<rapidjson::ASCII<>> m_document;
+        bool m_hasParseError;
+        bool m_hasReadError;
     };
 }

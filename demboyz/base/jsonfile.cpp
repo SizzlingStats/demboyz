@@ -218,14 +218,15 @@ namespace base
         JsonWriterFile::WriteBits(name, data, numBytes * 8);
     }
 
-    JsonReaderIterator::JsonReaderIterator(JsonValue* value):
-        m_value(value)
+    JsonReaderIterator::JsonReaderIterator(JsonValue* value, bool& hasReadError):
+        m_value(value),
+        m_hasReadError(hasReadError)
     {
     }
 
     JsonReaderObject JsonReaderIterator::operator*() const
     {
-        return JsonReaderObject(*m_value, false);
+        return JsonReaderObject(*m_value, m_hasReadError);
     }
 
     JsonReaderIterator& JsonReaderIterator::operator++()
@@ -244,7 +245,7 @@ namespace base
         return m_value != other.m_value;
     }
 
-    JsonReaderArray::JsonReaderArray(JsonValue& value, bool parseError):
+    JsonReaderArray::JsonReaderArray(JsonValue& value, bool& parseError):
         m_value(value),
         m_hasReadError(parseError)
     {
@@ -262,15 +263,15 @@ namespace base
 
     JsonReaderIterator JsonReaderArray::begin()
     {
-        return JsonReaderIterator(m_value.Begin());
+        return JsonReaderIterator(m_value.Begin(), m_hasReadError);
     }
 
     JsonReaderIterator JsonReaderArray::end()
     {
-        return JsonReaderIterator(m_value.End());
+        return JsonReaderIterator(m_value.End(), m_hasReadError);
     }
 
-    JsonReaderObject::JsonReaderObject(JsonValue& value, bool parseError):
+    JsonReaderObject::JsonReaderObject(JsonValue& value, bool& parseError):
         m_value(value),
         m_hasReadError(parseError)
     {
@@ -284,13 +285,15 @@ namespace base
     JsonReaderObject JsonReaderObject::ReadObject(const char* name) const
     {
         JsonValue& value = m_value[name];
-        return JsonReaderObject(value, !value.IsObject());
+        m_hasReadError |= !value.IsObject();
+        return JsonReaderObject(value, m_hasReadError);
     }
 
     JsonReaderArray JsonReaderObject::ReadArray(const char* name) const
     {
         JsonValue& value = m_value[name];
-        return JsonReaderArray(value, !value.IsArray());
+        m_hasReadError |= !value.IsArray();
+        return JsonReaderArray(value, m_hasReadError);
     }
 
     bool JsonReaderObject::ReadBool(const char* name)
@@ -450,6 +453,18 @@ namespace base
 
         auto& document = m_document;
         document.ParseStream<flags>(m_fileStream);
-        return JsonReaderObject(document, document.HasParseError());
+        m_hasParseError = document.HasParseError();
+        m_hasReadError = false;
+        return JsonReaderObject(document, m_hasReadError);
+    }
+
+    bool JsonReaderFile::HasParseError() const
+    {
+        return m_hasParseError;
+    }
+
+    bool JsonReaderFile::HasReadError() const
+    {
+        return m_hasReadError;
     }
 }

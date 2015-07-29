@@ -8,7 +8,7 @@
 
 #include "sourcesdk/bitbuf.h"
 #include <string.h>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 
 // FIXME: Can't use this until we get multithreaded allocations in tier0 working for tools
@@ -568,10 +568,10 @@ void bf_write::WriteBitCoordMP( const float f, bool bIntegral, bool bLowPrecisio
 	VPROF( "bf_write::WriteBitCoordMP" );
 #endif
 	int		signbit = (f <= -( bLowPrecision ? COORD_RESOLUTION_LOWPRECISION : COORD_RESOLUTION ));
-	int		intval = (int)abs(f);
+	int		intval = (int)std::abs(f);
 	int		fractval = bLowPrecision ? 
-		( abs((int)(f*COORD_DENOMINATOR_LOWPRECISION)) & (COORD_DENOMINATOR_LOWPRECISION-1) ) :
-		( abs((int)(f*COORD_DENOMINATOR)) & (COORD_DENOMINATOR-1) );
+		( std::abs((int)(f*COORD_DENOMINATOR_LOWPRECISION)) & (COORD_DENOMINATOR_LOWPRECISION-1) ) :
+		( std::abs((int)(f*COORD_DENOMINATOR)) & (COORD_DENOMINATOR-1) );
 
 	bool    bInBounds = intval < (1 << COORD_INTEGER_BITS_MP );
 
@@ -621,8 +621,8 @@ void bf_write::WriteBitCoord (const float f)
 	VPROF( "bf_write::WriteBitCoord" );
 #endif
 	int		signbit = (f <= -COORD_RESOLUTION);
-	int		intval = (int)abs(f);
-	int		fractval = abs((int)(f*COORD_DENOMINATOR)) & (COORD_DENOMINATOR-1);
+	int		intval = (int)std::abs(f);
+	int		fractval = std::abs((int)(f*COORD_DENOMINATOR)) & (COORD_DENOMINATOR-1);
 
 
 	// Send the bit flags that indicate whether we have an integer part and/or a fraction part.
@@ -675,7 +675,7 @@ void bf_write::WriteBitNormal( float f )
 	int	signbit = (f <= -NORMAL_RESOLUTION);
 
 	// NOTE: Since +/-1 are valid values for a normal, I'm going to encode that as all ones
-	unsigned int fractval = abs( (int)(f*NORMAL_DENOMINATOR) );
+	unsigned int fractval = std::abs( (int)(f*NORMAL_DENOMINATOR) );
 
 	// clamp..
 	if (fractval > NORMAL_DENOMINATOR)
@@ -1340,7 +1340,7 @@ void bf_read::ReadBitVec3Normal( Vector& fa )
 
 	float fafafbfb = fa[0] * fa[0] + fa[1] * fa[1];
 	if (fafafbfb < 1.0f)
-		fa[2] = sqrt( 1.0f - fafafbfb );
+		fa[2] = std::sqrt( 1.0f - fafafbfb );
 	else
 		fa[2] = 0.0f;
 

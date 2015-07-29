@@ -75,7 +75,7 @@ inline const char* DemoCmdToString(unsigned int cmd)
         "dem_stop",
         "dem_stringtables"
     };
-    if (cmd > (sizeof(cmdNames) / sizeof(const char*)))
+    if (cmd >= (sizeof(cmdNames) / sizeof(const char*)))
     {
         return "";
     }

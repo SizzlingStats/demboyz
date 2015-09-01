@@ -2,12 +2,19 @@
 solution "demboyz"
     basedir ".."
     location (_ACTION)
+    targetdir "../bin"
     startproject "demboyz"
     configurations { "Debug", "Release" }
     platforms "x32"
     flags { "MultiProcessorCompile", "Symbols" }
 
     defines "_CRT_SECURE_NO_WARNINGS"
+    configuration "Debug"
+        defines { "DEBUG" }
+    configuration "Release"
+        defines { "NDEBUG" }
+        optimize "Full"
+    configuration {}
     
     -- GCC specific build options.
     configuration "gmake"
@@ -34,12 +41,3 @@ solution "demboyz"
             "../demboyz"
         }
 
-        configuration "Debug"
-            targetdir (_ACTION .. "/build/Debug")
-            defines { "DEBUG" }
-
-        configuration "Release"
-            targetdir (_ACTION .. "/build/Release")
-            defines { "NDEBUG" }
-            optimize "Full"
-        configuration {}

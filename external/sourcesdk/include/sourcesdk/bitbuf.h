@@ -157,7 +157,7 @@ public:
 	void			WriteOneBitAt( int iBit, int nValue );
 	
 	// Write signed or unsigned. Range is only checked in debug.
-	void			WriteUBitLong( unsigned int data, int numbits, bool bCheckRange=true ) __restrict;
+	void			WriteUBitLong( unsigned int data, int numbits, bool bCheckRange=true );
 	void			WriteSBitLong( int data, int numbits );
 	
 	// Tell it whether or not the data is unsigned. If it's signed,
@@ -373,7 +373,7 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 #endif
 }
 
-inline void bf_write::WriteUBitLong( unsigned int curData, int numbits, bool bCheckRange ) __restrict
+inline void bf_write::WriteUBitLong( unsigned int curData, int numbits, bool bCheckRange )
 {
 #ifdef _DEBUG
 	// Make sure it doesn't overflow.
@@ -556,8 +556,8 @@ public:
 	
 	float			ReadBitAngle( int numbits );
 
-	unsigned int	ReadUBitLong( int numbits ) __restrict;
-	unsigned int	ReadUBitLongNoInline( int numbits ) __restrict;
+	unsigned int	ReadUBitLong( int numbits );
+	unsigned int	ReadUBitLongNoInline( int numbits );
 	unsigned int	PeekUBitLong( int numbits );
 	int				ReadSBitLong( int numbits );
 
@@ -619,8 +619,8 @@ public:
 	char*			ReadAndAllocateString( bool *pOverflow = 0 );
 
 	// Returns nonzero if any bits differ
-	int				CompareBits( bf_read * __restrict other, int bits ) __restrict;
-	int				CompareBitsAt( int offset, bf_read * __restrict other, int otherOffset, int bits ) __restrict;
+	int				CompareBits( bf_read * __restrict other, int bits );
+	int				CompareBitsAt( int offset, bf_read * __restrict other, int otherOffset, int bits );
 
 // Status.
 public:
@@ -770,7 +770,7 @@ inline unsigned int bf_read::ReadUBitVar()
 	return sixbits >> 2;
 }
 
-inline unsigned int bf_read::ReadUBitLong( int numbits ) __restrict
+inline unsigned int bf_read::ReadUBitLong( int numbits )
 {
 	Assert( numbits > 0 && numbits <= 32 );
 
@@ -803,7 +803,7 @@ inline unsigned int bf_read::ReadUBitLong( int numbits ) __restrict
 	return (dw1 | dw2) & bitmask;
 }
 
-inline int bf_read::CompareBits( bf_read * __restrict other, int numbits ) __restrict
+inline int bf_read::CompareBits( bf_read * __restrict other, int numbits )
 {
 	return (ReadUBitLong(numbits) != other->ReadUBitLong(numbits));
 }

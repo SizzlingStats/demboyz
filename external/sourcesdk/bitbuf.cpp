@@ -9,7 +9,7 @@
 #include "sourcesdk/bitbuf.h"
 #include <string.h>
 #include <cmath>
-#include <stdlib.h>
+#include <cstdlib>
 
 // FIXME: Can't use this until we get multithreaded allocations in tier0 working for tools
 // This is used by VVIS and fails to link
@@ -1460,7 +1460,7 @@ void bf_read::ExciseBits( int startbit, int bitstoremove )
 	m_nDataBytes = m_nDataBits >> 3;
 }
 
-int bf_read::CompareBitsAt( int offset, bf_read * __restrict other, int otherOffset, int numbits ) __restrict
+int bf_read::CompareBitsAt( int offset, bf_read * __restrict other, int otherOffset, int numbits )
 {
 	extern unsigned long g_ExtraMasks[33];
 

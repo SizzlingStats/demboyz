@@ -114,7 +114,7 @@ namespace base
         std::uint32_t   ReadUInt32(const char* name);
         std::uint64_t   ReadUint64(const char* name);
         std::size_t     ReadString(const char* name, char* dest, std::size_t maxLength);
-        std::string     ReadString(const char* name, std::size_t maxLength);
+        //std::string     ReadString(const char* name, std::size_t maxLength);
         float           ReadFloat(const char* name);
 
         std::size_t     ReadBits(const char* name, unsigned char* dest, std::size_t numBits);

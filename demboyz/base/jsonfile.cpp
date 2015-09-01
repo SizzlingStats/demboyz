@@ -362,7 +362,7 @@ namespace base
         return val.GetUint64();
     }
 
-    std::uint32_t JsonReaderObject::ReadString(const char* name, char* dest, std::uint32_t maxLength)
+    std::size_t JsonReaderObject::ReadString(const char* name, char* dest, std::uint32_t maxLength)
     {
         const auto& val = m_value[name];
         if (!val.IsString())

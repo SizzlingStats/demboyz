@@ -39,7 +39,7 @@ namespace base
         void WriteUInt32(const char* name, std::uint32_t value, bool writeCondition);
         void WriteUint64(const char* name, std::uint64_t value);
         void WriteString(const char* name, const char* value);
-        void WriteString(const char* name, const char* value, std::size_t length);
+        void WriteString(const char* name, const char* value, std::uint32_t length);
         void WriteString(const char* name, const std::string& value);
         void WriteFloat(const char* name, const double value);
 
@@ -113,8 +113,8 @@ namespace base
         std::int64_t    ReadInt64(const char* name);
         std::uint32_t   ReadUInt32(const char* name);
         std::uint64_t   ReadUint64(const char* name);
-        std::size_t     ReadString(const char* name, char* dest, std::size_t maxLength);
-        //std::string     ReadString(const char* name, std::size_t maxLength);
+        std::uint32_t   ReadString(const char* name, char* dest, std::uint32_t maxLength);
+        //std::string     ReadString(const char* name, std::uint32_t maxLength);
         float           ReadFloat(const char* name);
 
         std::size_t     ReadBits(const char* name, unsigned char* dest, std::size_t numBits);

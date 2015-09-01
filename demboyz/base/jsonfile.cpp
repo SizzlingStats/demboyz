@@ -159,7 +159,7 @@ namespace base
         writer.String(value);
     }
 
-    void JsonWriterFile::WriteString(const char* name, const char* value, std::size_t length)
+    void JsonWriterFile::WriteString(const char* name, const char* value, std::uint32_t length)
     {
         auto& writer = m_writer;
         writer.String(name);
@@ -362,7 +362,7 @@ namespace base
         return val.GetUint64();
     }
 
-    std::size_t JsonReaderObject::ReadString(const char* name, char* dest, std::uint32_t maxLength)
+    std::uint32_t JsonReaderObject::ReadString(const char* name, char* dest, std::uint32_t maxLength)
     {
         const auto& val = m_value[name];
         if (!val.IsString())

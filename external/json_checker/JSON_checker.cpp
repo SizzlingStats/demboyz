@@ -29,8 +29,6 @@ SOFTWARE.
 #include <stdlib.h>
 #include "json_checker/JSON_checker.h"
 
-#define true  1
-#define false 0
 #define __   -1     /* the universal error code */
 
 /*
@@ -258,7 +256,7 @@ new_JSON_checker(int depth)
 }
 
 
-int
+bool
 JSON_checker_char(JSON_checker jc, int next_char)
 {
 /*
@@ -385,7 +383,7 @@ JSON_checker_char(JSON_checker jc, int next_char)
 }
 
 
-int
+bool
 JSON_checker_done(JSON_checker jc)
 {
 /*

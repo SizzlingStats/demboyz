@@ -3,10 +3,6 @@
 
 /* JSON_checker.h */
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 typedef struct JSON_checker_struct {
     int state;
     int depth;
@@ -15,10 +11,7 @@ typedef struct JSON_checker_struct {
 } * JSON_checker;
 
 
-extern JSON_checker new_JSON_checker(int depth);
-extern int  JSON_checker_char(JSON_checker jc, int next_char);
-extern int  JSON_checker_done(JSON_checker jc);
+JSON_checker new_JSON_checker(int depth);
+bool JSON_checker_char(JSON_checker jc, int next_char);
+bool JSON_checker_done(JSON_checker jc);
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif /* __cplusplus */

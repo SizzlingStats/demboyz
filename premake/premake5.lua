@@ -23,8 +23,7 @@ solution "demboyz"
             "../demboyz/**.h",
             "../demboyz/**.cpp",
             "../external/**.h",
-            "../external/**.cpp",
-            "../external/**.c"
+            "../external/**.cpp"
         }
         includedirs
         {

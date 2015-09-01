@@ -52,59 +52,52 @@ namespace base
         FILE* m_fp;
     };
 
-    class JsonReaderObject;
-    class JsonReaderIterator
-    {
-    public:
-        using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
-
-    public:
-        explicit JsonReaderIterator(JsonValue* value, bool& hasReadError);
-
-        JsonReaderObject operator*() const;
-        JsonReaderIterator& operator++();
-        bool operator==(const JsonReaderIterator& other) const;
-        bool operator!=(const JsonReaderIterator& other) const;
-
-    private:
-        JsonValue* m_value;
-        bool& m_hasReadError;
-    };
-
-    class JsonReaderArray
-    {
-    public:
-        using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
-
-    public:
-        explicit JsonReaderArray(JsonValue& value, bool& parseError);
-
-        bool HasReadError() const;
-
-        std::size_t size() const;
-        JsonReaderIterator begin();
-        JsonReaderIterator end();
-
-        template<typename Container, typename Fn>
-        void TransformTo(Container& c, Fn fn)
-        {
-            c.resize(m_value.Size());
-            std::size_t index = 0;
-            for (base::JsonReaderObject obj : *this)
-            {
-                fn(obj, c[index++]);
-            }
-        }
-
-    private:
-        JsonValue& m_value;
-        bool& m_hasReadError;
-    };
-
     class JsonReaderObject
     {
     public:
         using JsonValue = rapidjson::GenericValue<rapidjson::ASCII<>>;
+
+        class JsonReaderIterator
+        {
+        public:
+            explicit JsonReaderIterator(JsonValue* value, bool& hasReadError);
+
+            JsonReaderObject operator*() const;
+            JsonReaderIterator& operator++();
+            bool operator==(const JsonReaderIterator& other) const;
+            bool operator!=(const JsonReaderIterator& other) const;
+
+        private:
+            JsonValue* m_value;
+            bool& m_hasReadError;
+        };
+
+        class JsonReaderArray
+        {
+        public:
+            explicit JsonReaderArray(JsonValue& value, bool& parseError);
+
+            bool HasReadError() const;
+
+            std::size_t size() const;
+            JsonReaderIterator begin();
+            JsonReaderIterator end();
+
+            template<typename Container, typename Fn>
+            void TransformTo(Container& c, Fn fn)
+            {
+                c.resize(m_value.Size());
+                std::size_t index = 0;
+                for (base::JsonReaderObject obj : *this)
+                {
+                    fn(obj, c[index++]);
+                }
+            }
+
+        private:
+            JsonValue& m_value;
+            bool& m_hasReadError;
+        };
 
     public:
         explicit JsonReaderObject(JsonValue& value, bool& parseError);
@@ -131,6 +124,9 @@ namespace base
         JsonValue& m_value;
         bool& m_hasReadError;
     };
+
+    using JsonReaderIterator = JsonReaderObject::JsonReaderIterator;
+    using JsonReaderArray = JsonReaderObject::JsonReaderArray;
 
     class JsonReaderFile
     {

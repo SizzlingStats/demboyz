@@ -5,7 +5,7 @@ we dem boyz
 
 ### What is it?
 
-Demboyz is a command line tool to convert TF2 STV demos into a human readable json format.
+Demboyz is a command line tool to convert TF2 STV demos into a human readable json format. Demboyz runs on Linux, Windows, and OSX.
 It supports the following conversions:
 
     .dem/.json <-> .dem/.json
@@ -24,6 +24,10 @@ It supports the following conversions:
     ./demboyz mystvdemo.json mystvdemo.con
 
 In the first example, mystvdemo.dem will be read from the current working directory, while mystvdemo.json will be written to the current working directory.
+
+## Compiling From Source
+
+When following instructions below, the compiled binary will be output in the bin folder.
 
 
 ### Using Vagrant

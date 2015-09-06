@@ -16,6 +16,14 @@ It supports the following conversions:
     The .con format is a log equal to what would be produced by TF2
     with netmessage/demmessage logs enabled.
 
+### Potential Uses
+* Exporting Stats: Parsing for player stats and motion throughout maps.
+* Anticheat: Interpreting player net data for malicious behavior and cheating
+* Anti-Anticheat: Modifying player net data to hide your malicious behaviour and cheating
+* Censoring: Cover up rude communication by removing player voice and chat messages
+* Social engineering: Make your friends seem rude by adding phony player voice and chat messages
+* ConeBone69 revival: Change the names of all players to ConeBone69
+
 ### Usage
 
     ./demboyz mystvdemo.dem mystvdemo.json

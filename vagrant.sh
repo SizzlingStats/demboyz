@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # http://askubuntu.com/a/497033
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -20,8 +20,9 @@ packages="$packages clang-3.6++"
 sudo apt-get install -y $packages
 
 # Why doesn't clang do this for us?
-[ ! -e /usr/bin/clang++ ] && sudo ln -s /usr/bin/clang++-3.6 /usr/bin/clang++
+sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.6 10
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.6 10
 
 # Build it!
 cd /vagrant/premake
-/bin/bash gmake.sh && { cd gmake; make; }
+./gmake.sh && { cd gmake; make; }

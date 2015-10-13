@@ -3,7 +3,7 @@ demboyz
 
 we dem boyz
 
-### What is it?
+## What is it?
 
 Demboyz is a command line tool to convert TF2 STV demos into a human readable json format. Demboyz runs on Linux, Windows, and OSX.
 It supports the following conversions:
@@ -16,7 +16,7 @@ It supports the following conversions:
     The .con format is a log equal to what would be produced by TF2
     with netmessage/demmessage logs enabled.
 
-### Potential Uses
+## Potential Uses
 * Exporting Stats: Parsing for player stats and motion throughout maps.
 * Anticheat: Interpreting player net data for malicious behavior and cheating
 * Anti-Anticheat: Modifying player net data to hide your malicious behaviour and cheating
@@ -24,7 +24,7 @@ It supports the following conversions:
 * Social engineering: Make your friends seem rude by adding phony player voice and chat messages
 * ConeBone69 revival: Change the names of all players to ConeBone69
 
-### Usage
+## Usage
 
     ./demboyz mystvdemo.dem mystvdemo.json
     ./demboyz mystvdemo.dem mystvdemo.con
@@ -32,6 +32,40 @@ It supports the following conversions:
     ./demboyz mystvdemo.json mystvdemo.con
 
 In the first example, mystvdemo.dem will be read from the current working directory, while mystvdemo.json will be written to the current working directory.
+
+## Contributing
+
+### For Developers
+
+If you would like to contribute to demboyz, here are a few tasks up for grabs:
+
+#### General programming experience:
+* Document the .dem format.
+    * Turn the working demboyz serialization code into a reference manual for the .dem fomat.
+    * Any amount of work on this helps. Document one struct!
+* Develop an app that uses demboyz.
+    * Provide feedback on the usefulness of the json demo format.
+    * Create new tools previously impossible to make.
+
+#### C++ and asm experience:
+* Continue reverse engineering the STV demo structs and serialization (svc_ messages).
+    * Many of the reversed svc_ messages still have unknown binary chunks of data.
+    * Reverse them for addition to the demboyz source.
+* Reverse engineer the POV demo structs and serialization (clc_ messages).
+    * Currently, demboyz only supports STV demos due to POV demo messages being separate and unknown.
+    * Work on reverse engineering the clc_ messages just like the svc_ messages.
+* Add a conversion to the replay demo format.
+    * The replay demo format would require reverse engineering just like POV and STV demos.
+
+### For Users
+
+* Cheer on the developers.
+* Pressure the developers.
+* Become a developer.
+
+## Who Uses demboyz?
+
+* [KZMod Demo Player [beta]](http://xtreme-jumps.eu/e107_plugins/forum/forum_viewtopic.php?359435) by kraster
 
 ## Compiling From Source
 

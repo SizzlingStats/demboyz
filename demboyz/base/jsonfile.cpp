@@ -218,7 +218,7 @@ namespace base
         JsonWriterFile::WriteBits(name, data, numBytes * 8);
     }
 
-    JsonReaderIterator::JsonReaderIterator(JsonValue* value, bool& hasReadError):
+    JsonReaderObject::JsonReaderIterator::JsonReaderIterator(JsonValue* value, bool& hasReadError):
         m_value(value),
         m_hasReadError(hasReadError)
     {
@@ -245,7 +245,7 @@ namespace base
         return m_value != other.m_value;
     }
 
-    JsonReaderArray::JsonReaderArray(JsonValue& value, bool& parseError):
+    JsonReaderObject::JsonReaderArray::JsonReaderArray(JsonValue& value, bool& parseError):
         m_value(value),
         m_hasReadError(parseError)
     {

@@ -189,7 +189,7 @@ enum modes {
     MODE_OBJECT,
 };
 
-static int
+static bool
 reject(JSON_checker jc)
 {
 /*
@@ -201,7 +201,7 @@ reject(JSON_checker jc)
 }
 
 
-static int
+static bool
 push(JSON_checker jc, int mode)
 {
 /*
@@ -216,7 +216,7 @@ push(JSON_checker jc, int mode)
 }
 
 
-static int
+static bool
 pop(JSON_checker jc, int mode)
 {
 /*
@@ -394,5 +394,5 @@ JSON_checker_done(JSON_checker jc)
 */
     int result = jc->state == OK && pop(jc, MODE_DONE);
     reject(jc);
-    return result;
+    return (result != 0);
 }

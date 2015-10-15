@@ -25,7 +25,7 @@ int32_t ReadNetpacket(base::JsonReaderFile& jsonReader, PacketTrailingBits& trai
 
 PacketTrailingBits ParsePacket(base::JsonReaderFile& jsonReader,
                                SourceGameContext& context, IDemoWriter* writer,
-                               void* netDataStructs[32])
+                               const NetHandlers::NetDataStructArray& netDataStructs)
 {
     PacketTrailingBits trailingBits = PacketTrailingBits();
     NetPacket netPacket = NetPacket();
@@ -40,7 +40,7 @@ PacketTrailingBits ParsePacket(base::JsonReaderFile& jsonReader,
 
 void DemoReader::ProcessJson(std::FILE* inputFp, IDemoWriter* writer)
 {
-    void* netDataStructs[32];
+    NetHandlers::NetDataStructArray netDataStructs;
     void* demDataStructs[9];
     NetHandlers::CreateNetMsgStructs(netDataStructs);
     DemHandlers::CreateDemMsgStructs(demDataStructs);

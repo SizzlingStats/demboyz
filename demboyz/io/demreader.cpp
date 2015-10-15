@@ -14,7 +14,7 @@
 
 PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
                                SourceGameContext& context, IDemoWriter* writer,
-                               void* netDataStructs[32])
+                               const NetHandlers::NetDataStructArray& netDataStructs)
 {
     assert(length <= NET_MAX_PAYLOAD);
     bf_read bitbuf(packet, length);
@@ -42,7 +42,7 @@ PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
 
 void DemoReader::ProcessDem(std::FILE* inputFp, IDemoWriter* writer)
 {
-    void* netDataStructs[32];
+    NetHandlers::NetDataStructArray netDataStructs;
     void* demDataStructs[9];
     NetHandlers::CreateNetMsgStructs(netDataStructs);
     DemHandlers::CreateDemMsgStructs(demDataStructs);

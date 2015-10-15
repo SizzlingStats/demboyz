@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <sstream>
+#include <array>
+#include "netmessages.h"
 
 namespace base
 {
@@ -64,8 +66,9 @@ struct SourceGameContext
 
 namespace NetHandlers
 {
-    void CreateNetMsgStructs(void* netDataStructs[32]);
-    void DestroyNetMsgStructs(void* netDataStructs[32]);
+    using NetDataStructArray = std::array<void*, NetMsg::SVC_LASTMSG + 1>;
+    void CreateNetMsgStructs(NetDataStructArray& netDataStructs);
+    void DestroyNetMsgStructs(NetDataStructArray& netDataStructs);
 
     bool NetMsg_BitRead(uint32_t type, BitRead& bitbuf, SourceGameContext& context, void* data);
     bool NetMsg_BitWrite(uint32_t type, BitWrite& bitbuf, const SourceGameContext& context, void* data);

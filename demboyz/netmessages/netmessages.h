@@ -1,45 +1,6 @@
 
 #pragma once
 
-#include <cstdint>
-
-#if !defined( MAX_OSPATH )
-#define MAX_OSPATH      260         // max length of a filesystem pathname
-#endif
-
-#include "net_nop.h"
-#include "net_disconnect.h"
-#include "net_file.h"
-#include "net_tick.h"
-#include "net_stringcmd.h"
-#include "net_setconvar.h"
-#include "net_signonstate.h"
-#include "svc_print.h"
-#include "svc_serverinfo.h"
-#include "svc_sendtable.h"
-#include "svc_classinfo.h"
-#include "svc_setpause.h"
-#include "svc_createstringtable.h"
-#include "svc_updatestringtable.h"
-#include "svc_voiceinit.h"
-#include "svc_voicedata.h"
-#include "svc_hltv.h"
-#include "svc_sounds.h"
-#include "svc_setview.h"
-#include "svc_fixangle.h"
-#include "svc_crosshairangle.h"
-#include "svc_bspdecal.h"
-#include "svc_terrainmod.h"
-#include "svc_usermessage.h"
-#include "svc_entitymessage.h"
-#include "svc_gameevent.h"
-#include "svc_packetentities.h"
-#include "svc_tempentities.h"
-#include "svc_prefetch.h"
-#include "svc_menu.h"
-#include "svc_gameeventlist.h"
-#include "svc_getcvarvalue.h"
-
 namespace NetMsg
 {
     enum

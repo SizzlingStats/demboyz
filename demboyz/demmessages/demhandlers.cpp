@@ -2,7 +2,16 @@
 #include "demhandlers.h"
 #include "demmessages.h"
 
-void DemHandlers::CreateDemMsgStructs(void* demDataStructs[9])
+#include "dem_unknown.h"
+#include "dem_packet.h"
+#include "dem_synctick.h"
+#include "dem_consolecmd.h"
+#include "dem_usercmd.h"
+#include "dem_datatables.h"
+#include "dem_stop.h"
+#include "dem_stringtables.h"
+
+void DemHandlers::CreateDemMsgStructs(DemDataStructArray& demDataStructs)
 {
     demDataStructs[0] = new DemMsg::Dem_Unknown();
     demDataStructs[1] = new DemMsg::Dem_Packet();
@@ -15,7 +24,7 @@ void DemHandlers::CreateDemMsgStructs(void* demDataStructs[9])
     demDataStructs[8] = new DemMsg::Dem_StringTables();
 }
 
-void DemHandlers::DestroyDemMsgStructs(void* demDataStructs[9])
+void DemHandlers::DestroyDemMsgStructs(DemDataStructArray& demDataStructs)
 {
     delete reinterpret_cast<DemMsg::Dem_Unknown*>(demDataStructs[0]);
     delete reinterpret_cast<DemMsg::Dem_Packet*>(demDataStructs[1]);

@@ -2,6 +2,8 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
+#include "demmessages.h"
 
 namespace base
 {
@@ -49,8 +51,9 @@ namespace DemHandlers
 
 namespace DemHandlers
 {
-    void CreateDemMsgStructs(void* demDataStructs[9]);
-    void DestroyDemMsgStructs(void* demDataStructs[9]);
+    using DemDataStructArray = std::array<void*, dem_lastcmd + 1>;
+    void CreateDemMsgStructs(DemDataStructArray& demDataStructs);
+    void DestroyDemMsgStructs(DemDataStructArray& demDataStructs);
 
     bool DemMsg_FileRead(uint32_t type, FileRead& demofile, void* data);
     bool DemMsg_FileWrite(uint32_t type, FileWrite& demofile, void* data);

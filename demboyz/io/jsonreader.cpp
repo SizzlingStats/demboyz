@@ -41,7 +41,7 @@ PacketTrailingBits ParsePacket(base::JsonReaderFile& jsonReader,
 void DemoReader::ProcessJson(std::FILE* inputFp, IDemoWriter* writer)
 {
     NetHandlers::NetDataStructArray netDataStructs;
-    void* demDataStructs[9];
+    DemHandlers::DemDataStructArray demDataStructs;
     NetHandlers::CreateNetMsgStructs(netDataStructs);
     DemHandlers::CreateDemMsgStructs(demDataStructs);
 

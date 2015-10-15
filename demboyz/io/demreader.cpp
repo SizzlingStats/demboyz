@@ -43,7 +43,7 @@ PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
 void DemoReader::ProcessDem(std::FILE* inputFp, IDemoWriter* writer)
 {
     NetHandlers::NetDataStructArray netDataStructs;
-    void* demDataStructs[9];
+    DemHandlers::DemDataStructArray demDataStructs;
     NetHandlers::CreateNetMsgStructs(netDataStructs);
     DemHandlers::CreateDemMsgStructs(demDataStructs);
 

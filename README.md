@@ -40,6 +40,10 @@ In the first example, mystvdemo.dem will be read from the current working direct
 If you would like to contribute to demboyz, here are a few tasks up for grabs:
 
 #### General programming experience:
+* Add automated tests to demboyz.
+    * Using the Catch C++ testing framework.
+    * Unit test the serialization of network messages.
+    * System test exact binary matches of dem -> json -> dem transformations.
 * Document the .dem format.
     * Turn the working demboyz serialization code into a reference manual for the .dem fomat.
     * Any amount of work on this helps. Document one struct!

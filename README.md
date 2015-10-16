@@ -78,16 +78,15 @@ When following instructions below, the compiled binary will be output in the bin
 
 ### Using Vagrant
 
-    # Launch VM
+    # Launch VM and build
     vagrant up
+
+    # Patch VM and re-build
+    vagrant provision
+
+    # Manual build
     vagrant ssh
-    cd /vagrant
-
-    # Install Linux dependencies (first time setup)
-    ./vagrant.sh
-
-    # Build demboyz
-    cd premake
+    cd /vagrant/premake
     ./gmake.sh && cd gmake
     make
 

@@ -1,4 +1,4 @@
-demboyz
+demboyz [![Build status](https://ci.appveyor.com/api/projects/status/pc63pbl9b0t5tygl/branch/master?svg=true)](https://ci.appveyor.com/project/SizzlingCalamari/demboyz/branch/master)
 =======
 
 we dem boyz

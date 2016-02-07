@@ -27,7 +27,7 @@ namespace NetHandlers
         }
         else
         {
-            data->dataLengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS + 1);
+            data->dataLengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS_OLD + 3);
         }
         data->isUserDataFixedSize = bitbuf.ReadOneBit() != 0;
         if (data->isUserDataFixedSize)
@@ -64,7 +64,7 @@ namespace NetHandlers
         }
         else
         {
-            bitbuf.WriteUBitLong(data->dataLengthInBits, NET_MAX_PAYLOAD_BITS + 1);
+            bitbuf.WriteUBitLong(data->dataLengthInBits, NET_MAX_PAYLOAD_BITS_OLD + 3);
         }
         bitbuf.WriteOneBit(data->isUserDataFixedSize);
         if (data->isUserDataFixedSize)

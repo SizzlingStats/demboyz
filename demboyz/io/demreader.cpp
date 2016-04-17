@@ -8,9 +8,7 @@
 #include "netmessages/netcontants.h"
 #include "demmessages/demhandlers.h"
 #include "sourcesdk/bitbuf.h"
-#include <vector>
 #include <cstdint>
-#include <memory>
 
 PacketTrailingBits ParsePacket(uint8_t* packet, size_t length,
                                SourceGameContext& context, IDemoWriter* writer,

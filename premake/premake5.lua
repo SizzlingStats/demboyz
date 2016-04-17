@@ -15,7 +15,7 @@ solution "demboyz"
         defines { "NDEBUG" }
         optimize "Full"
     configuration {}
-    
+
     -- GCC specific build options.
     configuration "gmake"
         -- Enables C++11 support.
@@ -30,7 +30,8 @@ solution "demboyz"
             "../demboyz/**.h",
             "../demboyz/**.cpp",
             "../external/**.h",
-            "../external/**.cpp"
+            "../external/**.cpp",
+            "../external/**.cc"
         }
         includedirs
         {
@@ -38,6 +39,7 @@ solution "demboyz"
             "../external/cbase64-1.1/include",
             "../external/sourcesdk/include",
             "../external/rapidjson-1.0.2/include",
+            "../external/snappy-1.1.3/include",
             "../demboyz"
         }
 

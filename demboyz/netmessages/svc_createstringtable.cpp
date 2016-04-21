@@ -42,7 +42,7 @@ namespace NetHandlers
         }
         if (context.protocol > 14)
         {
-            data->unk1 = bitbuf.ReadOneBit() != 0;
+            data->compressedData = bitbuf.ReadOneBit() != 0;
         }
         data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
         bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
@@ -74,7 +74,7 @@ namespace NetHandlers
         }
         if (context.protocol > 14)
         {
-            bitbuf.WriteOneBit(data->unk1);
+            bitbuf.WriteOneBit(data->compressedData);
         }
         bitbuf.WriteBits(data->data.get(), data->dataLengthInBits);
         return !bitbuf.IsOverflowed();
@@ -94,7 +94,7 @@ namespace NetHandlers
         data->userDataSizeBits = reader.ReadUInt32("userDataSizeBits");
         if (context.protocol > 14)
         {
-            data->unk1 = reader.ReadBool("unk1");
+            data->compressedData = reader.ReadBool("compressedData");
         }
         data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
         reader.ReadBits("data", data->data.get(), data->dataLengthInBits);
@@ -115,7 +115,7 @@ namespace NetHandlers
         jsonbuf.WriteUInt32("userDataSizeBits", data->userDataSizeBits);
         if (context.protocol > 14)
         {
-            jsonbuf.WriteBool("unk1", data->unk1);
+            jsonbuf.WriteBool("compressedData", data->compressedData);
         }
         jsonbuf.WriteBits("data", data->data.get(), data->dataLengthInBits);
         jsonbuf.EndObject();

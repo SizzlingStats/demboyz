@@ -16,7 +16,7 @@ namespace NetMsg
         bool isUserDataFixedSize;
         uint16_t userDataSize;
         uint8_t userDataSizeBits;
-        bool unk1;
+        bool compressedData;
         std::unique_ptr<uint8_t[]> data;
     };
 }

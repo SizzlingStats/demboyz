@@ -5,6 +5,93 @@
 #include "netmath.h"
 #include "netcontants.h"
 
+// #define WIP_STRINGTABLE
+
+#ifdef WIP_STRINGTABLE
+#include "sourcesdk/common.h"
+#include <vector>
+
+#define SUBSTRING_BITS 5
+struct StringHistoryEntry
+{
+    char string[(1 << SUBSTRING_BITS)];
+};
+
+static void StringTable_BitRead(NetHandlers::BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
+{
+    const size_t numEncodeBits = math::log2(data->maxEntries);
+    std::vector<StringHistoryEntry> history;
+    int lastEntry = -1;
+    for (uint i = 0; i < data->numEntries; ++i)
+    {
+        int entryIndex = lastEntry + 1;
+
+        if (bitbuf.ReadOneBit() == 0)
+        {
+            entryIndex = bitbuf.ReadUBitLong(numEncodeBits);
+        }
+        lastEntry = entryIndex;
+
+        const char *pEntry = NULL;
+        char entry[1024];
+        char substr[1024];
+        if (bitbuf.ReadOneBit() != 0)
+        {
+            bool substringcheck = bitbuf.ReadOneBit() != 0;
+            if (substringcheck)
+            {
+                int index = bitbuf.ReadUBitLong(5);
+                int bytestocopy = bitbuf.ReadUBitLong(SUBSTRING_BITS);
+                strncpy(entry, history.at(index).string, bytestocopy + 1);
+                entry[bytestocopy + 1] = '\0';
+                bitbuf.ReadString(substr, sizeof(substr));
+                strncat(entry, substr, sizeof(entry));
+            }
+            else
+            {
+                bitbuf.ReadString(entry, sizeof(entry));
+            }
+            pEntry = entry;
+            printf("%s\n", pEntry);
+        }
+        const int MAX_USERDATA_BITS = 14;
+        unsigned char tempbuf[(1 << MAX_USERDATA_BITS)] = { 0 };
+        const void *pUserData = NULL;
+        int nBytes = 0;
+        if (bitbuf.ReadOneBit() != 0)
+        {
+            if (data->isUserDataFixedSize)
+            {
+                nBytes = data->userDataSize;
+                tempbuf[nBytes - 1] = 0;
+                bitbuf.ReadBits(tempbuf, data->userDataSizeBits);
+            }
+            else
+            {
+                nBytes = bitbuf.ReadUBitLong(MAX_USERDATA_BITS);
+                bitbuf.ReadBytes(tempbuf, nBytes);
+            }
+            pUserData = tempbuf;
+        }
+
+        if (pEntry == NULL)
+        {
+            pEntry = "";
+        }
+
+        if (history.size() > 31)
+        {
+            history.erase(history.begin());
+        }
+
+        StringHistoryEntry she;
+        strncpy(she.string, pEntry, sizeof(she.string));
+        history.emplace_back(she);
+    }
+}
+
+#endif // WIP_STRINGTABLE
+
 namespace NetHandlers
 {
     bool SVC_CreateStringTable_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_CreateStringTable* data)
@@ -20,7 +107,9 @@ namespace NetHandlers
         }
         bitbuf.ReadString(data->tableName, sizeof(data->tableName));
         data->maxEntries = bitbuf.ReadWord();
-        data->numEntries = bitbuf.ReadUBitLong(math::log2(data->maxEntries) + 1);
+
+        const size_t numEncodeBits = math::log2(data->maxEntries);
+        data->numEntries = bitbuf.ReadUBitLong(numEncodeBits + 1);
         if (context.protocol > 23)
         {
             data->dataLengthInBits = bitbuf.ReadVarInt32();
@@ -46,6 +135,28 @@ namespace NetHandlers
         }
         data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
         bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
+
+#ifdef WIP_STRINGTABLE
+        if (data->compressedData)
+        {
+            bf_read bitbuf2(data->data.get(), data->dataLengthInBits);
+            const uint32_t decompressedNumBytes = bitbuf2.ReadUBitLong(32);
+            const uint32_t compressedNumBytes = bitbuf2.ReadUBitLong(32);
+            std::unique_ptr<uint8_t[]> compressedData(new uint8[compressedNumBytes]);
+            std::unique_ptr<uint8_t[]> uncompressedData(new uint8[decompressedNumBytes]);
+            bitbuf2.ReadBytes(compressedData.get(), compressedNumBytes);
+
+            uint32_t numWritten = COM_BufferToBufferDecompress(uncompressedData.get(), decompressedNumBytes, compressedData.get(), compressedNumBytes);
+            bitbuf2 = bf_read(uncompressedData.get(), decompressedNumBytes);
+            StringTable_BitRead(bitbuf2, context, data);
+        }
+        else
+        {
+            bf_read bitbuf2(data->data.get(), data->dataLengthInBits);
+            StringTable_BitRead(bitbuf2, context, data);
+        }
+#endif // WIP_STRINGTABLE
+
         return !bitbuf.IsOverflowed();
     }
 

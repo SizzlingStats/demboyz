@@ -110,14 +110,20 @@ namespace NetHandlers
 
         const size_t numEncodeBits = math::log2(data->maxEntries);
         data->numEntries = bitbuf.ReadUBitLong(numEncodeBits + 1);
+
+        size_t dataLengthInBits;
         if (context.protocol > 23)
         {
-            data->dataLengthInBits = bitbuf.ReadVarInt32();
+            dataLengthInBits = bitbuf.ReadVarInt32();
+            data->dataLengthInBits = dataLengthInBits;
         }
         else
         {
-            data->dataLengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS_OLD + 3);
+            dataLengthInBits = bitbuf.ReadUBitLong(NET_MAX_PAYLOAD_BITS_OLD + 3);
+            data->dataLengthInBits = dataLengthInBits;
         }
+        const size_t dataLengthInBytes = math::BitsToBytes(dataLengthInBits);
+
         data->isUserDataFixedSize = bitbuf.ReadOneBit() != 0;
         if (data->isUserDataFixedSize)
         {
@@ -133,13 +139,13 @@ namespace NetHandlers
         {
             data->compressedData = bitbuf.ReadOneBit() != 0;
         }
-        data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
-        bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
+        data->data.reset(new uint8_t[dataLengthInBytes]);
+        bitbuf.ReadBits(data->data.get(), dataLengthInBits);
 
 #ifdef WIP_STRINGTABLE
         if (data->compressedData)
         {
-            bf_read bitbuf2(data->data.get(), data->dataLengthInBits);
+            bf_read bitbuf2(data->data.get(), dataLengthInBytes, dataLengthInBits);
             const uint32_t decompressedNumBytes = bitbuf2.ReadUBitLong(32);
             const uint32_t compressedNumBytes = bitbuf2.ReadUBitLong(32);
             std::unique_ptr<uint8_t[]> compressedData(new uint8[compressedNumBytes]);
@@ -152,7 +158,7 @@ namespace NetHandlers
         }
         else
         {
-            bf_read bitbuf2(data->data.get(), data->dataLengthInBits);
+            bf_read bitbuf2(data->data.get(), dataLengthInBytes, dataLengthInBits);
             StringTable_BitRead(bitbuf2, context, data);
         }
 #endif // WIP_STRINGTABLE

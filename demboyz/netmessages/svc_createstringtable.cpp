@@ -21,16 +21,15 @@ static void StringTable_BitRead(NetHandlers::BitRead& bitbuf, SourceGameContext&
 {
     const size_t numEncodeBits = math::log2(data->maxEntries);
     std::vector<StringHistoryEntry> history;
-    int lastEntry = -1;
+    int entryIndex = -1;
     for (uint i = 0; i < data->numEntries; ++i)
     {
-        int entryIndex = lastEntry + 1;
+        entryIndex++;
 
         if (bitbuf.ReadOneBit() == 0)
         {
             entryIndex = bitbuf.ReadUBitLong(numEncodeBits);
         }
-        lastEntry = entryIndex;
 
         const char *pEntry = NULL;
         char entry[1024];

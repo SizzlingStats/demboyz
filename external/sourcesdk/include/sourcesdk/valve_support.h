@@ -59,6 +59,17 @@ inline bool is_little_endian()
 #define NORMAL_DENOMINATOR			( (1<<(NORMAL_FRACTIONAL_BITS)) - 1 )
 #define NORMAL_RESOLUTION			(1.0/(NORMAL_DENOMINATOR))
 
+template <typename T>
+inline T DWordSwapC( T dw )
+{
+    uint32 temp;
+    temp  =   *((uint32 *)&dw)               >> 24;
+    temp |= ((*((uint32 *)&dw) & 0x00FF0000) >> 8);
+    temp |= ((*((uint32 *)&dw) & 0x0000FF00) << 8);
+    temp |= ((*((uint32 *)&dw) & 0x000000FF) << 24);
+    return *((T*)&temp);
+}
+
 #if defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
     #define DWordSwap  DWordSwapAsm
     #pragma warning(push)
@@ -74,7 +85,7 @@ inline bool is_little_endian()
     }
     #pragma warning(pop)
 #else
-    #error write the 64 bit swaps
+    #define DWordSwap DWordSwapC
 #endif
 
 inline unsigned long LoadLittleDWord(const unsigned long *base, unsigned int dwordIndex)

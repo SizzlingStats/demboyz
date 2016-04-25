@@ -61,8 +61,6 @@ static void StringTable_BitRead(NetHandlers::BitRead& bitbuf, SourceGameContext&
         {
             if (data->isUserDataFixedSize)
             {
-                nBytes = data->userDataSize;
-                tempbuf[nBytes - 1] = 0;
                 bitbuf.ReadBits(tempbuf, data->userDataSizeBits);
             }
             else

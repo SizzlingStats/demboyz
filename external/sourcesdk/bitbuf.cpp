@@ -800,15 +800,18 @@ bf_read::bf_read()
 
 bf_read::bf_read( const void *pData, int nBytes, int nBits )
 {
-	m_bAssertOnOverflow = true;
 	StartReading( pData, nBytes, 0, nBits );
+	m_bAssertOnOverflow = true;
+	m_pDebugName = NULL;
+	m_errorHandler = NULL;
 }
 
 bf_read::bf_read( const char *pDebugName, const void *pData, int nBytes, int nBits )
 {
+	StartReading( pData, nBytes, 0, nBits );
 	m_bAssertOnOverflow = true;
 	m_pDebugName = pDebugName;
-	StartReading( pData, nBytes, 0, nBits );
+	m_errorHandler = NULL;
 }
 
 void bf_read::StartReading( const void *pData, int nBytes, int iStartBit, int nBits )

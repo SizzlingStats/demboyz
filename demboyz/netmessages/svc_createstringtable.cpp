@@ -56,7 +56,6 @@ static void StringTable_BitRead(NetHandlers::BitRead& bitbuf, SourceGameContext&
         const int MAX_USERDATA_BITS = 14;
         unsigned char tempbuf[(1 << MAX_USERDATA_BITS)] = { 0 };
         const void *pUserData = NULL;
-        int nBytes = 0;
         if (bitbuf.ReadOneBit() != 0)
         {
             if (data->isUserDataFixedSize)
@@ -65,7 +64,7 @@ static void StringTable_BitRead(NetHandlers::BitRead& bitbuf, SourceGameContext&
             }
             else
             {
-                nBytes = bitbuf.ReadUBitLong(MAX_USERDATA_BITS);
+                int nBytes = bitbuf.ReadUBitLong(MAX_USERDATA_BITS);
                 bitbuf.ReadBytes(tempbuf, nBytes);
             }
             pUserData = tempbuf;

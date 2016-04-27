@@ -1,7 +1,11 @@
-demboyz [![Build status](https://ci.appveyor.com/api/projects/status/pc63pbl9b0t5tygl/branch/master?svg=true)](https://ci.appveyor.com/project/SizzlingCalamari/demboyz/branch/master)
-=======
-
+# demboyz
 we dem boyz
+
+## Build Status
+| System | Compiler | Status |
+| ------ | -------- | ------ |
+| Linux 64-bit | G++-4.8.4 | [![Build Status](https://semaphoreci.com/api/v1/sizzlingcalamari/demboyz/branches/master/badge.svg)](https://semaphoreci.com/sizzlingcalamari/demboyz) |
+| Windows | VS2015 Update 2 | [![Build status](https://ci.appveyor.com/api/projects/status/pc63pbl9b0t5tygl/branch/master?svg=true)](https://ci.appveyor.com/project/SizzlingCalamari/demboyz/branch/master) |
 
 ## What is it?
 

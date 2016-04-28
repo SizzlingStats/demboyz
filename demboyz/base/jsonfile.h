@@ -3,7 +3,7 @@
 
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/filereadstream.h>
-#include <rapidjson/writer.h>
+#include <rapidjson/prettywriter.h>
 #include <rapidjson/document.h>
 #include <cstdint>
 #include <cstdio>
@@ -48,7 +48,7 @@ namespace base
 
     private:
         rapidjson::FileWriteStream m_fileStream;
-        rapidjson::Writer<rapidjson::FileWriteStream, rapidjson::ASCII<>> m_writer;
+        rapidjson::PrettyWriter<rapidjson::FileWriteStream, rapidjson::ASCII<>> m_writer;
         FILE* m_fp;
     };
 

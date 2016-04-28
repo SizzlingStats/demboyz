@@ -3,6 +3,7 @@
 
 #include "netmessages/netcontants.h"
 #include <cstdint>
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>

@@ -2,11 +2,12 @@
 #include "svc_gameeventlist.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "game/sourcecontext.h"
 #include "netcontants.h"
 #include "netmath.h"
 
-using EventDescriptor = NetMsg::SVC_GameEventList::EventDescriptor;
-using EventValue = NetMsg::SVC_GameEventList::EventValue;
+using EventDescriptor = GameEvents::EventDescriptor;
+using EventValue = GameEvents::EventValue;
 
 uint32_t CalculateNumDataBits(const std::vector<EventDescriptor>& eventDescriptors)
 {
@@ -38,13 +39,20 @@ namespace NetHandlers
             event.id = bitbuf.ReadUBitLong(MAX_EVENT_BITS);
             bitbuf.ReadString(event.name, sizeof(event.name));
             EventValue value;
-            while ((value.type = bitbuf.ReadUBitLong(3)) > 0)
+            while ((value.type = static_cast<GameEvents::EventValueType>(bitbuf.ReadUBitLong(3))) > 0)
             {
                 bitbuf.ReadString(value.name, sizeof(value.name));
                 event.values.push_back(value);
             }
             event.values.shrink_to_fit();
         }
+
+#ifdef WIP_GAMEEVENTS
+        if (!context.gameEventList)
+        {
+            context.gameEventList = new NetMsg::SVC_GameEventList(*data);
+        }
+#endif
         return !bitbuf.IsOverflowed();
     }
 
@@ -52,6 +60,7 @@ namespace NetHandlers
     {
         bitbuf.WriteUBitLong(data->eventDescriptors.size(), MAX_EVENT_BITS);
         bitbuf.WriteUBitLong(data->dataLengthInBits, 20);
+        assert(data->dataLengthInBits == CalculateNumDataBits(data->eventDescriptors));
         for (EventDescriptor& event : data->eventDescriptors)
         {
             bitbuf.WriteUBitLong(event.id, MAX_EVENT_BITS);
@@ -79,7 +88,7 @@ namespace NetHandlers
             base::JsonReaderArray values = obj.ReadArray("values");
             values.TransformTo(event.values, [](base::JsonReaderObject& obj, EventValue& value)
             {
-                value.type = obj.ReadUInt32("type");
+                value.type = static_cast<GameEvents::EventValueType>(obj.ReadUInt32("type"));
                 obj.ReadString("name", value.name, sizeof(value.name));
             });
         });

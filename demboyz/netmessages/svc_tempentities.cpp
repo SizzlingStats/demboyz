@@ -2,6 +2,7 @@
 #include "svc_tempentities.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "game/sourcecontext.h"
 #include "netcontants.h"
 #include "netmath.h"
 

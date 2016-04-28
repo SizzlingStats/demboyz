@@ -4,6 +4,7 @@
 #include "demofile/demofile.h"
 #include "demofile/demotypes.h"
 
+#include "game/sourcecontext.h"
 #include "netmessages/nethandlers.h"
 #include "netmessages/netcontants.h"
 #include "demmessages/demhandlers.h"

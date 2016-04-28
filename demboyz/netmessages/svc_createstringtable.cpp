@@ -2,6 +2,7 @@
 #include "svc_createstringtable.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "game/sourcecontext.h"
 #include "netmath.h"
 #include "netcontants.h"
 

@@ -2,6 +2,7 @@
 #include "svc_prefetch.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "game/sourcecontext.h"
 #include "netcontants.h"
 
 namespace NetHandlers

@@ -5,13 +5,32 @@
 #include "netcontants.h"
 #include "netmath.h"
 
+#ifdef WIP_GAMEEVENTS
+#include "svc_gameeventlist.h"
+#endif
+
 namespace NetHandlers
 {
     bool SVC_GameEvent_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_GameEvent* data)
     {
-        data->dataLengthInBits = bitbuf.ReadUBitLong(11);
-        data->data.reset(new uint8_t[math::BitsToBytes(data->dataLengthInBits)]);
-        bitbuf.ReadBits(data->data.get(), data->dataLengthInBits);
+        const unsigned int numBits = bitbuf.ReadUBitLong(11);
+        const size_t numBytes = math::BitsToBytes(numBits);
+
+        data->dataLengthInBits = numBits;
+        data->data.reset(new uint8_t[numBytes]);
+        bitbuf.ReadBits(data->data.get(), numBits);
+
+#ifdef WIP_GAMEEVENTS
+        {
+            BitRead bitbuf2(data->data.get(), numBytes, numBits);
+            const size_t id = bitbuf2.ReadUBitLong(9);
+            //std::vector<char> stringMem;
+            //GameEvents::ParseEventData(bitbuf2, context.gameEventList->eventDescriptors[id], stringMem);
+            GameEvents::PrintEventData(bitbuf2, context.gameEventList->eventDescriptors[id]);
+            printf("%i\n", id);
+        }
+#endif // WIP_GAMEEVENTS
+
         return !bitbuf.IsOverflowed();
     }
 

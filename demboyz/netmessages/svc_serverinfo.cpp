@@ -2,6 +2,7 @@
 #include "svc_serverinfo.h"
 #include "base/bitfile.h"
 #include "base/jsonfile.h"
+#include "game/sourcecontext.h"
 
 namespace NetHandlers
 {

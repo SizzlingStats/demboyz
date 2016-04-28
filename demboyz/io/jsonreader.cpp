@@ -5,6 +5,7 @@
 #include "base/jsonfile.h"
 #include "io/idemowriter.h"
 
+#include "game/sourcecontext.h"
 #include "netmessages/nethandlers.h"
 #include "demmessages/demhandlers.h"
 

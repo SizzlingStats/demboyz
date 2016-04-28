@@ -25,10 +25,7 @@ namespace NetHandlers
     using JsonWrite = base::JsonWriterFile;
 }
 
-struct SourceGameContext
-{
-    int16_t protocol;
-};
+struct SourceGameContext;
 
 #if !defined(MAX_OSPATH)
 #define MAX_OSPATH 260 // max length of a filesystem pathname

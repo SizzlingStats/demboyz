@@ -117,18 +117,20 @@ bf_write::bf_write()
 	m_errorHandler = NULL;
 }
 
-bf_write::bf_write( const char *pDebugName, void *pData, int nBytes, int nBits )
-{
-	m_bAssertOnOverflow = true;
-	m_pDebugName = pDebugName;
-	StartWriting( pData, nBytes, 0, nBits );
-}
-
 bf_write::bf_write( void *pData, int nBytes, int nBits )
 {
+	StartWriting( pData, nBytes, 0, nBits );
 	m_bAssertOnOverflow = true;
 	m_pDebugName = NULL;
+	m_errorHandler = NULL;
+}
+
+bf_write::bf_write( const char *pDebugName, void *pData, int nBytes, int nBits )
+{
 	StartWriting( pData, nBytes, 0, nBits );
+	m_bAssertOnOverflow = true;
+	m_pDebugName = pDebugName;
+	m_errorHandler = NULL;
 }
 
 void bf_write::StartWriting( void *pData, int nBytes, int iStartBit, int nBits )

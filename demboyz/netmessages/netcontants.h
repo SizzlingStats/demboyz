@@ -21,7 +21,10 @@ enum constants
     // Max # of edicts in a level
     MAX_EDICTS = (1 << MAX_EDICT_BITS),
     MAX_DECAL_INDEX_BITS = 9,
-    SP_MODEL_INDEX_BITS = 11,
+
+    SP_MODEL_INDEX_BITS_OLD = 11,
+    SP_MODEL_INDEX_BITS = 13,
+
     MAX_SERVER_CLASS_BITS = 9,
 
     MAX_EVENT_NAME_LENGTH = 32,

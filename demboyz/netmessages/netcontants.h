@@ -49,5 +49,5 @@ enum constants
     SIGNONSTATE_FULL = 6, // we are fully connected, first non-delta packet received
     SIGNONSTATE_CHANGELEVEL = 7,  // server is changing level, please wait
 
-    MAX_STRINGTABLE_DATA = 524288   // 2^19
+    MAX_STRINGTABLE_DATA = 2 * 524288   // 2^19
 };

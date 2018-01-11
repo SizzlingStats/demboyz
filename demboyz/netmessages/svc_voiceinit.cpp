@@ -9,6 +9,15 @@ namespace NetHandlers
     {
         bitbuf.ReadString(data->voiceCodec, sizeof(data->voiceCodec));
         data->quality = bitbuf.ReadByte();
+        if(data->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            data->sampleRate = bitbuf.ReadShort();
+        }
+        else
+        {
+            // V_strnicmp < 1 is from them, not me.
+            data->sampleRate = V_strnicmp(data->voiceCodec, "vaudio_celt", sizeof(data->voiceCodec)) < 1 ? 22050 : 11025;
+        }
         return !bitbuf.IsOverflowed();
     }
 
@@ -16,6 +25,10 @@ namespace NetHandlers
     {
         bitbuf.WriteString(data->voiceCodec);
         bitbuf.WriteByte(data->quality);
+        if(data->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            bitbuf.WriteShort(data->sampleRate);
+        }
         return !bitbuf.IsOverflowed();
     }
 
@@ -25,6 +38,7 @@ namespace NetHandlers
         assert(!reader.HasReadError());
         reader.ReadString("voiceCodec", data->voiceCodec, sizeof(data->voiceCodec));
         data->quality = reader.ReadUInt32("quality");
+        data->sampleRate = reader.ReadInt32("sampleRate");
         return !reader.HasReadError();
     }
 
@@ -34,13 +48,21 @@ namespace NetHandlers
         jsonbuf.StartObject();
         jsonbuf.WriteString("voiceCodec", data->voiceCodec);
         jsonbuf.WriteUInt32("quality", data->quality);
+        jsonbuf.WriteInt32("sampleRate", data->sampleRate);
         jsonbuf.EndObject();
         return jsonbuf.IsComplete();
     }
 
     void SVC_VoiceInit_ToString_Internal(std::ostringstream& out, NetMsg::SVC_VoiceInit* data)
     {
-        out << "svc_VoiceInit: codec \"" << data->voiceCodec
-            << "\", qualitty " << static_cast<uint32_t>(data->quality);
+        out << "svc_VoiceInit: codec \"" << data->voiceCodec;
+        if(data->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            out << "\", sample rate " << static_cast<uint32_t>(data->sampleRate);
+        }
+        else
+        {
+            out << "\", qualitty " << static_cast<uint32_t>(data->quality);
+        }
     }
 }

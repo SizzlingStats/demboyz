@@ -40,6 +40,8 @@
 #include "svc_menu.h"
 #include "svc_gameeventlist.h"
 #include "svc_getcvarvalue.h"
+#include "svc_cmdkeyvalues.h"
+#include "svc_setpausetimed.h"
 
 void NetHandlers::CreateNetMsgStructs(NetDataStructArray& netDataStructs)
 {
@@ -75,6 +77,8 @@ void NetHandlers::CreateNetMsgStructs(NetDataStructArray& netDataStructs)
     netDataStructs[29] = new NetMsg::SVC_Menu();
     netDataStructs[30] = new NetMsg::SVC_GameEventList();
     netDataStructs[31] = new NetMsg::SVC_GetCvarValue();
+    netDataStructs[32] = new NetMsg::SVC_CmdKeyValues();
+    netDataStructs[33] = new NetMsg::SVC_SetPauseTimed();
 }
 
 void NetHandlers::DestroyNetMsgStructs(NetDataStructArray& netDataStructs)
@@ -111,6 +115,8 @@ void NetHandlers::DestroyNetMsgStructs(NetDataStructArray& netDataStructs)
     delete reinterpret_cast<NetMsg::SVC_Menu*>(netDataStructs[29]);
     delete reinterpret_cast<NetMsg::SVC_GameEventList*>(netDataStructs[30]);
     delete reinterpret_cast<NetMsg::SVC_GetCvarValue*>(netDataStructs[31]);
+    delete reinterpret_cast<NetMsg::SVC_CmdKeyValues*>(netDataStructs[32]);
+    delete reinterpret_cast<NetMsg::SVC_SetPauseTimed*>(netDataStructs[33]);
 }
 
 #define DECLARE_NET_HANDLER_ARRAY(funcname) \
@@ -146,7 +152,9 @@ void NetHandlers::DestroyNetMsgStructs(NetDataStructArray& netDataStructs)
         &NetHandlers::SVC_Prefetch_##funcname, \
         &NetHandlers::SVC_Menu_##funcname, \
         &NetHandlers::SVC_GameEventList_##funcname, \
-        &NetHandlers::SVC_GetCvarValue_##funcname \
+        &NetHandlers::SVC_GetCvarValue_##funcname, \
+        &NetHandlers::SVC_CmdKeyValues_##funcname, \
+        &NetHandlers::SVC_SetPauseTimed_##funcname \
     }
 
 typedef bool (*NetMsgBitReadFn)(NetHandlers::BitRead& bitbuf, SourceGameContext& context, void* data);

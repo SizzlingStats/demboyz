@@ -61,6 +61,9 @@ namespace NetMsg
 
         svc_GetCvarValue = 31,      // Server wants to know the value of a cvar on the client.
 
-        SVC_LASTMSG = 31            // last known server messages
+        svc_CmdKeyValues = 32,
+        svc_SetPauseTimed = 33,
+
+        SVC_LASTMSG = 33            // last known server messages
     };
 }

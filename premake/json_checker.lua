@@ -13,8 +13,8 @@ group "external"
         }
         files
         {
-            base_dir .. "*.h",
-            base_dir .. "*.cpp"
+            base_dir .. "**.h",
+            base_dir .. "**.cpp"
         }
     project "*"
 group ""

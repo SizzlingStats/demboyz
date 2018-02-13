@@ -17,8 +17,8 @@ group "external"
         }
         files
         {
-            base_dir .. "*.h",
-            base_dir .. "*.c"
+            base_dir .. "**.h",
+            base_dir .. "**.c"
         }
         excludes
         {

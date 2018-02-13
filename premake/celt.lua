@@ -9,7 +9,9 @@ group "external"
 
         defines
         {
-            "restrict="
+            "restrict=",
+            "CUSTOM_MODES",
+            "CUSTOM_MODES_ONLY"
         }
         includedirs
         {

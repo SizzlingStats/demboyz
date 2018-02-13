@@ -42,10 +42,12 @@ solution "demboyz"
         links
         {
             "json_checker",
-            "sourcesdk"
+            "sourcesdk",
+            "celt"
         }
     project "*"
 
     dofile "json_checker.lua"
     dofile "snappy.lua"
     dofile "sourcesdk.lua"
+    dofile "celt.lua"

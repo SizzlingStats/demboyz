@@ -28,10 +28,7 @@ solution "demboyz"
         files
         {
             "../demboyz/**.h",
-            "../demboyz/**.cpp",
-            "../external/**.h",
-            "../external/**.cpp",
-            "../external/**.cc"
+            "../demboyz/**.cpp"
         }
         includedirs
         {
@@ -42,4 +39,13 @@ solution "demboyz"
             "../external/snappy-1.1.3/include",
             "../demboyz"
         }
+        links
+        {
+            "json_checker",
+            "sourcesdk"
+        }
+    project "*"
 
+    dofile "json_checker.lua"
+    dofile "snappy.lua"
+    dofile "sourcesdk.lua"

@@ -13,7 +13,7 @@ group "external"
         }
         includedirs
         {
-            base_dir .. "include/"
+            base_dir .. "include/celt/"
         }
         files
         {

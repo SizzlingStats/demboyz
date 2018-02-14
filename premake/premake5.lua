@@ -20,7 +20,6 @@ solution "demboyz"
         kind "ConsoleApp"
         language "C++"
         configuration "gmake"
-            -- Enables C++11 support.
             buildoptions { "-std=c++11" }
         configuration {}
         files

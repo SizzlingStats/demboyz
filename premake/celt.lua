@@ -1,5 +1,5 @@
 
-local base_dir = (solution().basedir .. "/external/celt-0.11.1/")
+local base_dir = (solution().basedir .. "/external/celt-e18de77/")
 
 group "external"
     project "celt"
@@ -9,9 +9,10 @@ group "external"
 
         defines
         {
-            "restrict=",
             "CUSTOM_MODES",
-            "CUSTOM_MODES_ONLY"
+            "CUSTOM_MODES_ONLY",
+            "DISABLE_FLOAT_API",
+            "HAVE_CONFIG_H"
         }
         includedirs
         {

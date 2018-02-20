@@ -61,6 +61,40 @@ static const unsigned char spread_icdf[4] = {25, 23, 2, 0};
 
 static const unsigned char tapset_icdf[3]={2,1,0};
 
+static const unsigned char toOpusTable[20] = {
+      0xE0, 0xE8, 0xF0, 0xF8,
+      0xC0, 0xC8, 0xD0, 0xD8,
+      0xA0, 0xA8, 0xB0, 0xB8,
+      0x00, 0x00, 0x00, 0x00,
+      0x80, 0x88, 0x90, 0x98,
+};
+
+static const unsigned char fromOpusTable[16] = {
+      0x80, 0x88, 0x90, 0x98,
+      0x40, 0x48, 0x50, 0x58,
+      0x20, 0x28, 0x30, 0x38,
+      0x00, 0x08, 0x10, 0x18
+};
+
+static inline int toOpus(unsigned char c)
+{
+   int ret=0;
+   if (c<0xA0)
+      ret = toOpusTable[c>>3];
+   if (ret == 0)
+      return -1;
+   else
+      return ret|(c&0x7);
+}
+
+static inline int fromOpus(unsigned char c)
+{
+   if (c<0x80)
+      return -1;
+   else
+      return fromOpusTable[(c>>3)-16] | (c&0x7);
+}
+
 #define COMBFILTER_MAXPERIOD 1024
 #define COMBFILTER_MINPERIOD 15
 
@@ -108,14 +142,16 @@ struct CELTEncoder {
 
    celt_int32 bitrate;
    int vbr;
+   int signalling;
    int constrained_vbr;      /* If zero, VBR can do whatever it likes with the rate */
+   int loss_rate;
 
    /* Everything beyond this point gets cleared on a reset */
 #define ENCODER_RESET_START rng
 
-   ec_uint32 rng;
+   celt_uint32 rng;
    int spread_decision;
-   int delayedIntra;
+   celt_word32 delayedIntra;
    int tonal_average;
    int lastCodedBands;
    int hf_average;
@@ -226,6 +262,8 @@ CELTEncoder *celt_encoder_init_custom(CELTEncoder *st, const CELTMode *mode, int
    st->upsample = 1;
    st->start = 0;
    st->end = st->mode->effEBands;
+   st->signalling = 1;
+
    st->constrained_vbr = 1;
    st->clip = 1;
 
@@ -317,9 +355,9 @@ static int transient_analysis(const celt_word32 * restrict in, int len, int C,
    for (i=0;i<N;i++)
    {
       int j;
-      float max_abs=0;
+      celt_word16 max_abs=0;
       for (j=0;j<block;j++)
-         max_abs = MAX32(max_abs, tmp[i*block+j]);
+         max_abs = MAX16(max_abs, ABS16(tmp[i*block+j]));
       bins[i] = max_abs;
    }
    for (i=0;i<N;i++)
@@ -687,8 +725,8 @@ static void tf_encode(int start, int end, int isTransient, int *tf_res, int LM, 
    int tf_select_rsv;
    int tf_changed;
    int logp;
-   ec_uint32 budget;
-   ec_uint32 tell;
+   celt_uint32 budget;
+   celt_uint32 tell;
    budget = enc->storage*8;
    tell = ec_tell(enc);
    logp = isTransient ? 2 : 4;
@@ -727,8 +765,8 @@ static void tf_decode(int start, int end, int isTransient, int *tf_res, int LM, 
    int tf_select_rsv;
    int tf_changed;
    int logp;
-   ec_uint32 budget;
-   ec_uint32 tell;
+   celt_uint32 budget;
+   celt_uint32 tell;
 
    budget = dec->storage*8;
    tell = ec_tell(dec);
@@ -915,13 +953,11 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
    int anti_collapse_rsv;
    int anti_collapse_on=0;
    int silence=0;
-   SAVE_STACK;
+   ALLOC_STACK;
 
    if (nbCompressedBytes<2 || pcm==NULL)
      return CELT_BAD_ARG;
 
-   /* Can't produce more than 1275 output bytes */
-   nbCompressedBytes = IMIN(nbCompressedBytes,1275);
    frame_size *= st->upsample;
    for (LM=0;LM<=st->mode->maxLM;LM++)
       if (st->mode->shortMdctSize<<LM==frame_size)
@@ -946,13 +982,37 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
       tell=ec_tell(enc);
       nbFilledBytes=(tell+4)>>3;
    }
+
+   if (st->signalling && enc==NULL)
+   {
+      int tmp = (st->mode->effEBands-st->end)>>1;
+      st->end = IMAX(1, st->mode->effEBands-tmp);
+      compressed[0] = tmp<<5;
+      compressed[0] |= LM<<3;
+      compressed[0] |= (C==2)<<2;
+      /* Convert "standard mode" to Opus header */
+      if (st->mode->Fs==48000 && st->mode->shortMdctSize==120)
+      {
+         int c0 = toOpus(compressed[0]);
+         if (c0<0)
+            return CELT_BAD_ARG;
+         compressed[0] = c0;
+      }
+      compressed++;
+      nbCompressedBytes--;
+   }
+
+   /* Can't produce more than 1275 output bytes */
+   nbCompressedBytes = IMIN(nbCompressedBytes,1275);
    nbAvailableBytes = nbCompressedBytes - nbFilledBytes;
 
    if (st->vbr)
    {
       celt_int32 den=st->mode->Fs>>BITRES;
       vbr_rate=(st->bitrate*frame_size+(den>>1))/den;
-      effectiveBytes = vbr_rate>>3;
+      if (st->signalling)
+         vbr_rate -= 8<<BITRES;
+      effectiveBytes = vbr_rate>>(3+BITRES);
    } else {
       celt_int32 tmp;
       vbr_rate = 0;
@@ -960,7 +1020,7 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
       if (tell>1)
          tmp += tell;
       nbCompressedBytes = IMAX(2, IMIN(nbCompressedBytes,
-            (tmp+4*st->mode->Fs)/(8*st->mode->Fs)));
+            (tmp+4*st->mode->Fs)/(8*st->mode->Fs)-!!st->signalling));
       effectiveBytes = nbCompressedBytes;
    }
 
@@ -1083,6 +1143,12 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
          if (pitch_index > COMBFILTER_MAXPERIOD-2)
             pitch_index = COMBFILTER_MAXPERIOD-2;
          gain1 = MULT16_16_Q15(QCONST16(.7f,15),gain1);
+         if (st->loss_rate>2)
+            gain1 = HALF32(gain1);
+         if (st->loss_rate>4)
+            gain1 = HALF32(gain1);
+         if (st->loss_rate>8)
+            gain1 = 0;
          prefilter_tapset = st->tapset_decision;
       } else {
          gain1 = 0;
@@ -1238,7 +1304,7 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
    quant_coarse_energy(st->mode, st->start, st->end, effEnd, bandLogE,
          oldBandE, total_bits, error, enc,
          C, LM, nbAvailableBytes, st->force_intra,
-         &st->delayedIntra, st->complexity >= 4);
+         &st->delayedIntra, st->complexity >= 4, st->loss_rate);
 
    tf_encode(st->start, st->end, isTransient, tf_res, LM, tf_select, enc);
 
@@ -1366,16 +1432,22 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
      nbAvailableBytes = IMAX(min_allowed,nbAvailableBytes);
      nbAvailableBytes = IMIN(nbCompressedBytes,nbAvailableBytes+nbFilledBytes) - nbFilledBytes;
 
-     if(silence)
-     {
-       nbAvailableBytes = 2;
-       target = 2*8<<BITRES;
-     }
-
      /* By how much did we "miss" the target on that frame */
      delta = target - vbr_rate;
 
      target=nbAvailableBytes<<(BITRES+3);
+
+     /*If the frame is silent we don't adjust our drift, otherwise
+       the encoder will shoot to very high rates after hitting a
+       span of silence, but we do allow the bitres to refill.
+       This means that we'll undershoot our target in CVBR/VBR modes
+       on files with lots of silence. */
+     if(silence)
+     {
+       nbAvailableBytes = 2;
+       target = 2*8<<BITRES;
+       delta = 0;
+     }
 
      if (st->vbr_count < 970)
      {
@@ -1603,9 +1675,12 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const celt_sig * pcm, i
       it's already filled with zeros */
    ec_enc_done(enc);
    
+   if (st->signalling)
+      nbCompressedBytes++;
+
    RESTORE_STACK;
    if (ec_get_error(enc))
-      return CELT_CORRUPTED_DATA;
+      return CELT_INTERNAL_ERROR;
    else
       return nbCompressedBytes;
 }
@@ -1618,7 +1693,6 @@ int celt_encode_with_ec_float(CELTEncoder * restrict st, const float * pcm, int 
    int j, ret, C, N;
    VARDECL(celt_int16, in);
    ALLOC_STACK;
-   SAVE_STACK;
 
    if (pcm==NULL)
       return CELT_BAD_ARG;
@@ -1647,7 +1721,6 @@ int celt_encode_with_ec(CELTEncoder * restrict st, const celt_int16 * pcm, int f
    int j, ret, C, N;
    VARDECL(celt_sig, in);
    ALLOC_STACK;
-   SAVE_STACK;
 
    if (pcm==NULL)
       return CELT_BAD_ARG;
@@ -1688,14 +1761,6 @@ int celt_encoder_ctl(CELTEncoder * restrict st, int request, ...)
    va_start(ap, request);
    switch (request)
    {
-      case CELT_GET_MODE_REQUEST:
-      {
-         const CELTMode ** value = va_arg(ap, const CELTMode**);
-         if (value==0)
-            goto bad_arg;
-         *value=st->mode;
-      }
-      break;
       case CELT_SET_COMPLEXITY_REQUEST:
       {
          int value = va_arg(ap, celt_int32);
@@ -1727,6 +1792,14 @@ int celt_encoder_ctl(CELTEncoder * restrict st, int request, ...)
             goto bad_arg;
          st->disable_pf = value<=1;
          st->force_intra = value==0;
+      }
+      break;
+      case CELT_SET_LOSS_PERC_REQUEST:
+      {
+         int value = va_arg(ap, celt_int32);
+         if (value<0 || value>100)
+            goto bad_arg;
+         st->loss_rate = value;
       }
       break;
       case CELT_SET_VBR_CONSTRAINT_REQUEST:
@@ -1775,6 +1848,22 @@ int celt_encoder_ctl(CELTEncoder * restrict st, int request, ...)
          st->clip = value;
       }
       break;
+#ifdef OPUS_BUILD
+      case CELT_SET_SIGNALLING_REQUEST:
+      {
+         celt_int32 value = va_arg(ap, celt_int32);
+         st->signalling = value;
+      }
+      break;
+      case CELT_GET_MODE_REQUEST:
+      {
+         const CELTMode ** value = va_arg(ap, const CELTMode**);
+         if (value==0)
+            goto bad_arg;
+         *value=st->mode;
+      }
+      break;
+#endif
       default:
          goto bad_request;
    }
@@ -1806,11 +1895,13 @@ struct CELTDecoder {
 
    int downsample;
    int start, end;
+   int signalling;
 
    /* Everything beyond this point gets cleared on a reset */
 #define DECODER_RESET_START rng
 
-   ec_uint32 rng;
+   celt_uint32 rng;
+   int error;
    int last_pitch_index;
    int loss_count;
    int postfilter_period;
@@ -1824,10 +1915,10 @@ struct CELTDecoder {
    
    celt_sig _decode_mem[1]; /* Size = channels*(DECODE_BUFFER_SIZE+mode->overlap) */
    /* celt_word16 lpc[],  Size = channels*LPC_ORDER */
-   /* celt_word16 oldEBands[], Size = channels*mode->nbEBands */
-   /* celt_word16 oldLogE[], Size = channels*mode->nbEBands */
-   /* celt_word16 oldLogE2[], Size = channels*mode->nbEBands */
-   /* celt_word16 backgroundLogE[], Size = channels*mode->nbEBands */
+   /* celt_word16 oldEBands[], Size = 2*mode->nbEBands */
+   /* celt_word16 oldLogE[], Size = 2*mode->nbEBands */
+   /* celt_word16 oldLogE2[], Size = 2*mode->nbEBands */
+   /* celt_word16 backgroundLogE[], Size = 2*mode->nbEBands */
 };
 
 int celt_decoder_get_size(int channels)
@@ -1841,7 +1932,7 @@ int celt_decoder_get_size_custom(const CELTMode *mode, int channels)
    int size = sizeof(struct CELTDecoder)
             + (channels*(DECODE_BUFFER_SIZE+mode->overlap)-1)*sizeof(celt_sig)
             + channels*LPC_ORDER*sizeof(celt_word16)
-            + 4*channels*mode->nbEBands*sizeof(celt_word16);
+            + 4*2*mode->nbEBands*sizeof(celt_word16);
    return size;
 }
 
@@ -1906,6 +1997,7 @@ CELTDecoder *celt_decoder_init_custom(CELTDecoder *st, const CELTMode *mode, int
    st->downsample = 1;
    st->start = 0;
    st->end = st->mode->effEBands;
+   st->signalling = 1;
 
    st->loss_count = 0;
 
@@ -1959,6 +2051,11 @@ static void celt_decode_lost(CELTDecoder * restrict st, celt_word16 * restrict p
       VARDECL(celt_norm, X);
       VARDECL(celt_ener, bandE);
       celt_uint32 seed;
+      int effEnd;
+
+      effEnd = st->end;
+      if (effEnd > st->mode->effEBands)
+         effEnd = st->mode->effEBands;
 
       ALLOC(freq, C*N, celt_sig); /**< Interleaved signal MDCTs */
       ALLOC(X, C*N, celt_norm);   /**< Interleaved normalised MDCTs */
@@ -1967,18 +2064,42 @@ static void celt_decode_lost(CELTDecoder * restrict st, celt_word16 * restrict p
       log2Amp(st->mode, st->start, st->end, bandE, backgroundLogE, C);
 
       seed = st->rng;
-      for (i=0;i<C*N;i++)
+      for (c=0;c<C;c++)
       {
-            seed = lcg_rand(seed);
-            X[i] = (celt_int32)(seed)>>20;
+         for (i=0;i<(st->mode->eBands[st->start]<<LM);i++)
+            X[c*N+i] = 0;
+         for (i=0;i<st->mode->effEBands;i++)
+         {
+            int j;
+            int boffs;
+            int blen;
+            boffs = N*c+(st->mode->eBands[i]<<LM);
+            blen = (st->mode->eBands[i+1]-st->mode->eBands[i])<<LM;
+            for (j=0;j<blen;j++)
+            {
+               seed = lcg_rand(seed);
+               X[boffs+j] = (celt_int32)(seed)>>20;
+            }
+            renormalise_vector(X+boffs, blen, Q15ONE);
+         }
+         for (i=(st->mode->eBands[st->end]<<LM);i<N;i++)
+            X[c*N+i] = 0;
       }
       st->rng = seed;
-      for (c=0;c<C;c++)
-         for (i=0;i<st->mode->nbEBands;i++)
-            renormalise_vector(X+N*c+(st->mode->eBands[i]<<LM), (st->mode->eBands[i+1]-st->mode->eBands[i])<<LM, Q15ONE);
 
-      denormalise_bands(st->mode, X, freq, bandE, st->mode->nbEBands, C, 1<<LM);
+      denormalise_bands(st->mode, X, freq, bandE, st->mode->effEBands, C, 1<<LM);
 
+      c=0; do
+         for (i=0;i<st->mode->eBands[st->start]<<LM;i++)
+            freq[c*N+i] = 0;
+      while (++c<C);
+      c=0; do {
+         int bound = st->mode->eBands[effEnd]<<LM;
+         if (st->downsample!=1)
+            bound = IMIN(bound, N/st->downsample);
+         for (i=bound;i<N;i++)
+            freq[c*N+i] = 0;
+      } while (++c<C);
       compute_inv_mdcts(st->mode, 0, freq, out_syn, overlap_mem, C, LM);
       plc = 0;
    } else if (st->loss_count == 0)
@@ -2194,20 +2315,10 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    int anti_collapse_rsv;
    int anti_collapse_on=0;
    int silence;
-   const int C = CHANNELS(st->stream_channels);
-
-   SAVE_STACK;
-
-   if (len<0 || len>1275 || pcm==NULL)
-      return CELT_BAD_ARG;
+   int C = CHANNELS(st->stream_channels);
+   ALLOC_STACK;
 
    frame_size *= st->downsample;
-   for (LM=0;LM<=st->mode->maxLM;LM++)
-      if (st->mode->shortMdctSize<<LM==frame_size)
-         break;
-   if (LM>st->mode->maxLM)
-      return CELT_BAD_ARG;
-   M=1<<LM;
 
    c=0; do {
       decode_mem[c] = st->_decode_mem + c*(DECODE_BUFFER_SIZE+st->overlap);
@@ -2215,10 +2326,43 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
       overlap_mem[c] = decode_mem[c]+DECODE_BUFFER_SIZE;
    } while (++c<CC);
    lpc = (celt_word16*)(st->_decode_mem+(DECODE_BUFFER_SIZE+st->overlap)*CC);
-   oldBandE = lpc+CC*LPC_ORDER;
-   oldLogE = oldBandE + CC*st->mode->nbEBands;
-   oldLogE2 = oldLogE + CC*st->mode->nbEBands;
-   backgroundLogE = oldLogE2  + CC*st->mode->nbEBands;
+   oldBandE = lpc+LPC_ORDER;
+   oldLogE = oldBandE + 2*st->mode->nbEBands;
+   oldLogE2 = oldLogE + 2*st->mode->nbEBands;
+   backgroundLogE = oldLogE2  + 2*st->mode->nbEBands;
+
+   if (st->signalling && data!=NULL)
+   {
+      int data0=data[0];
+      /* Convert "standard mode" to Opus header */
+      if (st->mode->Fs==48000 && st->mode->shortMdctSize==120)
+      {
+         data0 = fromOpus(data0);
+         if (data0<0)
+            return CELT_CORRUPTED_DATA;
+      }
+      st->end = IMAX(1, st->mode->effEBands-2*(data0>>5));
+      LM = (data0>>3)&0x3;
+      C = 1 + ((data0>>2)&0x1);
+      data++;
+      len--;
+      if (LM>st->mode->maxLM)
+         return CELT_CORRUPTED_DATA;
+      if (frame_size < st->mode->shortMdctSize<<LM)
+         return CELT_BUFFER_TOO_SMALL;
+      else
+         frame_size = st->mode->shortMdctSize<<LM;
+   } else {
+      for (LM=0;LM<=st->mode->maxLM;LM++)
+         if (st->mode->shortMdctSize<<LM==frame_size)
+            break;
+      if (LM>st->mode->maxLM)
+         return CELT_BAD_ARG;
+   }
+   M=1<<LM;
+
+   if (len<0 || len>1275 || pcm==NULL)
+      return CELT_BAD_ARG;
 
    N = M*st->mode->shortMdctSize;
 
@@ -2226,40 +2370,36 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    if (effEnd > st->mode->effEBands)
       effEnd = st->mode->effEBands;
 
-   ALLOC(freq, CC*N, celt_sig); /**< Interleaved signal MDCTs */
-   ALLOC(X, CC*N, celt_norm);   /**< Interleaved normalised MDCTs */
-   ALLOC(bandE, st->mode->nbEBands*CC, celt_ener);
+   ALLOC(freq, IMAX(CC,C)*N, celt_sig); /**< Interleaved signal MDCTs */
+   ALLOC(X, C*N, celt_norm);   /**< Interleaved normalised MDCTs */
+   ALLOC(bandE, st->mode->nbEBands*C, celt_ener);
    c=0; do
       for (i=0;i<M*st->mode->eBands[st->start];i++)
          X[c*N+i] = 0;
-   while (++c<CC);
+   while (++c<C);
    c=0; do   
       for (i=M*st->mode->eBands[effEnd];i<N;i++)
          X[c*N+i] = 0;
-   while (++c<CC);
+   while (++c<C);
 
    if (data == NULL || len<=1)
    {
       celt_decode_lost(st, pcm, N, LM);
       RESTORE_STACK;
-      return CELT_OK;
+      return frame_size/st->downsample;
    }
    if (len<0) {
      RESTORE_STACK;
      return CELT_BAD_ARG;
    }
-   
+
    if (dec == NULL)
    {
       ec_dec_init(&_dec,(unsigned char*)data,len);
       dec = &_dec;
    }
 
-   if (C>CC)
-   {
-      RESTORE_STACK;
-      return CELT_CORRUPTED_DATA;
-   } else if (C<CC)
+   if (C<CC)
    {
       for (i=0;i<st->mode->nbEBands;i++)
          oldBandE[i]=MAX16(oldBandE[i],oldBandE[st->mode->nbEBands+i]);
@@ -2395,7 +2535,7 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
          fine_quant, fine_priority, len*8-ec_tell(dec), dec, C);
 
    if (anti_collapse_on)
-      anti_collapse(st->mode, X, collapse_masks, LM, C, CC, N,
+      anti_collapse(st->mode, X, collapse_masks, LM, C, C, N,
             st->start, st->end, oldBandE, oldLogE, oldLogE2, pulses, st->rng);
 
    log2Amp(st->mode, st->start, st->end, bandE, oldBandE, C);
@@ -2436,6 +2576,11 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
       for (i=0;i<N;i++)
          freq[N+i] = freq[i];
    }
+   if (CC==1&&C==2)
+   {
+      for (i=0;i<N;i++)
+         freq[i] = HALF32(ADD32(freq[i],freq[N+i]));
+   }
 
    /* Compute inverse MDCTs */
    compute_inv_mdcts(st->mode, shortBlocks, freq, out_syn, overlap_mem, CC, LM);
@@ -2467,7 +2612,7 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    }
 #endif /* ENABLE_POSTFILTER */
 
-   if (CC==2&&C==1) {
+   if (C==1) {
       for (i=0;i<st->mode->nbEBands;i++)
          oldBandE[st->mode->nbEBands+i]=oldBandE[i];
    }
@@ -2479,17 +2624,17 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
          oldBandE[c*st->mode->nbEBands+i]=0;
       for (i=st->end;i<st->mode->nbEBands;i++)
          oldBandE[c*st->mode->nbEBands+i]=0;
-   } while (++c<CC);
+   } while (++c<2);
    if (!isTransient)
    {
-      for (i=0;i<CC*st->mode->nbEBands;i++)
+      for (i=0;i<2*st->mode->nbEBands;i++)
          oldLogE2[i] = oldLogE[i];
-      for (i=0;i<CC*st->mode->nbEBands;i++)
+      for (i=0;i<2*st->mode->nbEBands;i++)
          oldLogE[i] = oldBandE[i];
-      for (i=0;i<CC*st->mode->nbEBands;i++)
+      for (i=0;i<2*st->mode->nbEBands;i++)
          backgroundLogE[i] = MIN16(backgroundLogE[i] + M*QCONST16(0.001f,DB_SHIFT), oldBandE[i]);
    } else {
-      for (i=0;i<CC*st->mode->nbEBands;i++)
+      for (i=0;i<2*st->mode->nbEBands;i++)
          oldLogE[i] = MIN16(oldLogE[i], oldBandE[i]);
    }
    st->rng = dec->rng;
@@ -2497,10 +2642,11 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    deemphasis(out_syn, pcm, N, CC, st->downsample, st->mode->preemph, st->preemph_memD);
    st->loss_count = 0;
    RESTORE_STACK;
-   if (ec_tell(dec) > 8*len || ec_get_error(dec))
-      return CELT_CORRUPTED_DATA;
-   else
-      return CELT_OK;
+   if (ec_tell(dec) > 8*len)
+      return CELT_INTERNAL_ERROR;
+   if(ec_get_error(dec))
+      st->error = 1;
+   return frame_size/st->downsample;
 }
 
 #ifdef FIXED_POINT
@@ -2511,7 +2657,6 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    int j, ret, C, N;
    VARDECL(celt_int16, out);
    ALLOC_STACK;
-   SAVE_STACK;
 
    if (pcm==NULL)
       return CELT_BAD_ARG;
@@ -2521,8 +2666,8 @@ int celt_decode_with_ec_float(CELTDecoder * restrict st, const unsigned char *da
    
    ALLOC(out, C*N, celt_int16);
    ret=celt_decode_with_ec(st, data, len, out, frame_size, dec);
-   if (ret==0)
-      for (j=0;j<C*N;j++)
+   if (ret>0)
+      for (j=0;j<C*ret;j++)
          pcm[j]=out[j]*(1.f/32768.f);
      
    RESTORE_STACK;
@@ -2536,7 +2681,6 @@ int celt_decode_with_ec(CELTDecoder * restrict st, const unsigned char *data, in
    int j, ret, C, N;
    VARDECL(celt_sig, out);
    ALLOC_STACK;
-   SAVE_STACK;
 
    if (pcm==NULL)
       return CELT_BAD_ARG;
@@ -2547,8 +2691,8 @@ int celt_decode_with_ec(CELTDecoder * restrict st, const unsigned char *data, in
 
    ret=celt_decode_with_ec_float(st, data, len, out, frame_size, dec);
 
-   if (ret==0)
-      for (j=0;j<C*N;j++)
+   if (ret>0)
+      for (j=0;j<C*ret;j++)
          pcm[j] = FLOAT2INT16 (out[j]);
    
    RESTORE_STACK;
@@ -2575,14 +2719,6 @@ int celt_decoder_ctl(CELTDecoder * restrict st, int request, ...)
    va_start(ap, request);
    switch (request)
    {
-      case CELT_GET_MODE_REQUEST:
-      {
-         const CELTMode ** value = va_arg(ap, const CELTMode**);
-         if (value==0)
-            goto bad_arg;
-         *value=st->mode;
-      }
-      break;
       case CELT_SET_START_BAND_REQUEST:
       {
          celt_int32 value = va_arg(ap, celt_int32);
@@ -2607,6 +2743,23 @@ int celt_decoder_ctl(CELTDecoder * restrict st, int request, ...)
          st->stream_channels = value;
       }
       break;
+      case CELT_GET_AND_CLEAR_ERROR_REQUEST:
+      {
+         int *value = va_arg(ap, int*);
+         if (value==NULL)
+            goto bad_arg;
+         *value=st->error;
+         st->error = 0;
+      }
+      break;
+      case CELT_GET_LOOKAHEAD_REQUEST:
+      {
+         int *value = va_arg(ap, int*);
+         if (value==NULL)
+            goto bad_arg;
+         *value = st->overlap/st->downsample;
+      }
+      break;
       case CELT_RESET_STATE:
       {
          CELT_MEMSET((char*)&st->DECODER_RESET_START, 0,
@@ -2614,6 +2767,22 @@ int celt_decoder_ctl(CELTDecoder * restrict st, int request, ...)
                ((char*)&st->DECODER_RESET_START - (char*)st));
       }
       break;
+#ifdef OPUS_BUILD
+      case CELT_GET_MODE_REQUEST:
+      {
+         const CELTMode ** value = va_arg(ap, const CELTMode**);
+         if (value==0)
+            goto bad_arg;
+         *value=st->mode;
+      }
+      break;
+      case CELT_SET_SIGNALLING_REQUEST:
+      {
+         celt_int32 value = va_arg(ap, celt_int32);
+         st->signalling = value;
+      }
+      break;
+#endif
       default:
          goto bad_request;
    }
@@ -2632,7 +2801,7 @@ const char *celt_strerror(int error)
    static const char *error_strings[8] = {
       "success",
       "invalid argument",
-      "invalid mode",
+      "buffer too small",
       "internal error",
       "corrupted stream",
       "request not implemented",

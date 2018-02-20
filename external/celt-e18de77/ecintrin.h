@@ -26,6 +26,7 @@
 */
 
 /*Some common macros for potential platform-specific optimization.*/
+#include "celt_types.h"
 #include <math.h>
 #include <limits.h>
 #if !defined(_ecintrin_H)
@@ -81,6 +82,9 @@
   All other code should use EC_ILOG() instead.*/
 #if defined(_MSC_VER)
 # include <intrin.h>
+/*In _DEBUG mode this is not an intrinsic by default.*/
+# pragma intrinsic(_BitScanReverse)
+
 static __inline int ec_bsr(unsigned long _x){
   unsigned long ret;
   _BitScanReverse(&ret,_x);
@@ -91,7 +95,7 @@ static __inline int ec_bsr(unsigned long _x){
 #elif defined(ENABLE_TI_DSPLIB)
 # include "dsplib.h"
 # define EC_CLZ0    (31)
-# define EC_CLZ(_x) (_lnorm(x))
+# define EC_CLZ(_x) (_lnorm(_x))
 #elif defined(__GNUC_PREREQ)
 # if __GNUC_PREREQ(3,4)
 #  if INT_MAX>=2147483647
@@ -111,6 +115,8 @@ static __inline int ec_bsr(unsigned long _x){
   When we need to, it can be special cased.*/
 # define EC_ILOG(_x) (EC_CLZ0-EC_CLZ(_x))
 #else
+int ec_ilog(celt_uint32 _v);
+
 # define EC_ILOG(_x) (ec_ilog(_x))
 #endif
 

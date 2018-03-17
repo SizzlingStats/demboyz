@@ -44,7 +44,7 @@
 #include <stddef.h>
 #endif
 
-#if defined(_MSC_VER) && (_MSC_VER <= 1912)
+#if defined(_MSC_VER) && (_MSC_VER <= 1913)
 #include <basetsd.h>
 typedef SSIZE_T ssize_t;
 #endif

@@ -139,8 +139,8 @@ private:
 
 private:
     CELTDecoder* m_celtDecoder = NULL;
-    uint32_t m_frameSizeSamples;
-    uint32_t m_encodedFrameSizeBytes;
+    uint32_t m_frameSizeSamples = 0;
+    uint32_t m_encodedFrameSizeBytes = 0;
 };
 
 #endif // USE_VAUDIO_CELT
@@ -162,7 +162,7 @@ private:
     struct PlayerVoiceState
     {
 #ifdef USE_VAUDIO_CELT
-        IVoiceCodec* celtDecoder;
+        IVoiceCodec* celtDecoder = nullptr;
 #else
         CeltVoiceDecoder decoder;
 #endif

@@ -9,7 +9,8 @@ class WaveFileWriter
 {
 public:
     WaveFileWriter():
-        m_file(nullptr)
+        m_file(nullptr),
+        m_DataBytes(0)
     {
     }
 

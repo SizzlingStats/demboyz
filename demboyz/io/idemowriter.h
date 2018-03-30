@@ -46,6 +46,7 @@ public:
     static IDemoWriter* CreateJsonWriter(void* outputFp);
     static IDemoWriter* CreateDemoWriter(void* outputFp);
     static IDemoWriter* CreateConLogWriter(void* outputFp);
+    static IDemoWriter* CreateVoiceDataWriter(const char* outputPath);
 
     static void FreeDemoWriter(IDemoWriter* writer)
     {

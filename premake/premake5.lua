@@ -34,6 +34,7 @@ solution "demboyz"
             "../external/sourcesdk/include",
             "../external/rapidjson-1.0.2/include",
             "../external/snappy-1.1.3/include",
+            "../external/celt-e18de77/include",
             "../demboyz"
         }
         links

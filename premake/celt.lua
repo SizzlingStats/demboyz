@@ -7,6 +7,16 @@ group "external"
         language "C"
         location (_ACTION .. "/" .. project().name)
 
+        -- disable sse and sse2 for valve binary compat.
+        -- the osx build of vaudio_celt uses sse2
+        configuration "windows"
+            buildoptions "/arch:IA32"
+        configuration "linux"
+            buildoptions "-mfpmath=387"
+        configuration "macosx"
+            buildoptions { "-mfpmath=sse", "-msse2" }
+        configuration {}
+
         defines
         {
             "CUSTOM_MODES",

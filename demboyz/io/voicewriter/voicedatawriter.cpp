@@ -11,7 +11,10 @@
 
 #include "wavfilewriter.h"
 
-#define USE_VAUDIO_CELT
+#ifdef _WIN32
+//#define USE_VAUDIO_CELT
+#endif
+
 #define MAX_PLAYERS 33
 
 #ifdef USE_VAUDIO_CELT

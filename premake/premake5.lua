@@ -57,6 +57,7 @@ solution "demboyz"
             "sourcesdk",
             "celt"
         }
+        dofile "steamworks.lua"
         add_tag("SupportJustMyCode", "false", "demboyz")
     project "*"
 

@@ -5,145 +5,15 @@
 #include "netmessages/svc_voiceinit.h"
 #include "netmessages/svc_voicedata.h"
 
-#include "celt/celt.h"
+#include "demofile/demotypes.h"
 
 #include <cassert>
 
 #include "wavfilewriter.h"
 
-#ifdef _WIN32
-//#define USE_VAUDIO_CELT
-#endif
+#include "ivoicecodecmanager.h"
 
 #define MAX_PLAYERS 33
-
-#ifdef USE_VAUDIO_CELT
-#define VC_EXTRALEAN
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#endif
-
-struct CeltConfig
-{
-    celt_int32 sampleRate;
-    uint32_t frameSizeSamples;
-    uint32_t encodedFrameSizeBytes;
-};
-
-static CeltConfig sCeltConfigs[] =
-{
-    { 44100, 256, 120 },    // unused
-    { 22050, 120, 60 },     // unused
-    { 22050, 256, 60 },     // unused
-    { 22050, 512, 64 },     // vaudio_celt
-    { 44100, 1024, 128 }    // vaudio_celt_high
-};
-
-#ifdef USE_VAUDIO_CELT
-
-class IVoiceCodec
-{
-protected:
-    virtual ~IVoiceCodec() {}
-
-public:
-    // Initialize the object. The uncompressed format is always 8-bit signed mono.
-    virtual bool Init( int quality ) = 0;
-
-    // Use this to delete the object.
-    virtual void Release() = 0;
-
-    // Compress the voice data.
-    // pUncompressed        -   16-bit signed mono voice data.
-    // maxCompressedBytes   -   The length of the pCompressed buffer. Don't exceed this.
-    // bFinal               -   Set to true on the last call to Compress (the user stopped talking).
-    //                          Some codecs like big block sizes and will hang onto data you give them in Compress calls.
-    //                          When you call with bFinal, the codec will give you compressed data no matter what.
-    // Return the number of bytes you filled into pCompressed.
-    virtual int Compress(const char *pUncompressed, int nSamples, char *pCompressed, int maxCompressedBytes, bool bFinal) = 0;
-
-    // Decompress voice data. pUncompressed is 16-bit signed mono.
-    virtual int Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes) = 0;
-
-    // Some codecs maintain state between Compress and Decompress calls. This should clear that state.
-    virtual bool ResetState() = 0;
-};
-
-typedef void* (CreateInterfaceFn)(const char *pName, int *pReturnCode);
-static HINSTANCE celtDll;
-static CreateInterfaceFn* createInterfaceFunc;
-
-#else
-
-class CeltVoiceDecoder
-{
-public:
-    bool DoInit(CELTMode* celtMode, uint32_t frameSizeSamples, uint32_t encodedFrameSizeBytes)
-    {
-        if(m_celtDecoder)
-        {
-            return false;
-        }
-
-        int error = CELT_OK;
-        m_celtDecoder = celt_decoder_create_custom(celtMode, sCeltChannels, &error);
-        assert(error == CELT_OK);
-        assert(m_celtDecoder);
-
-        m_frameSizeSamples = frameSizeSamples;
-        m_encodedFrameSizeBytes = encodedFrameSizeBytes;
-        return true;
-    }
-
-    void Destroy()
-    {
-        celt_decoder_destroy(m_celtDecoder);
-        m_celtDecoder = NULL;
-    }
-
-    void Reset()
-    {
-    }
-
-    int Decompress(
-        const uint8_t* compressedData,
-        int compressedBytes,
-        int16_t* uncompressedData,
-        int maxUncompressedSamples)
-    {
-        int curCompressedByte = 0;
-        int curDecompressedSample = 0;
-
-        const uint32_t encodedframeSizeBytes = m_encodedFrameSizeBytes;
-        const uint32_t frameSizeSamples = m_frameSizeSamples;
-        while(
-            ((compressedBytes - curCompressedByte) >= encodedframeSizeBytes) &&
-            ((maxUncompressedSamples - curDecompressedSample) >= frameSizeSamples))
-        {
-            DecodeFrame(&compressedData[curCompressedByte], &uncompressedData[curDecompressedSample]);
-            curCompressedByte += encodedframeSizeBytes;
-            curDecompressedSample += frameSizeSamples;
-        }
-        return curDecompressedSample;
-    }
-
-private:
-    void DecodeFrame(const uint8_t* compressedData, int16_t* uncompressedData)
-    {
-        int error = celt_decode(m_celtDecoder, compressedData, m_encodedFrameSizeBytes, uncompressedData, m_frameSizeSamples);
-        assert(error >= CELT_OK);
-    }
-
-private:
-    static const int sCeltChannels = 1;
-
-private:
-    CELTDecoder* m_celtDecoder = NULL;
-    uint32_t m_frameSizeSamples = 0;
-    uint32_t m_encodedFrameSizeBytes = 0;
-};
-
-#endif // USE_VAUDIO_CELT
 
 class VoiceDataWriter: public IDemoWriter
 {
@@ -161,25 +31,20 @@ public:
 private:
     struct PlayerVoiceState
     {
-#ifdef USE_VAUDIO_CELT
-        IVoiceCodec* celtDecoder = nullptr;
-#else
-        CeltVoiceDecoder decoder;
-#endif
+        IVoiceCodec* voiceDecoder = nullptr;
+
         WaveFileWriter wavWriter;
         int32_t lastVoiceDataTick = -1;
     };
 
 private:
-    CELTMode* m_celtMode;
+    IVoiceCodecManager* mVoiceCodecManager;
     PlayerVoiceState m_playerVoiceStates[MAX_PLAYERS];
 
     int32_t m_curTick;
     const char* m_outputPath;
 
-    int16_t m_decodeBuffer[8192];
-
-    static const int sQuality = 3;
+    int16_t m_decodeBuffer[22528];
 };
 
 IDemoWriter* IDemoWriter::CreateVoiceDataWriter(const char* outputPath)
@@ -188,49 +53,35 @@ IDemoWriter* IDemoWriter::CreateVoiceDataWriter(const char* outputPath)
 }
 
 VoiceDataWriter::VoiceDataWriter(const char* outputPath):
-    m_celtMode(nullptr),
+    mVoiceCodecManager(nullptr),
     m_playerVoiceStates(),
-    m_curTick(-1),
+    m_curTick(0),
     m_outputPath(outputPath)
 {
 }
 
 void VoiceDataWriter::StartWriting(demoheader_t& header)
 {
-#ifdef USE_VAUDIO_CELT
-    celtDll = LoadLibrary(TEXT("vaudio_celt.dll"));
-    createInterfaceFunc = (CreateInterfaceFn*)GetProcAddress(celtDll, "CreateInterface");
-#else
-    int error = CELT_OK;
-    const CeltConfig& config = sCeltConfigs[sQuality];
-    m_celtMode = celt_mode_create(config.sampleRate, config.frameSizeSamples, &error);
-    assert(error == CELT_OK);
-    assert(m_celtMode);
-#endif
 }
 
 void VoiceDataWriter::EndWriting()
 {
     for(PlayerVoiceState& state : m_playerVoiceStates)
     {
-#ifdef USE_VAUDIO_CELT
-        if(state.celtDecoder)
+        if (state.voiceDecoder)
         {
-            state.celtDecoder->Release();
+            state.voiceDecoder->Destroy();
+            delete state.voiceDecoder;
+            state.voiceDecoder = nullptr;
         }
-#else
-        state.decoder.Destroy();
-#endif
+
         state.wavWriter.Close();
         state.lastVoiceDataTick = -1;
     }
-#ifndef USE_VAUDIO_CELT
-    if(m_celtMode)
-    {
-        celt_mode_destroy(m_celtMode);
-        m_celtMode = nullptr;
-    }
-#endif
+
+    mVoiceCodecManager->Destroy();
+    delete mVoiceCodecManager;
+    mVoiceCodecManager = nullptr;
 }
 
 void VoiceDataWriter::StartCommandPacket(const CommandPacket& packet)
@@ -247,9 +98,13 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
     if(packet.type == NetMsg::svc_VoiceInit)
     {
         NetMsg::SVC_VoiceInit* voiceInit = static_cast<NetMsg::SVC_VoiceInit*>(packet.data);
-        assert(!strcmp(voiceInit->voiceCodec, "vaudio_celt"));
-        assert(voiceInit->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE);
-        assert(voiceInit->sampleRate == sCeltConfigs[sQuality].sampleRate);
+
+        assert(!mVoiceCodecManager);
+        mVoiceCodecManager = IVoiceCodecManager::Create(voiceInit->voiceCodec);
+        assert(mVoiceCodecManager);
+
+        bool result = mVoiceCodecManager->Init(voiceInit->quality, voiceInit->sampleRate);
+        assert(result);
     }
     else if(packet.type == NetMsg::svc_VoiceData)
     {
@@ -257,23 +112,16 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
         assert(voiceData->fromClientIndex < MAX_PLAYERS);
 
         PlayerVoiceState& state = m_playerVoiceStates[voiceData->fromClientIndex];
+        if (!state.voiceDecoder)
+        {
+            state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
+            state.voiceDecoder->Init();
 
-        const CeltConfig& config = sCeltConfigs[sQuality];
-#ifdef USE_VAUDIO_CELT
-        const bool initWavWriter = !state.celtDecoder;
-        if(!state.celtDecoder)
-        {
-            int ret = 0;
-            state.celtDecoder = static_cast<IVoiceCodec*>(createInterfaceFunc("vaudio_celt", &ret));
-            state.celtDecoder->Init(sQuality);
-        }
-#else
-        const bool initWavWriter = state.decoder.DoInit(m_celtMode, config.frameSizeSamples, config.encodedFrameSizeBytes);
-#endif
-        if(initWavWriter)
-        {
+            int sampleRate = mVoiceCodecManager->GetSampleRate();
+
+            // Init output file
             std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
-            state.wavWriter.Init(name.c_str(), config.sampleRate);
+            state.wavWriter.Init(name.c_str(), sampleRate);
             assert(state.lastVoiceDataTick == -1);
             state.lastVoiceDataTick = m_curTick;
         }
@@ -281,11 +129,9 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
         assert((voiceData->dataLengthInBits % 8) == 0);
         const int numBytes = voiceData->dataLengthInBits / 8;
 
-#ifdef USE_VAUDIO_CELT
-        const int numDecompressedSamples = state.celtDecoder->Decompress((const char*)voiceData->data.get(), numBytes, (char*)m_decodeBuffer, 8192*2);
-#else
-        const int numDecompressedSamples = state.decoder.Decompress(voiceData->data.get(), numBytes, m_decodeBuffer, 8192);
-#endif
+        const int numBytesWritten = state.voiceDecoder->Decompress(voiceData->data.get(), numBytes, (uint8_t*)m_decodeBuffer, sizeof(m_decodeBuffer));
+        const int numDecompressedSamples = numBytesWritten / sizeof(int16_t);
+
         state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
 
         state.lastVoiceDataTick = m_curTick;

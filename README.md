@@ -5,7 +5,7 @@ we dem boyz
 | System | Compiler | Status |
 | ------ | -------- | ------ |
 | Linux 64-bit | G++-4.8.4 | [![Build Status](https://semaphoreci.com/api/v1/sizzlingcalamari/demboyz/branches/master/badge.svg)](https://semaphoreci.com/sizzlingcalamari/demboyz) |
-| Windows | VS2017 | [![Build status](https://ci.appveyor.com/api/projects/status/pc63pbl9b0t5tygl/branch/master?svg=true)](https://ci.appveyor.com/project/SizzlingCalamari/demboyz/branch/master) |
+| Windows | VS2022 | [![Build status](https://ci.appveyor.com/api/projects/status/pc63pbl9b0t5tygl/branch/master?svg=true)](https://ci.appveyor.com/project/SizzlingCalamari/demboyz/branch/master) |
 | OSX | Apple LLVM version 7.3.0 (clang-703.0.31) | [![Build Status](https://travis-ci.org/SizzlingStats/demboyz.svg?branch=master)](https://travis-ci.org/SizzlingStats/demboyz) |
 
 ## What is it?

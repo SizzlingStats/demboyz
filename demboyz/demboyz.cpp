@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <string>
 #include <cassert>
+#include <filesystem>
 
 std::string GetExtension(const std::string& filename)
 {
@@ -21,7 +22,8 @@ enum class FileType
     None,
     Dem,
     Json,
-    ConLog
+    ConLog,
+    Voice
 };
 
 FileType GetFileType(const std::string& filename)
@@ -42,7 +44,43 @@ FileType GetFileType(const std::string& filename)
     return FileType::None;
 }
 
-int main(const int argc, const char* argv[])
+int VoiceMain(const int argc, const char* argv[])
+{
+    if (argc != 3)
+    {
+        fprintf(stderr, "Usage: %s <Input>.dem <OutputDir>\n", argv[0]);
+        return -1;
+    }
+
+    const char* outputDir = argv[2];
+
+    std::filesystem::path outputDirPath(outputDir);
+    std::filesystem::create_directories(outputDirPath);
+    if (!std::filesystem::is_directory(outputDirPath))
+    {
+        fprintf(stderr, "Error: Invalid output directory\n");
+        return -1;
+    }
+
+    const char* inputFile = argv[1];
+    FILE* inputFp = fopen(inputFile, "rb");
+    if (!inputFp)
+    {
+        fprintf(stderr, "Error: Could not open input file\n");
+        return -1;
+    }
+
+    fprintf(stdout, "Extracting voice data from %s to %s\n", inputFile, outputDir);
+
+    IDemoWriter* writer = IDemoWriter::CreateVoiceDataWriter(outputDir);
+    DemoReader::ProcessDem(inputFp, writer);
+    IDemoWriter::FreeDemoWriter(writer);
+
+    fclose(inputFp);
+    return 0;
+}
+
+int DemboyzMain(const int argc, const char* argv[])
 {
     if (argc != 3)
     {
@@ -140,4 +178,35 @@ int main(const int argc, const char* argv[])
         fclose(outputFp);
     }*/
     return 0;
+}
+
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
+int main(const int argc, const char* argv[])
+{
+    {
+        // fix up working directory
+        char temp[1024] = {};
+        const char* dir = getcwd(temp, sizeof(temp));
+        const char* premake_pos = strstr(dir, "premake");
+        chdir("..");
+        if (premake_pos)
+        {
+            chdir("..");
+        }
+        getcwd(temp, sizeof(temp));
+
+        printf("Working Directory: %s\n", temp);
+    }
+
+    if (argc > 2 && GetExtension(argv[2]).empty())
+    {
+        return VoiceMain(argc, argv);
+    }
+
+    return DemboyzMain(argc, argv);
 }

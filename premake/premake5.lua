@@ -34,7 +34,7 @@ solution "demboyz"
         kind "ConsoleApp"
         language "C++"
         configuration "gmake"
-            buildoptions { "-std=c++11" }
+            buildoptions { "-std=c++17" }
         configuration {}
         files
         {
@@ -59,6 +59,7 @@ solution "demboyz"
         }
         dofile "steamworks.lua"
         add_tag("SupportJustMyCode", "false", "demboyz")
+        add_tag("LanguageStandard", "stdcpp17", "demboyz")
     project "*"
 
     dofile "json_checker.lua"

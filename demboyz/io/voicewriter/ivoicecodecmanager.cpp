@@ -1,5 +1,6 @@
 
 #include "ivoicecodecmanager.h"
+#include "steamvoicecodecmanager.h"
 #include "celtcodecmanager.h"
 #include "vaudioceltcodecmanager.h"
 
@@ -24,6 +25,10 @@ IVoiceCodecManager* IVoiceCodecManager::Create(const char* codec)
 #else
 		return CreateCeltCodecManager();
 #endif
+	}
+	else if (!strcmp(codec, "steam"))
+	{
+		return CreateSteamCodecManager();
 	}
 	return nullptr;
 }

@@ -19,6 +19,11 @@ solution "demboyz"
     targetdir "../bin"
     startproject "demboyz"
     configurations { "Debug", "Release" }
+    debugargs
+    {
+        --"D:/projects/demboyz_data/steam_voice_test/Jan_28_7.47_PM-pl_frontier_final.dem",
+        --"D:/projects/demboyz_data/steam_voice_test/out"
+    }
     platforms "x32"
     flags { "MultiProcessorCompile", "Symbols" }
 

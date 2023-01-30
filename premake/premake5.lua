@@ -1,16 +1,18 @@
 
-require "vstudio"
 local function add_tag(tag, value, project_name)
-    premake.override(premake.vstudio.vc2010.elements, "clCompile",
-    function(oldfn, cfg)
-        local calls = oldfn(cfg)
-        if project_name == nil or cfg.project.name == project_name then
-            table.insert(calls, function(cfg)
-                premake.vstudio.vc2010.element(tag, nil, value)
+    if string.find(_ACTION, "vs") then
+        require "vstudio"
+        premake.override(premake.vstudio.vc2010.elements, "clCompile",
+            function(oldfn, cfg)
+                local calls = oldfn(cfg)
+                if project_name == nil or cfg.project.name == project_name then
+                    table.insert(calls, function(cfg)
+                        premake.vstudio.vc2010.element(tag, nil, value)
+                    end)
+                end
+                return calls
             end)
-        end
-        return calls
-    end)
+    end
 end
 
 solution "demboyz"

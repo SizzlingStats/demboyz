@@ -18,11 +18,12 @@ solution "demboyz"
     location (_ACTION)
     targetdir "../bin"
     startproject "demboyz"
+    debugdir "../bin"
     configurations { "Debug", "Release" }
     debugargs
     {
-        --"D:/projects/demboyz_data/steam_voice_test/Jan_28_7.47_PM-pl_frontier_final.dem",
-        --"D:/projects/demboyz_data/steam_voice_test/out"
+        "Jan_28_7.47_PM-pl_frontier_final.dem",
+        "out"
     }
     platforms "x32"
     flags { "MultiProcessorCompile", "Symbols" }

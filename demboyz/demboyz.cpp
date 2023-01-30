@@ -180,33 +180,11 @@ int DemboyzMain(const int argc, const char* argv[])
     return 0;
 }
 
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <unistd.h>
-#endif
-
 int main(const int argc, const char* argv[])
 {
-    {
-        // fix up working directory
-        char temp[1024] = {};
-        const char* dir = getcwd(temp, sizeof(temp));
-        const char* premake_pos = strstr(dir, "premake");
-        chdir("..");
-        if (premake_pos)
-        {
-            chdir("..");
-        }
-        getcwd(temp, sizeof(temp));
-
-        printf("Working Directory: %s\n", temp);
-    }
-
     if (argc > 2 && GetExtension(argv[2]).empty())
     {
         return VoiceMain(argc, argv);
     }
-
     return DemboyzMain(argc, argv);
 }

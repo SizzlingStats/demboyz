@@ -22,8 +22,8 @@ solution "demboyz"
     configurations { "Debug", "Release" }
     debugargs
     {
-        "Jan_28_7.47_PM-pl_frontier_final.dem",
-        "out"
+        --"Jan_28_7.47_PM-pl_frontier_final.dem",
+        --"out"
     }
     platforms "x32"
     flags { "MultiProcessorCompile", "Symbols" }

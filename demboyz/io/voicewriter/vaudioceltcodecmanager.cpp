@@ -1,5 +1,8 @@
 
 #include "vaudioceltcodecmanager.h"
+
+#ifdef _WIN32
+
 #include "ivoicecodecmanager.h"
 
 #define VC_EXTRALEAN
@@ -162,3 +165,12 @@ int32_t VAudioCeltCodecManager::GetSampleRate()
 {
     return sSamplingRates[sQuality];
 }
+
+#else // _WIN32
+
+IVoiceCodecManager* CreateVAudioCeltCodecManager()
+{
+    return nullptr;
+}
+
+#endif

@@ -9,7 +9,7 @@
 class SteamVoiceCodec : public IVoiceCodec
 {
 public:
-    SteamVoiceCodec(ISteamUser* steamUser);
+    SteamVoiceCodec(ISteamUser* steamUser, uint32 sampleRate);
     virtual ~SteamVoiceCodec();
 
     virtual bool Init();
@@ -24,10 +24,12 @@ public:
 
 private:
     ISteamUser* mSteamUser;
+    uint32 mSampleRate;
 };
 
-SteamVoiceCodec::SteamVoiceCodec(ISteamUser* steamUser) :
-    mSteamUser(steamUser)
+SteamVoiceCodec::SteamVoiceCodec(ISteamUser* steamUser, uint32 sampleRate) :
+    mSteamUser(steamUser),
+    mSampleRate(sampleRate)
 {
 }
 
@@ -51,9 +53,8 @@ uint32_t SteamVoiceCodec::Decompress(
     uint32_t destBufferSize)
 {
     uint32 numBytesWritten = 0;
-    volatile uint32 sampleRate = mSteamUser->GetVoiceOptimalSampleRate();
     EVoiceResult result = mSteamUser->DecompressVoice(
-        compressedData, compressedBytes, destBuffer, destBufferSize, &numBytesWritten, 22050);
+        compressedData, compressedBytes, destBuffer, destBufferSize, &numBytesWritten, mSampleRate);
     return numBytesWritten;
 }
 
@@ -74,6 +75,7 @@ private:
     HSteamPipe mPipe;
     HSteamUser mLocalUser;
     ISteamUser* mSteamUser;
+    uint32 mSampleRate;
 };
 
 IVoiceCodecManager* CreateSteamCodecManager()
@@ -85,7 +87,8 @@ SteamCodecManager::SteamCodecManager() :
     mSteamClient(nullptr),
     mPipe(0),
     mLocalUser(0),
-    mSteamUser(nullptr)
+    mSteamUser(nullptr),
+    mSampleRate(0)
 {
 }
 
@@ -112,6 +115,8 @@ bool SteamCodecManager::Init(uint8_t quality, int32_t sampleRate)
     mSteamUser = mSteamClient->GetISteamUser(mLocalUser, mPipe, STEAMUSER_INTERFACE_VERSION);
     assert(mSteamUser);
 
+    mSampleRate = mSteamUser->GetVoiceOptimalSampleRate();
+
     return mSteamUser;
 }
 
@@ -129,10 +134,10 @@ void SteamCodecManager::Destroy()
 
 IVoiceCodec* SteamCodecManager::CreateVoiceCodec()
 {
-    return new SteamVoiceCodec(mSteamUser);
+    return new SteamVoiceCodec(mSteamUser, mSampleRate);
 }
 
 int32_t SteamCodecManager::GetSampleRate()
 {
-    return 22050;
+    return mSampleRate;
 }

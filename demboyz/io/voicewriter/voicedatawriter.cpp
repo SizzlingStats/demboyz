@@ -13,7 +13,7 @@
 
 #include "ivoicecodecmanager.h"
 
-#define MAX_PLAYERS 65
+#define MAX_PLAYERS 101
 
 class VoiceDataWriter: public IDemoWriter
 {

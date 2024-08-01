@@ -1,12 +1,11 @@
-name: VSCode Build
+name: VSCode Build and Release
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - '*'
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -27,7 +26,25 @@ jobs:
     - name: Build the project
       run: |
         cd premake/vs2022
-        msbuild.exe demboyz.vcxproj /p:Configuration=Release
+        msbuild.exe demboyz.vcxproj /p:Configuration=Release /p:OutDir=..\..\bin\Release\
 
-    - name: List build output
-      run: dir bin
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: bin/Release/demboyz.exe
+        asset_name: demboyz.exe
+        asset_content_type: application/octet-stream

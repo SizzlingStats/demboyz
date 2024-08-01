@@ -30,4 +30,4 @@ jobs:
         msbuild.exe demboyz.vcxproj /p:Configuration=Release
 
     - name: List build output
-      run: dir premake/vs2022/Release
+      run: dir bin

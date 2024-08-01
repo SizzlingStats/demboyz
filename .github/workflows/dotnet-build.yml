@@ -28,7 +28,8 @@ jobs:
     - name: Generate project files
       run: |
         cd premake
-        premake5.exe --file=premake5.lua vs2022
+        ls
+        ./premake5.exe --file=premake5.lua vs2022
 
     - name: Build the project
       run: |

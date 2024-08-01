@@ -2,8 +2,6 @@ name: VSCode Build and Release
 
 on:
   push:
-    tags:
-      - '*'
   release:
     types: [published]
 

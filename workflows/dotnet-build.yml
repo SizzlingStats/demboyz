@@ -1,0 +1,40 @@
+name: VSCode Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Premake
+      run: |
+        # Download Premake5
+        Invoke-WebRequest -Uri "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha16/premake-5.0.0-alpha16-windows.zip" -OutFile "premake5.zip"
+        # Extract Premake5
+        Expand-Archive premake5.zip -DestinationPath premake
+        # Add Premake5 to PATH
+        $env:Path += ";$PWD\premake"
+
+    - name: Generate project files
+      run: |
+        cd premake
+        premake5.exe --file=premake5.lua vs2022
+
+    - name: Build the project
+      run: |
+        cd premake/vs2022
+        msbuild demboyz.vcxproj /p:Configuration=Release
+
+        
+    - name: List build output
+      run: dir premake/vs2022/Release

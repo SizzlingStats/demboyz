@@ -16,14 +16,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Premake
-      run: |
-        # Download Premake5
-        Invoke-WebRequest -Uri "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha16/premake-5.0.0-alpha16-windows.zip" -OutFile "premake5.zip"
-        # Extract Premake5
-        Expand-Archive premake5.zip -DestinationPath premake
-        # Add Premake5 to PATH
-        $env:Path += ";$PWD\premake"
+    # - name: Set up Premake
+    #   run: |
+    #     # Download Premake5
+    #     Invoke-WebRequest -Uri "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha16/premake-5.0.0-alpha16-windows.zip" -OutFile "premake5.zip"
+    #     # Extract Premake5
+    #     Expand-Archive premake5.zip -DestinationPath premake
+    #     # Add Premake5 to PATH
+    #     $env:Path += ";$PWD\premake"
 
     - name: Generate project files
       run: |

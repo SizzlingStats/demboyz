@@ -34,7 +34,7 @@ jobs:
     - name: Build the project
       run: |
         cd premake/vs2022
-        msbuild demboyz.vcxproj /p:Configuration=Release
+        msbuild.exe demboyz.vcxproj /p:Configuration=Release
 
         
     - name: List build output

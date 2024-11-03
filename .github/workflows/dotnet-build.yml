@@ -1,0 +1,48 @@
+name: VSCode Build and Release
+
+on:
+  push:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Generate project files
+      run: |
+        cd premake
+        ./premake5.exe --file=premake5.lua vs2022
+
+    - name: Build the project
+      run: |
+        cd premake/vs2022
+        msbuild.exe demboyz.vcxproj /p:Configuration=Release /p:OutDir=..\..\bin\Release\
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: bin/Release/demboyz.exe
+        asset_name: demboyz.exe
+        asset_content_type: application/octet-stream

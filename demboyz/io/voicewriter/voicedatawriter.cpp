@@ -5,13 +5,22 @@
 #include "netmessages/svc_voiceinit.h"
 #include "netmessages/svc_voicedata.h"
 
-#include "demofile/demotypes.h"
+#include "demmessages/dem_stringtables.h"
+#include "demofile/demofile.h"
 
 #include <cassert>
 
 #include "wavfilewriter.h"
 
 #include "ivoicecodecmanager.h"
+
+#include <filesystem>
+#include <fstream> // Include for file operations
+#include <vector>
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <map>
 
 #define MAX_PLAYERS 101
 
@@ -43,6 +52,7 @@ private:
 
     int32_t m_curTick;
     const char* m_outputPath;
+    std::map<int, std::string> m_playerNames;
 
     int16_t m_decodeBuffer[22528];
 };
@@ -87,6 +97,28 @@ void VoiceDataWriter::EndWriting()
 void VoiceDataWriter::StartCommandPacket(const CommandPacket& packet)
 {
     m_curTick = packet.tick;
+
+    if (packet.cmd == dem_stringtables)
+    {
+        DemMsg::Dem_StringTables* stringTables = (DemMsg::Dem_StringTables*)packet.data;
+        for (const DemMsg::Dem_StringTables::StringTable& table : stringTables->stringtables)
+        {
+            if (!strcmp(table.tableName.c_str(), "userinfo"))
+            {
+                int index_counter = 0;
+                for (const DemMsg::Dem_StringTables::StringTableEntry& entry : table.entries)
+                {
+                    const char* nameUtf8 = (const char*)entry.data.begin();
+                    if (nameUtf8) // Check if nameUtf8 is not null
+                    {
+                        m_playerNames[index_counter] = std::string(nameUtf8);
+                    }
+                    index_counter++;
+                }
+            }
+        }
+    }
+
 }
 
 void VoiceDataWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
@@ -116,14 +148,32 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
         {
             state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
             state.voiceDecoder->Init();
+        }
+
+        // Check if we need to start a new WAV file
+        if (state.lastVoiceDataTick == -1 || m_curTick - state.lastVoiceDataTick >= 300)
+        {
+            // Close the previous WAV file if open
+            state.wavWriter.Close();
 
             int sampleRate = mVoiceCodecManager->GetSampleRate();
 
-            // Init output file
-            std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
-            state.wavWriter.Init(name.c_str(), sampleRate);
-            assert(state.lastVoiceDataTick == -1);
-            state.lastVoiceDataTick = m_curTick;
+            // Create directory for the client
+            std::string clientDir = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex);
+            std::filesystem::create_directories(clientDir);
+
+            // Write the name.txt file with the player's name
+            std::string nameFilePath = clientDir + "/name.txt";
+            std::ofstream nameFile(nameFilePath);
+            if (nameFile.is_open())
+            {
+                nameFile << m_playerNames[int(voiceData->fromClientIndex)] << "\n";
+                nameFile.close();
+            }
+
+            // Init new output file with tick number
+            std::string fileName = clientDir + "/" + std::to_string(m_curTick) + ".wav";
+            state.wavWriter.Init(fileName.c_str(), sampleRate);
         }
 
         assert((voiceData->dataLengthInBits % 8) == 0);
@@ -134,6 +184,7 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
 
         state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
 
+        // Update last voice data tick
         state.lastVoiceDataTick = m_curTick;
     }
 }

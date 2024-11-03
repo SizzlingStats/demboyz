@@ -1,13 +1,10 @@
 
-#include "idemowriter.h"
+#include "demowriter.h"
 #include "demofile/demotypes.h"
-#include "demofile/demofile.h"
 #include "netmessages/nethandlers.h"
 #include "netmessages/netcontants.h"
 #include "demmessages/demhandlers.h"
-#include "sourcesdk/bitbuf.h"
 #include <cstdio>
-#include <memory>
 
 #ifdef _WIN32
 #include <io.h>
@@ -32,25 +29,6 @@ int truncate(FILE* fp, int relative_offset)
     return ftruncate(fd, statbuf.st_size + relative_offset);
 #endif
 }
-
-class DemoWriter: public IDemoWriter
-{
-public:
-    DemoWriter(FILE* outputFp);
-
-    virtual void StartWriting(demoheader_t& header) override final;
-    virtual void EndWriting() override final;
-
-    virtual void StartCommandPacket(const CommandPacket& packet) override final;
-    virtual void EndCommandPacket(const PacketTrailingBits& trailingBits) override final;
-
-    virtual void WriteNetPacket(NetPacket& packet, SourceGameContext& context) override final;
-
-private:
-    DemoFileWriter m_writer;
-    bf_write m_cmdPacketBuf;
-    std::unique_ptr<uint8_t[]> m_packetBuffer;
-};
 
 IDemoWriter* IDemoWriter::CreateDemoWriter(void* outputFp)
 {

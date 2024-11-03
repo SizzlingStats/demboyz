@@ -44,6 +44,39 @@ FileType GetFileType(const std::string& filename)
     return FileType::None;
 }
 
+int RocketModeFixMain(const int argc, const char* argv[])
+{
+    assert(argc == 4);
+    assert(!strcmp(argv[1], "-rocketmodefix"));
+
+    const char* inputDemo = argv[2];
+    const char* outputDemo = argv[3];
+    FILE* inputFp = fopen(inputDemo, "rb");
+    if (!inputFp)
+    {
+        fprintf(stderr, "Error: Could not open input file\n");
+        return -1;
+    }
+
+    FILE* outputFp = fopen(outputDemo, "wb");
+    if (!outputFp)
+    {
+        fprintf(stderr, "Error: Could not open input file\n");
+        fclose(inputFp);
+        return -1;
+    }
+
+    fprintf(stdout, "Fixing up rocketmode demo %s to %s\n", inputDemo, outputDemo);
+
+    IDemoWriter* writer = IDemoWriter::CreateRocketModeFixerDemoWriter(outputFp);
+    DemoReader::ProcessDem(inputFp, writer);
+    IDemoWriter::FreeDemoWriter(writer);
+
+    fclose(outputFp);
+    fclose(inputFp);
+    return 0;
+}
+
 int VoiceMain(const int argc, const char* argv[])
 {
     if (argc != 3)
@@ -182,7 +215,11 @@ int DemboyzMain(const int argc, const char* argv[])
 
 int main(const int argc, const char* argv[])
 {
-    if (argc > 2 && GetExtension(argv[2]).empty())
+    if (argc == 4 && !strcmp(argv[1], "-rocketmodefix"))
+    {
+        return RocketModeFixMain(argc, argv);
+    }
+    else if (argc > 2 && GetExtension(argv[2]).empty())
     {
         return VoiceMain(argc, argv);
     }

@@ -48,6 +48,8 @@ public:
     static IDemoWriter* CreateConLogWriter(void* outputFp);
     static IDemoWriter* CreateVoiceDataWriter(const char* outputPath);
 
+    static IDemoWriter* CreateRocketModeFixerDemoWriter(void* outputFp);
+
     static void FreeDemoWriter(IDemoWriter* writer)
     {
         delete writer;

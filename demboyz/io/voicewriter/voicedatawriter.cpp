@@ -111,29 +111,32 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
         NetMsg::SVC_VoiceData* voiceData = static_cast<NetMsg::SVC_VoiceData*>(packet.data);
         assert(voiceData->fromClientIndex < MAX_PLAYERS);
 
-        PlayerVoiceState& state = m_playerVoiceStates[voiceData->fromClientIndex];
-        if (!state.voiceDecoder)
+        if (voiceData->dataLengthInBits > 0)
         {
-            state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
-            state.voiceDecoder->Init();
+            PlayerVoiceState& state = m_playerVoiceStates[voiceData->fromClientIndex];
+            if (!state.voiceDecoder)
+            {
+                state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
+                state.voiceDecoder->Init();
 
-            int sampleRate = mVoiceCodecManager->GetSampleRate();
+                int sampleRate = mVoiceCodecManager->GetSampleRate();
 
-            // Init output file
-            std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
-            state.wavWriter.Init(name.c_str(), sampleRate);
-            assert(state.lastVoiceDataTick == -1);
+                // Init output file
+                std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
+                state.wavWriter.Init(name.c_str(), sampleRate);
+                assert(state.lastVoiceDataTick == -1);
+                state.lastVoiceDataTick = m_curTick;
+            }
+
+            assert((voiceData->dataLengthInBits % 8) == 0);
+            const int numBytes = voiceData->dataLengthInBits / 8;
+
+            const int numBytesWritten = state.voiceDecoder->Decompress(voiceData->data.get(), numBytes, (uint8_t*)m_decodeBuffer, sizeof(m_decodeBuffer));
+            const int numDecompressedSamples = numBytesWritten / sizeof(int16_t);
+
+            state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
+
             state.lastVoiceDataTick = m_curTick;
         }
-
-        assert((voiceData->dataLengthInBits % 8) == 0);
-        const int numBytes = voiceData->dataLengthInBits / 8;
-
-        const int numBytesWritten = state.voiceDecoder->Decompress(voiceData->data.get(), numBytes, (uint8_t*)m_decodeBuffer, sizeof(m_decodeBuffer));
-        const int numDecompressedSamples = numBytesWritten / sizeof(int16_t);
-
-        state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
-
-        state.lastVoiceDataTick = m_curTick;
     }
 }

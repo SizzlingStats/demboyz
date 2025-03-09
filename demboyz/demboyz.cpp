@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <string>
 #include <cassert>
+#include <cstring>
 #include <filesystem>
 
 std::string GetExtension(const std::string& filename)

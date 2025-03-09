@@ -15,6 +15,7 @@ It supports the following conversions:
 
     .dem/.json <-> .dem/.json
     .dem/.json -> .con
+    .dem/.json -> directory of .wav files (for voice data writer)
 
     The .dem format is the TF2 STV demo format.
     The .json format is the demboyz streaming json demo format.
@@ -35,6 +36,7 @@ It supports the following conversions:
     ./demboyz mystvdemo.dem mystvdemo.con
     ./demboyz mystvdemo.json mystvdemo.dem
     ./demboyz mystvdemo.json mystvdemo.con
+    ./demboyz mystvdemo.dem mystvdemofolder (voice data writer)
 
 In the first example, mystvdemo.dem will be read from the current working directory, while mystvdemo.json will be written to the current working directory.
 
@@ -99,10 +101,10 @@ When following instructions below, the compiled binary will be output in the bin
     exit
     vagrant halt
 
-### With Visual Studio 2013
+### With Visual Studio
 
-    # Generate vs 2013 project
+    # Generate vs project
     cd premake
-    vs2013.bat
+    vs2022.bat
     
-Open generated VS solution at premake/vs2013/demboyz.sln
+Open generated VS solution at premake/vs2022/demboyz.sln

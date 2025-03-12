@@ -50,15 +50,6 @@ bool DemoJsonReader::ReadCmdHeader(base::JsonReaderObject& reader, unsigned char
 }
 
 bool DemoJsonReader::ReadUserCmd(base::JsonReaderObject& reader, int32_t& cmdNum,
-                                 uint8_t* buffer, int32_t length, int32_t& bytesRead)
-{
-    base::JsonReaderObject object = reader.ReadObject("usercmd");
-    cmdNum = object.ReadInt32("cmd");
-    bytesRead = object.ReadBytes("data", buffer, length);
-    return !object.HasReadError();
-}
-
-bool DemoJsonReader::ReadUserCmd(base::JsonReaderObject& reader, int32_t cmdNum,
                                  Array<uint8_t>& dest, int32_t maxLength)
 {
     base::JsonReaderObject object = reader.ReadObject("usercmd");

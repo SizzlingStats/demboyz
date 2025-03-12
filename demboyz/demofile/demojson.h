@@ -17,9 +17,7 @@ namespace DemoJsonReader
     bool ReadSequenceInfo(base::JsonReaderObject& reader, int32_t& seqNum1, int32_t& seqNum2);
     bool ReadCmdInfo(base::JsonReaderObject& reader, democmdinfo_t& info);
     bool ReadCmdHeader(base::JsonReaderObject& reader, unsigned char& cmd, int32_t& tick);
-    bool ReadUserCmd(base::JsonReaderObject& reader, int32_t& cmdNum,
-                     uint8_t* buffer, int32_t length, int32_t& bytesRead);
-    bool ReadUserCmd(base::JsonReaderObject& reader, int32_t cmdNum, Array<uint8_t>& dest, int32_t maxLength);
+    bool ReadUserCmd(base::JsonReaderObject& reader, int32_t& cmdNum, Array<uint8_t>& dest, int32_t maxLength);
     bool ReadVector(base::JsonReaderObject& reader, const char* name, Vector& vec);
     bool ReadAngle(base::JsonReaderObject& reader, const char* name, QAngle& angle);
 }

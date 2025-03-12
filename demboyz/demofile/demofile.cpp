@@ -46,20 +46,19 @@ int32_t DemoFileReader::ReadRawData(uint8_t* buffer, int32_t maxLength)
 
 Array<uint8_t> DemoFileReader::ReadRawData(int32_t maxLength)
 {
+    Array<uint8_t> data;
+
     FILE* fp = m_demoFp;
 
     int32_t size;
     fread(&size, sizeof(int32_t), 1, fp);
 
-    Array<uint8_t> data;
-    if (maxLength < size)
+    if (size <= maxLength)
     {
-        return std::move(data);
+        data.reset(size);
+        fread(data.begin(), 1, size, fp);
     }
-
-    data.reset(size);
-    fread(data.begin(), 1, size, fp);
-    return std::move(data);
+    return data;
 }
 
 void DemoFileReader::ReadSequenceInfo(int32_t& seqNum1, int32_t& seqNum2)

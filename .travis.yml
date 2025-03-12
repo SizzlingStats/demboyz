@@ -1,8 +1,0 @@
-
-language: cpp
-os: osx
-script:
-  - g++ -v
-  - clang++ -v
-  - cd premake && ./gmake.sh
-  - cd gmake && make config=release_x32

@@ -82,24 +82,13 @@ If you would like to contribute to demboyz, here are a few tasks up for grabs:
 
 When following instructions below, the compiled binary will be output in the bin folder.
 
+If using voice extraction capabilities, ensure steam is running and logged in.
 
-### Using Vagrant
+### OSX & Linux
 
-    # Launch VM and build
-    vagrant up
-
-    # Patch VM and re-build
-    vagrant provision
-
-    # Manual build
-    vagrant ssh
-    cd /vagrant/premake
+    cd premake
     ./gmake.sh && cd gmake
-    make
-
-    # Disconnect session and stop VM
-    exit
-    vagrant halt
+    make -j4
 
 ### With Visual Studio
 

@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cassert>
 #include <string.h>
+#include <stdlib.h>
 #include "vector.h"
 
 using uint64 = std::uint64_t;
@@ -18,14 +19,27 @@ using int8 = std::int8_t;
 using uint = unsigned int;
 using byte = char;
 
-#if defined(_M_IX86)
-#define __i386__ 1
+#define PLATFORM_64BITS
+
+#ifdef _WIN32
+    #ifdef PLATFORM_64BITS
+        typedef __int64 intp;				// intp is an integer that can accomodate a pointer
+        typedef unsigned __int64 uintp;		// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+    #else
+        typedef __int32 intp;
+        typedef unsigned __int32 uintp;
+    #endif
+#else
+    #ifdef PLATFORM_64BITS
+        typedef long long			intp;
+        typedef unsigned long long	uintp;
+    #else
+        typedef int					intp;
+        typedef unsigned int		uintp;
+    #endif
 #endif
 
 #define IsPC() true
-#ifdef _WIN64
-    #define PLATFORM_WINDOWS_PC64 1
-#endif
 
 #define Assert(x) assert(x)
 #define AssertMsg(x, ...) assert(x)
@@ -34,15 +48,9 @@ using byte = char;
 
 #define Q_memcpy memcpy
 
-inline bool is_little_endian()
-{
-    union {
-        uint32 i;
-        uint8 c[4];
-    } bint = { 0x01020304 };
-
-    return bint.c[0] == 4;
-}
+#define VALVE_LITTLE_ENDIAN 1
+#define RESTRICT
+#define FORCEINLINE inline
 
 // OVERALL Coordinate Size Limits used in COMMON.C MSG_*BitCoord() Routines (and someday the HUD)
 #define	COORD_INTEGER_BITS			14
@@ -60,64 +68,55 @@ inline bool is_little_endian()
 #define NORMAL_DENOMINATOR			( (1<<(NORMAL_FRACTIONAL_BITS)) - 1 )
 #define NORMAL_RESOLUTION			(1.0/(NORMAL_DENOMINATOR))
 
+///////////
+
+#if defined _MSC_VER		// MSVC (What about MinGW and Clang for Windows)
+
+#define DWordSwap(d) ((uint32)(_byteswap_ulong( (unsigned long) d)))
+
+#elif defined __GNUC__		// GCC or Clang
+
+#define DWordSwap(d) __builtin_bswap32(d)
+
+#else						// N/A, native code
+
+#pragma message( "TODO: Using non-intrinsic byteswap functions..." )
+
 template <typename T>
-inline T DWordSwapC( T dw )
+inline T DWordSwapC(T dw)
 {
     uint32 temp;
-    temp  =   *((uint32 *)&dw)               >> 24;
-    temp |= ((*((uint32 *)&dw) & 0x00FF0000) >> 8);
-    temp |= ((*((uint32 *)&dw) & 0x0000FF00) << 8);
-    temp |= ((*((uint32 *)&dw) & 0x000000FF) << 24);
+
+    static_assert(sizeof(T) == sizeof(uint32));
+
+    temp = *((uint32*)&dw) >> 24;
+    temp |= ((*((uint32*)&dw) & 0x00FF0000) >> 8);
+    temp |= ((*((uint32*)&dw) & 0x0000FF00) << 8);
+    temp |= ((*((uint32*)&dw) & 0x000000FF) << 24);
+
     return *((T*)&temp);
 }
 
-#if defined( _MSC_VER ) && !defined( PLATFORM_WINDOWS_PC64 )
-    #define DWordSwap  DWordSwapAsm
-    #pragma warning(push)
-    #pragma warning (disable:4035) // no return value
-    template <typename T>
-    inline T DWordSwapAsm( T dw )
-    {
-        __asm
-        {
-            mov eax, dw
-            bswap eax
-        }
-    }
-    #pragma warning(pop)
-#else
-    #define DWordSwap DWordSwapC
+#define DWordSwap DWordSwapC
+
 #endif
-
-inline unsigned long LoadLittleDWord(const unsigned long *base, unsigned int dwordIndex)
-{
-    return (is_little_endian() ? base[dwordIndex] : (DWordSwap(base[dwordIndex])));
-}
-
-inline void StoreLittleDWord(unsigned long *base, unsigned int dwordIndex, unsigned long dword)
-{
-    base[dwordIndex] = (is_little_endian() ? dword : (DWordSwap(dword)));
-}
 
 // If a swapped float passes through the fpu, the bytes may get changed.
 // Prevent this by swapping floats as DWORDs.
-#define SafeSwapFloat( pOut, pIn ) (*((uint*)pOut) = DWordSwap( *((uint*)pIn) ))
+#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((uint*)pIn) ))
 
-inline void LittleFloat(float* pOut, float* pIn)
+inline long BigLong(long val) { int test = 1; return (*(char*)&test == 1) ? DWordSwap(val) : val; }
+inline uint32 LittleDWord(uint32 val) { int test = 1; return (*(char*)&test == 1) ? val : DWordSwap(val); }
+inline void LittleFloat(float* pOut, const float* pIn) { int test = 1; (*(char*)&test == 1) ? (*pOut = *pIn) : SafeSwapFloat(pOut, pIn); }
+
+FORCEINLINE uint32 LoadLittleDWord(uint32* base, unsigned int dwordIndex)
 {
-    if (is_little_endian())
-    {
-        *pOut = *pIn;
-    }
-    else
-    {
-        SafeSwapFloat(pOut, pIn);
-    }
+    return LittleDWord(base[dwordIndex]);
 }
 
-inline long BigLong(long val)
+FORCEINLINE void StoreLittleDWord(uint32* base, unsigned int dwordIndex, uint32 dword)
 {
-    return is_little_endian() ? DWordSwap(val) : val;
+    base[dwordIndex] = LittleDWord(dword);
 }
 
 #define BITS_PER_INT 32

@@ -27,7 +27,7 @@ solution "demboyz"
         --"Jan_28_7.47_PM-pl_frontier_final.dem",
         --"out"
     }
-    platforms "x32"
+    platforms "x64"
     flags { "MultiProcessorCompile", "Symbols" }
 
     defines "_CRT_SECURE_NO_WARNINGS"

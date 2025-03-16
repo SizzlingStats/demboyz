@@ -68,16 +68,6 @@ If you would like to contribute to demboyz, here are a few tasks up for grabs:
 * Add a conversion to the replay demo format.
     * The replay demo format would require reverse engineering just like POV and STV demos.
 
-### For Users
-
-* Cheer on the developers.
-* Pressure the developers.
-* Become a developer.
-
-## Who Uses demboyz?
-
-* [KZMod Demo Player [beta]](http://xtreme-jumps.eu/e107_plugins/forum/forum_viewtopic.php?359435) by kraster
-
 ## Compiling From Source
 
 When following instructions below, the compiled binary will be output in the bin folder.

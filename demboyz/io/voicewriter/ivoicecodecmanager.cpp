@@ -24,7 +24,7 @@ IVoiceCodecManager* IVoiceCodecManager::Create(const char* codec)
 #if USE_VAUDIO_SPEEX
 		return CreateVAudioSpeexCodecManager();
 #else
-		return CreateSpeexCodecManager();
+		return nullptr;// CreateSpeexCodecManager();
 #endif
 	}
 	else if (!strcmp(codec, "vaudio_celt"))

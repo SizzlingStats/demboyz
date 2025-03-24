@@ -3,3 +3,4 @@
 
 class IVoiceCodecManager;
 IVoiceCodecManager* CreateVAudioCeltCodecManager();
+IVoiceCodecManager* CreateVAudioSpeexCodecManager();

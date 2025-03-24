@@ -27,7 +27,7 @@ solution "demboyz"
         --"Jan_28_7.47_PM-pl_frontier_final.dem",
         --"out"
     }
-    platforms "x64"
+    platforms { "x64", "x32" }
     flags { "MultiProcessorCompile", "Symbols" }
 
     defines { "_CRT_SECURE_NO_WARNINGS", "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
@@ -65,7 +65,11 @@ solution "demboyz"
             "sourcesdk",
             "celt"
         }
-        dofile "steamworks.lua"
+        configuration "x64"
+            dofile "steamworks.lua"
+        configuration "x32"
+            dofile "steamworks32.lua"
+        configuration {}
         add_tag("SupportJustMyCode", "false", "demboyz")
         add_tag("LanguageStandard", "stdcpp17", "demboyz")
     project "*"

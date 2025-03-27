@@ -10,7 +10,7 @@ namespace NetHandlers
     bool SVC_Prefetch_BitRead_Internal(BitRead& bitbuf, SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
         data->type = NetMsg::SVC_Prefetch::SOUND;
-        if (context.protocol > 23)
+        if (context.protocol > 22)
         {
             data->soundIndex = bitbuf.ReadUBitLong(MAX_SOUND_INDEX_BITS);
         }
@@ -23,7 +23,7 @@ namespace NetHandlers
 
     bool SVC_Prefetch_BitWrite_Internal(BitWrite& bitbuf, const SourceGameContext& context, NetMsg::SVC_Prefetch* data)
     {
-        if (context.protocol > 23)
+        if (context.protocol > 22)
         {
             bitbuf.WriteUBitLong(data->soundIndex, MAX_SOUND_INDEX_BITS);
         }

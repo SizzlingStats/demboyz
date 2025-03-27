@@ -2,12 +2,14 @@
 #include "../idemowriter.h"
 #include "netmessages/netmessages.h"
 
+#include "netmessages/net_setconvar.h"
 #include "netmessages/svc_voiceinit.h"
 #include "netmessages/svc_voicedata.h"
 
 #include "demofile/demotypes.h"
 
 #include <cassert>
+#include <cstring>
 
 #include "wavfilewriter.h"
 
@@ -44,6 +46,10 @@ private:
     int32_t m_curTick;
     const char* m_outputPath;
 
+    // If true, override to use steam voice
+    // when given a valid SVC_VoiceInit quality value.
+    bool m_bSVUseSteamVoice;
+
     int16_t m_decodeBuffer[22528];
 };
 
@@ -56,12 +62,22 @@ VoiceDataWriter::VoiceDataWriter(const char* outputPath):
     mVoiceCodecManager(nullptr),
     m_playerVoiceStates(),
     m_curTick(0),
-    m_outputPath(outputPath)
+    m_outputPath(outputPath),
+    m_bSVUseSteamVoice(false)
 {
 }
 
 void VoiceDataWriter::StartWriting(demoheader_t& header)
 {
+    // Steam voice codec and cvar sv_use_steam_voice released during network protocol 15.
+    // We can't trust the SVC_VoiceInit codec on this protocol because we
+    // don't know if the demo was recorded before or after the steam voice update.
+    if (header.networkprotocol >= 16)
+    {
+        // sv_use_steam_voice defaulted to true on release and
+        // we can guarantee that value on network protocol 16 or later.
+        m_bSVUseSteamVoice = true;
+    }
 }
 
 void VoiceDataWriter::EndWriting()
@@ -95,15 +111,46 @@ void VoiceDataWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 
 void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
-    if(packet.type == NetMsg::svc_VoiceInit)
+    if (packet.type == NetMsg::net_SetConVar)
     {
+        NetMsg::Net_SetConVar* setConvar = static_cast<NetMsg::Net_SetConVar*>(packet.data);
+        for (const NetMsg::Net_SetConVar::cvar_t& cvar : setConvar->cvars)
+        {
+            if (!strcmp(cvar.name, "sv_use_steam_voice") && !strcmp(cvar.name, "0"))
+            {
+                m_bSVUseSteamVoice = false;
+            }
+        }
+    }
+    else if (packet.type == NetMsg::svc_VoiceInit)
+    {
+        assert(!mVoiceCodecManager);
+
         NetMsg::SVC_VoiceInit* voiceInit = static_cast<NetMsg::SVC_VoiceInit*>(packet.data);
 
-        assert(!mVoiceCodecManager);
-        mVoiceCodecManager = IVoiceCodecManager::Create(voiceInit->voiceCodec);
+        const char* codec = voiceInit->voiceCodec;
+        int32_t sampleRate = voiceInit->sampleRate;
+        if (voiceInit->quality != NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            if (m_bSVUseSteamVoice)
+            {
+                codec = "steam";
+                sampleRate = 0;
+            }
+            else if (!strcmp(codec, "vaudio_celt"))
+            {
+                sampleRate = 22050;
+            }
+            else
+            {
+                sampleRate = 11025;
+            }
+        }
+
+        mVoiceCodecManager = IVoiceCodecManager::Create(codec);
         assert(mVoiceCodecManager);
 
-        bool result = mVoiceCodecManager->Init(voiceInit->quality, voiceInit->sampleRate);
+        bool result = mVoiceCodecManager->Init(voiceInit->quality, sampleRate);
         assert(result);
     }
     else if(packet.type == NetMsg::svc_VoiceData)

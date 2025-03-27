@@ -15,8 +15,7 @@ namespace NetHandlers
         }
         else
         {
-            // V_strnicmp < 1 is from them, not me.
-            data->sampleRate = V_strnicmp(data->voiceCodec, "vaudio_celt", sizeof(data->voiceCodec)) < 1 ? 22050 : 11025;
+            data->sampleRate = 0;
         }
         return !bitbuf.IsOverflowed();
     }
@@ -38,7 +37,14 @@ namespace NetHandlers
         assert(!reader.HasReadError());
         reader.ReadString("voiceCodec", data->voiceCodec, sizeof(data->voiceCodec));
         data->quality = reader.ReadUInt32("quality");
-        data->sampleRate = reader.ReadInt32("sampleRate");
+        if (data->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            data->sampleRate = reader.ReadInt32("sampleRate");
+        }
+        else
+        {
+            data->sampleRate = 0;
+        }
         return !reader.HasReadError();
     }
 
@@ -48,7 +54,10 @@ namespace NetHandlers
         jsonbuf.StartObject();
         jsonbuf.WriteString("voiceCodec", data->voiceCodec);
         jsonbuf.WriteUInt32("quality", data->quality);
-        jsonbuf.WriteInt32("sampleRate", data->sampleRate);
+        if (data->quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
+        {
+            jsonbuf.WriteInt32("sampleRate", data->sampleRate);
+        }
         jsonbuf.EndObject();
         return jsonbuf.IsComplete();
     }

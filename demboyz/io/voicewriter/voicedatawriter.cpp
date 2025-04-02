@@ -116,7 +116,7 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
         NetMsg::Net_SetConVar* setConvar = static_cast<NetMsg::Net_SetConVar*>(packet.data);
         for (const NetMsg::Net_SetConVar::cvar_t& cvar : setConvar->cvars)
         {
-            if (!strcmp(cvar.name, "sv_use_steam_voice") && !strcmp(cvar.name, "0"))
+            if (!strcmp(cvar.name, "sv_use_steam_voice") && !strcmp(cvar.value, "0"))
             {
                 m_bSVUseSteamVoice = false;
             }

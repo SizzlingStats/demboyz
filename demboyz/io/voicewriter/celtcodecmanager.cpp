@@ -20,14 +20,12 @@ static CeltConfig sCeltConfigs[] =
     { 22050, 512, 64 },     // vaudio_celt
     { 44100, 1024, 128 }    // vaudio_celt_high
 };
-
-static const int sQuality = 3;
 static const int sCeltChannels = 1;
 
 class CeltVoiceCodec : public IVoiceCodec
 {
 public:
-    CeltVoiceCodec(CELTMode* celtMode);
+    CeltVoiceCodec(CELTMode* celtMode, int quality);
     virtual ~CeltVoiceCodec();
 
     virtual bool Init();
@@ -53,14 +51,16 @@ private:
     uint32_t mFrameSizeSamples;
     uint32_t mFrameSizeBytes;
     uint32_t mEncodedFrameSizeBytes;
+    int mQuality;
 };
 
-CeltVoiceCodec::CeltVoiceCodec(CELTMode* celtMode) :
+CeltVoiceCodec::CeltVoiceCodec(CELTMode* celtMode, int quality) :
     mCeltMode(celtMode),
     mCeltDecoder(nullptr),
     mFrameSizeSamples(0),
     mFrameSizeBytes(0),
-    mEncodedFrameSizeBytes(0)
+    mEncodedFrameSizeBytes(0),
+    mQuality(quality)
 {
 }
 
@@ -70,7 +70,7 @@ CeltVoiceCodec::~CeltVoiceCodec()
 
 bool CeltVoiceCodec::Init()
 {
-    const CeltConfig& config = sCeltConfigs[sQuality];
+    const CeltConfig& config = sCeltConfigs[mQuality];
     mFrameSizeSamples = config.frameSizeSamples;
     mFrameSizeBytes = config.frameSizeSamples * sCeltChannels * sizeof(int16_t);
     mEncodedFrameSizeBytes = config.encodedFrameSizeBytes;
@@ -115,25 +115,27 @@ uint32_t CeltVoiceCodec::Decompress(
 class CeltCodecManager : public IVoiceCodecManager
 {
 public:
-    CeltCodecManager();
+    CeltCodecManager(bool bHighQuality);
     virtual ~CeltCodecManager();
 
-    virtual bool Init(uint8_t quality, int32_t sampleRate);
+    virtual bool Init();
     virtual void Destroy();
     virtual IVoiceCodec* CreateVoiceCodec();
     virtual int32_t GetSampleRate();
 
 private:
     CELTMode* m_celtMode;
+    int m_Quality;
 };
 
-IVoiceCodecManager* CreateCeltCodecManager()
+IVoiceCodecManager* CreateCeltCodecManager(bool bHighQuality)
 {
-    return new CeltCodecManager;
+    return new CeltCodecManager(bHighQuality);
 }
 
-CeltCodecManager::CeltCodecManager() :
-    m_celtMode(nullptr)
+CeltCodecManager::CeltCodecManager(bool bHighQuality) :
+    m_celtMode(nullptr),
+    m_Quality(bHighQuality ? 4 : 3)
 {
 }
 
@@ -141,12 +143,9 @@ CeltCodecManager::~CeltCodecManager()
 {
 }
 
-bool CeltCodecManager::Init(uint8_t quality, int32_t sampleRate)
+bool CeltCodecManager::Init()
 {
-    const CeltConfig& config = sCeltConfigs[sQuality];
-
-    //assert(quality == NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE);
-    assert(sampleRate == config.sampleRate);
+    const CeltConfig& config = sCeltConfigs[m_Quality];
 
     int error = CELT_OK;
     m_celtMode = celt_mode_create(config.sampleRate, config.frameSizeSamples, &error);
@@ -167,10 +166,10 @@ void CeltCodecManager::Destroy()
 
 IVoiceCodec* CeltCodecManager::CreateVoiceCodec()
 {
-    return new CeltVoiceCodec(m_celtMode);
+    return new CeltVoiceCodec(m_celtMode, m_Quality);
 }
 
 int32_t CeltCodecManager::GetSampleRate()
 {
-    return sCeltConfigs[sQuality].sampleRate;
+    return sCeltConfigs[m_Quality].sampleRate;
 }

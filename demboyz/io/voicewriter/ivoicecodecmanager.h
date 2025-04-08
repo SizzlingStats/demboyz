@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 class IVoiceCodec
 {
@@ -20,16 +20,29 @@ public:
     ) = 0;
 };
 
+enum class VoiceCodec : uint8_t
+{
+    Unknown = 0,
+    Steam,
+    Speex,
+    Celt,
+    Celt_High
+};
+
 class IVoiceCodecManager
 {
 public:
     virtual ~IVoiceCodecManager();
 
-    virtual bool Init(uint8_t quality, int32_t sampleRate) = 0;
+    virtual bool Init() = 0;
     virtual void Destroy() = 0;
+
     virtual IVoiceCodec* CreateVoiceCodec() = 0;
     virtual int32_t GetSampleRate() = 0;
 
 public:
-    static IVoiceCodecManager* Create(const char* codec);
+    static IVoiceCodecManager* Create(
+        VoiceCodec codec,
+        const uint8_t* compressedData,
+        uint32_t compressedBytes);
 };

@@ -104,17 +104,13 @@ public:
     {
     }
 
-    virtual bool Init(uint8_t quality, int32_t sampleRate)
+    virtual bool Init()
     {
         mVAudioDll = LoadLibraryA(GetCodecDll());
         assert(mVAudioDll);
 
         mIVAudioVoiceCodecCreateInterfaceFunc = (CreateInterfaceFn*)GetProcAddress(mVAudioDll, "CreateInterface");
         assert(mIVAudioVoiceCodecCreateInterfaceFunc);
-
-        // Do not trust the sample rate or quality from the packets
-        //mSampleRate = sampleRate;
-        //mQuality = quality;
 
         return true;
     }
@@ -172,7 +168,7 @@ protected:
     virtual const char* GetCodecName() const { return "vaudio_speex"; }
 };
 
-IVoiceCodecManager* CreateVAudioCeltCodecManager()
+IVoiceCodecManager* CreateVAudioCeltCodecManager(bool bHighQuality)
 {
     const int32_t sSamplingRates[] =
     {
@@ -182,9 +178,9 @@ IVoiceCodecManager* CreateVAudioCeltCodecManager()
         { 22050 },  // vaudio_celt
         { 44100 }   // vaudio_celt_high
     };
-    const int sQuality = 3;
+    const int quality = bHighQuality ? 4 : 3;
 
-    return new VAudioCeltCodecManager(sSamplingRates[sQuality], sQuality);
+    return new VAudioCeltCodecManager(sSamplingRates[quality], quality);
 }
 
 IVoiceCodecManager* CreateVAudioSpeexCodecManager()

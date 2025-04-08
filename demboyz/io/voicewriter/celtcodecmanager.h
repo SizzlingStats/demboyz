@@ -2,4 +2,4 @@
 #pragma once
 
 class IVoiceCodecManager;
-IVoiceCodecManager* CreateCeltCodecManager();
+IVoiceCodecManager* CreateCeltCodecManager(bool bHighQuality);

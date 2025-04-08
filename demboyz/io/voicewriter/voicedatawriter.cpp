@@ -36,19 +36,14 @@ private:
         IVoiceCodec* voiceDecoder = nullptr;
 
         WaveFileWriter wavWriter;
-        int32_t lastVoiceDataTick = -1;
     };
 
 private:
     IVoiceCodecManager* mVoiceCodecManager;
     PlayerVoiceState m_playerVoiceStates[MAX_PLAYERS];
 
-    int32_t m_curTick;
     const char* m_outputPath;
-
-    // If true, override to use steam voice
-    // when given a valid SVC_VoiceInit quality value.
-    bool m_bSVUseSteamVoice;
+    VoiceCodec m_voiceInitCodec;
 
     int16_t m_decodeBuffer[22528];
 };
@@ -61,23 +56,13 @@ IDemoWriter* IDemoWriter::CreateVoiceDataWriter(const char* outputPath)
 VoiceDataWriter::VoiceDataWriter(const char* outputPath):
     mVoiceCodecManager(nullptr),
     m_playerVoiceStates(),
-    m_curTick(0),
     m_outputPath(outputPath),
-    m_bSVUseSteamVoice(false)
+    m_voiceInitCodec(VoiceCodec::Unknown)
 {
 }
 
 void VoiceDataWriter::StartWriting(demoheader_t& header)
 {
-    // Steam voice codec and cvar sv_use_steam_voice released during network protocol 15.
-    // We can't trust the SVC_VoiceInit codec on this protocol because we
-    // don't know if the demo was recorded before or after the steam voice update.
-    if (header.networkprotocol >= 16)
-    {
-        // sv_use_steam_voice defaulted to true on release and
-        // we can guarantee that value on network protocol 16 or later.
-        m_bSVUseSteamVoice = true;
-    }
 }
 
 void VoiceDataWriter::EndWriting()
@@ -92,98 +77,91 @@ void VoiceDataWriter::EndWriting()
         }
 
         state.wavWriter.Close();
-        state.lastVoiceDataTick = -1;
     }
 
-    mVoiceCodecManager->Destroy();
-    delete mVoiceCodecManager;
-    mVoiceCodecManager = nullptr;
+    if (mVoiceCodecManager)
+    {
+        mVoiceCodecManager->Destroy();
+        delete mVoiceCodecManager;
+        mVoiceCodecManager = nullptr;
+    }
 }
 
 void VoiceDataWriter::StartCommandPacket(const CommandPacket& packet)
 {
-    m_curTick = packet.tick;
 }
 
 void VoiceDataWriter::EndCommandPacket(const PacketTrailingBits& trailingBits)
 {
 }
 
+static VoiceCodec CodecFromString(const char* codec)
+{
+    if (!strcmp(codec, "steam"))
+    {
+        return VoiceCodec::Steam;
+    }
+    else if (!strcmp(codec, "vaudio_speex"))
+    {
+        return VoiceCodec::Speex;
+    }
+    else if (!strcmp(codec, "vaudio_celt"))
+    {
+        return VoiceCodec::Celt;
+    }
+    else if (!strcmp(codec, "vaudio_celt_high"))
+    {
+        return VoiceCodec::Celt_High;
+    }
+    return VoiceCodec::Unknown;
+}
+
 void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& context)
 {
-    if (packet.type == NetMsg::net_SetConVar)
+    if (packet.type == NetMsg::svc_VoiceInit)
     {
-        NetMsg::Net_SetConVar* setConvar = static_cast<NetMsg::Net_SetConVar*>(packet.data);
-        for (const NetMsg::Net_SetConVar::cvar_t& cvar : setConvar->cvars)
-        {
-            if (!strcmp(cvar.name, "sv_use_steam_voice") && !strcmp(cvar.value, "0"))
-            {
-                m_bSVUseSteamVoice = false;
-            }
-        }
-    }
-    else if (packet.type == NetMsg::svc_VoiceInit)
-    {
-        assert(!mVoiceCodecManager);
-
         NetMsg::SVC_VoiceInit* voiceInit = static_cast<NetMsg::SVC_VoiceInit*>(packet.data);
-
-        const char* codec = voiceInit->voiceCodec;
-        int32_t sampleRate = voiceInit->sampleRate;
-        if (voiceInit->quality != NetMsg::SVC_VoiceInit::QUALITY_HAS_SAMPLE_RATE)
-        {
-            if (m_bSVUseSteamVoice)
-            {
-                codec = "steam";
-                sampleRate = 0;
-            }
-            else if (!strcmp(codec, "vaudio_celt"))
-            {
-                sampleRate = 22050;
-            }
-            else
-            {
-                sampleRate = 11025;
-            }
-        }
-
-        mVoiceCodecManager = IVoiceCodecManager::Create(codec);
-        assert(mVoiceCodecManager);
-
-        bool result = mVoiceCodecManager->Init(voiceInit->quality, sampleRate);
-        assert(result);
+        m_voiceInitCodec = CodecFromString(voiceInit->voiceCodec);
     }
     else if(packet.type == NetMsg::svc_VoiceData)
     {
         NetMsg::SVC_VoiceData* voiceData = static_cast<NetMsg::SVC_VoiceData*>(packet.data);
         assert(voiceData->fromClientIndex < MAX_PLAYERS);
 
-        if (voiceData->dataLengthInBits > 0)
+        if (voiceData->dataLengthInBits == 0)
         {
-            PlayerVoiceState& state = m_playerVoiceStates[voiceData->fromClientIndex];
-            if (!state.voiceDecoder)
+            return;
+        }
+
+        assert((voiceData->dataLengthInBits % 8) == 0);
+        const int numCompressedBytes = voiceData->dataLengthInBits / 8;
+        const uint8_t* compressedData = voiceData->data.get();
+
+        PlayerVoiceState& state = m_playerVoiceStates[voiceData->fromClientIndex];
+        if (!state.voiceDecoder)
+        {
+            if (!mVoiceCodecManager)
             {
-                state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
-                state.voiceDecoder->Init();
+                mVoiceCodecManager = IVoiceCodecManager::Create(m_voiceInitCodec, compressedData, numCompressedBytes);
+                assert(mVoiceCodecManager);
 
-                int sampleRate = mVoiceCodecManager->GetSampleRate();
-
-                // Init output file
-                std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
-                state.wavWriter.Init(name.c_str(), sampleRate);
-                assert(state.lastVoiceDataTick == -1);
-                state.lastVoiceDataTick = m_curTick;
+                const bool result = mVoiceCodecManager->Init();
+                assert(result);
             }
 
-            assert((voiceData->dataLengthInBits % 8) == 0);
-            const int numBytes = voiceData->dataLengthInBits / 8;
+            state.voiceDecoder = mVoiceCodecManager->CreateVoiceCodec();
+            state.voiceDecoder->Init();
 
-            const int numBytesWritten = state.voiceDecoder->Decompress(voiceData->data.get(), numBytes, (uint8_t*)m_decodeBuffer, sizeof(m_decodeBuffer));
-            const int numDecompressedSamples = numBytesWritten / sizeof(int16_t);
+            int sampleRate = mVoiceCodecManager->GetSampleRate();
 
-            state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
-
-            state.lastVoiceDataTick = m_curTick;
+            // Init output file
+            std::string name = std::string(m_outputPath) + "/client_" + std::to_string((uint32_t)voiceData->fromClientIndex) + ".wav";
+            state.wavWriter.Init(name.c_str(), sampleRate);
         }
+
+        const uint32_t numBytesWritten = state.voiceDecoder->Decompress(compressedData, numCompressedBytes, (uint8_t*)m_decodeBuffer, sizeof(m_decodeBuffer));
+        const uint32_t numDecompressedSamples = numBytesWritten / sizeof(int16_t);
+
+        state.wavWriter.WriteSamples(m_decodeBuffer, numDecompressedSamples);
     }
 }

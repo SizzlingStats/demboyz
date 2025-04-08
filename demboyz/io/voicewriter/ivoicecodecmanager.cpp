@@ -4,6 +4,8 @@
 #include "celtcodecmanager.h"
 #include "vaudiocodecmanager.h"
 
+#include <cstdio>
+
 #define USE_VAUDIO_CELT 0 && _WIN32
 #define USE_VAUDIO_SPEEX 1 && _WIN32
 
@@ -24,8 +26,13 @@ IVoiceCodecManager* IVoiceCodecManager::Create(
 	{
 		if (IsValidSteamVoicePacket(compressedData, compressedBytes))
 		{
+			printf("VoiceWriter: overriding codec %i as Steam Voice.\n", codec);
 			codec = VoiceCodec::Steam;
 		}
+	}
+	else
+	{
+		printf("VoiceWriter: codec %i.\n", codec);
 	}
 
 	if (codec == VoiceCodec::Steam)

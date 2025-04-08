@@ -122,6 +122,8 @@ void VoiceDataWriter::WriteNetPacket(NetPacket& packet, SourceGameContext& conte
     {
         NetMsg::SVC_VoiceInit* voiceInit = static_cast<NetMsg::SVC_VoiceInit*>(packet.data);
         m_voiceInitCodec = CodecFromString(voiceInit->voiceCodec);
+
+        printf("VoiceWriter: SV_VoiceInit %s\n", voiceInit->voiceCodec);
     }
     else if(packet.type == NetMsg::svc_VoiceData)
     {

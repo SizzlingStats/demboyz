@@ -18,43 +18,43 @@ IVoiceCodecManager::~IVoiceCodecManager()
 }
 
 IVoiceCodecManager* IVoiceCodecManager::Create(
-	VoiceCodec codec,
-	const uint8_t* compressedData,
-	uint32_t compressedBytes)
+    VoiceCodec codec,
+    const uint8_t* compressedData,
+    uint32_t compressedBytes)
 {
-	if (codec != VoiceCodec::Steam)
-	{
-		if (IsValidSteamVoicePacket(compressedData, compressedBytes))
-		{
-			printf("VoiceWriter: overriding codec %i as Steam Voice.\n", codec);
-			codec = VoiceCodec::Steam;
-		}
-	}
-	else
-	{
-		printf("VoiceWriter: codec %i.\n", codec);
-	}
+    if (codec != VoiceCodec::Steam)
+    {
+        if (IsValidSteamVoicePacket(compressedData, compressedBytes))
+        {
+            printf("VoiceWriter: overriding codec %i as Steam Voice.\n", codec);
+            codec = VoiceCodec::Steam;
+        }
+    }
+    else
+    {
+        printf("VoiceWriter: codec %i.\n", codec);
+    }
 
-	if (codec == VoiceCodec::Steam)
-	{
-		return CreateSteamCodecManager();
-	}
-	else if (codec == VoiceCodec::Speex)
-	{
+    if (codec == VoiceCodec::Steam)
+    {
+        return CreateSteamCodecManager();
+    }
+    else if (codec == VoiceCodec::Speex)
+    {
 #if USE_VAUDIO_SPEEX
-		return CreateVAudioSpeexCodecManager();
+        return CreateVAudioSpeexCodecManager();
 #else
-		return nullptr;// CreateSpeexCodecManager();
+        return CreateSpeexCodecManager();
 #endif
-	}
-	else if (codec == VoiceCodec::Celt || codec == VoiceCodec::Celt_High)
-	{
-		const bool bHighQuality = (codec == VoiceCodec::Celt_High);
+    }
+    else if (codec == VoiceCodec::Celt || codec == VoiceCodec::Celt_High)
+    {
+        const bool bHighQuality = (codec == VoiceCodec::Celt_High);
 #if USE_VAUDIO_CELT
-		return CreateVAudioCeltCodecManager(bHighQuality);
+        return CreateVAudioCeltCodecManager(bHighQuality);
 #else
-		return CreateCeltCodecManager(bHighQuality);
+        return CreateCeltCodecManager(bHighQuality);
 #endif
-	}
-	return nullptr;
+    }
+    return nullptr;
 }

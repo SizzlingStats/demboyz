@@ -3,11 +3,12 @@
 #include "steamvoicecodecmanager.h"
 #include "celtcodecmanager.h"
 #include "vaudiocodecmanager.h"
+#include "speexcodecmanager.h"
 
 #include <cstdio>
 
 #define USE_VAUDIO_CELT 0 && _WIN32
-#define USE_VAUDIO_SPEEX 1 && _WIN32
+#define USE_VAUDIO_SPEEX 0 && _WIN32
 
 IVoiceCodec::~IVoiceCodec()
 {

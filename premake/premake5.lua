@@ -57,13 +57,15 @@ solution "demboyz"
             "../external/rapidjson-1.0.2/include",
             "../external/snappy-1.1.3/include",
             "../external/celt-e18de77/include",
+            "../external/speex-Speex-1.2.1/include",
             "../demboyz"
         }
         links
         {
             "json_checker",
             "sourcesdk",
-            "celt"
+            "celt",
+            "speex"
         }
         configuration "x64"
             dofile "steamworks.lua"
@@ -78,3 +80,4 @@ solution "demboyz"
     dofile "snappy.lua"
     dofile "sourcesdk.lua"
     dofile "celt.lua"
+    dofile "speex.lua"

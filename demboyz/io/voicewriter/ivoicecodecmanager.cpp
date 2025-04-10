@@ -27,13 +27,13 @@ IVoiceCodecManager* IVoiceCodecManager::Create(
     {
         if (IsValidSteamVoicePacket(compressedData, compressedBytes))
         {
-            printf("VoiceWriter: overriding codec %i as Steam Voice.\n", codec);
+            printf("VoiceWriter: overriding codec %i as Steam Voice.\n", static_cast<int>(codec));
             codec = VoiceCodec::Steam;
         }
     }
     else
     {
-        printf("VoiceWriter: codec %i.\n", codec);
+        printf("VoiceWriter: codec %i.\n", static_cast<int>(codec));
     }
 
     if (codec == VoiceCodec::Steam)

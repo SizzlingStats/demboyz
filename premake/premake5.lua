@@ -30,7 +30,14 @@ solution "demboyz"
     platforms { "x64", "x32" }
     flags { "MultiProcessorCompile", "Symbols" }
 
-    defines { "_CRT_SECURE_NO_WARNINGS", "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING" }
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS",
+        "_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING",
+        "RAPIDJSON_HAS_CXX11_RVALUE_REFS=1",
+        "RAPIDJSON_HAS_CXX11_NOEXCEPT=1",
+        "RAPIDJSON_HAS_CXX11_TYPETRAITS=1"
+    }
     configuration "Debug"
         defines { "DEBUG" }
     configuration "Release"

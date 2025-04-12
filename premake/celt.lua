@@ -9,12 +9,16 @@ group "external"
 
         -- disable sse and sse2 for valve binary compat.
         -- the osx build of vaudio_celt uses sse2
-        configuration "windows"
+        configuration { "windows", "x32" }
             buildoptions "/arch:IA32"
         configuration "linux"
             buildoptions "-mfpmath=387"
         configuration "macosx"
             buildoptions { "-mfpmath=sse", "-msse2" }
+        configuration {}
+
+        configuration "gmake"
+            buildoptions { "-Wno-shift-op-parentheses" }
         configuration {}
 
         defines

@@ -405,7 +405,9 @@ failure:
 void celt_mode_destroy(CELTMode *mode)
 {
 #ifdef CUSTOM_MODES
+#ifndef CUSTOM_MODES_ONLY
    int i;
+#endif /* CUSTOM_MODES_ONLY */
    if (mode == NULL)
       return;
 #ifndef CUSTOM_MODES_ONLY

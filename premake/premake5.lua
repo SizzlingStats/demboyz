@@ -42,7 +42,7 @@ solution "demboyz"
         kind "ConsoleApp"
         language "C++"
         configuration "gmake"
-            buildoptions { "-std=c++17" }
+            buildoptions { "-std=c++17", "-Wno-deprecated-declarations" }
         configuration {}
         files
         {
